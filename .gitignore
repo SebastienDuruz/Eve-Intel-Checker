@@ -396,5 +396,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-EveIntelChecker/appsettings.json
-EveIntelChecker/appsettings.json
+*.appsettings.json
+appsettings.json
