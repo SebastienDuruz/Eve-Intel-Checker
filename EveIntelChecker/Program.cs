@@ -1,9 +1,12 @@
 using ElectronNET.API;
 using ElectronNET.API.Entities;
+using EveIntelChecker.Data;
 using EveIntelChecker.ElectronApp;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,7 @@ try
     builder.Services.AddServerSideBlazor();
     builder.Services.AddMudServices();
     builder.Services.AddElectron();
+    builder.Services.AddSingleton<EVE_API>();
 
     builder.WebHost.UseElectron(args);
 

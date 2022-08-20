@@ -5,11 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="h5.ElectronNET.API" Version="20.0.3.31598" />
+    <PackageReference Include="ElectronNET.API" Version="13.5.1" />
+    <PackageReference Include="ESI.NET" Version="2021.12.12" />
     <PackageReference Include="MudBlazor" Version="6.0.14" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="electron.manifest.json">
