@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 *.appsettings.json
 appsettings.json
+EveIntelChecker/eve-static-data.sqlite

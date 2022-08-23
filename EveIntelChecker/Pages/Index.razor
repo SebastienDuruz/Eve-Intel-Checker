@@ -1,5 +1,25 @@
 ﻿@page "/"
+@using ESI.NET
+@using ESI.NET.Logic
+@using EveIntelChecker.Data
+@using EveIntelChecker.Models
+@using Microsoft.AspNetCore.WebUtilities
 
-<PageTitle>Index</PageTitle>
+@inject NavigationManager NavManager
+@inject EveStaticDatabase EveStaticDb
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
+<PageTitle>IntelChecker</PageTitle>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+</MudContainer>
+
+@code{
+    private MapSolarSystem _selectedSystem;
+
+    private async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return new List<MapSolarSystem>();
+        return EveStaticDb.SolarSystems.Where(x => x.SolarSystemName.Contains(value, StringComparison.InvariantCultureIgnoreCase) || x.SolarSystemID.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+    }
+}

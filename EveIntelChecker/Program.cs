@@ -1,5 +1,7 @@
 using ElectronNET.API;
 using ElectronNET.API.Entities;
+using ESI.NET;
+using ESI.NET.Models.Corporation;
 using EveIntelChecker.Data;
 using EveIntelChecker.ElectronApp;
 using Microsoft.AspNetCore.Components;
@@ -10,40 +12,35 @@ using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-try
+// Add services to the container.
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddMudServices();
+builder.Services.AddElectron();
+//builder.Services.AddSingleton<EVE_API>();
+builder.Services.AddSingleton<EveStaticDatabase>();
+
+builder.WebHost.UseElectron(args);
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-    // Add services to the container.
-    builder.Services.AddRazorPages();
-    builder.Services.AddServerSideBlazor();
-    builder.Services.AddMudServices();
-    builder.Services.AddElectron();
-    builder.Services.AddSingleton<EVE_API>();
-
-    builder.WebHost.UseElectron(args);
-
-    var app = builder.Build();
-
-    // Configure the HTTP request pipeline.
-    if (!app.Environment.IsDevelopment())
-    {
-        app.UseExceptionHandler("/Error");
-        app.UseHsts();
-    }
-
-    app.UseHttpsRedirection();
-    app.UseStaticFiles();
-    app.UseRouting();
-    app.MapBlazorHub();
-    app.MapFallbackToPage("/_Host");
-
-    if (HybridSupport.IsElectronActive)
-    {
-        await ElectronHandler.CreateElectronWindow();
-    }
-
-    app.Run();
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
-catch(Exception ex)
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+
+if (HybridSupport.IsElectronActive)
 {
-
+    await ElectronHandler.CreateElectronWindow();
 }
+
+app.Run();
+
