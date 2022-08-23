@@ -1,6 +1,7 @@
 ﻿/// Author : Sébastien Duruz
 /// Date : 23.08.2022
 
+using EveIntelChecker.Models;
 using EveIntelChecker.Models.Database;
 using Microsoft.Data.Sqlite;
 using System.Data;
@@ -168,6 +169,48 @@ namespace EveIntelChecker.Data
             }
 
             return constellations;
+        }
+
+        public async Task<List<IntelSystem>> BuildSystemsList(MapSolarSystem root)
+        {
+            List<IntelSystem> intelSystems = new List<IntelSystem>();
+            intelSystems.Add(ConvertMapSytemToIntelSystem(root));
+
+            for(int i = 0; i < 2; ++i)
+            {
+                foreach(IntelSystem system in intelSystems)
+                {
+                    foreach(long id in system.ConnectedSytemsId)
+                    {
+                        if(!intelSystems.Exists(x => x.SystemId == id))
+                        {
+                            IntelSystem current = ConvertMapSytemToIntelSystem(SolarSystems.Where(x => x.SolarSystemID == id).First());
+                            current.Jumps = i + 1;
+                            intelSystems.Add(current);
+                        }
+                    }
+                }
+            }
+
+            return intelSystems;
+        }
+
+        private IntelSystem ConvertMapSytemToIntelSystem(MapSolarSystem system)
+        {
+            IntelSystem intelSystem = new IntelSystem();
+            intelSystem.SystemId = system.SolarSystemID;
+            intelSystem.SystemName = system.SolarSystemName;
+            intelSystem.SystemDomainId = system.RegionID;
+            intelSystem.SystemConstellationId = system.ConstellationID;
+            intelSystem.SystemDomainName = Regions.Where(x => x.RegionID == system.RegionID).First().RegionName;
+            intelSystem.SystemConstellationName = Constellations.Where(x => x.ConstellationID == system.ConstellationID).First().ConstallationName;
+
+            foreach(MapSolarSystemJump connection in SolarSystemJumps.Where(x => x.FromSolarSystemID == intelSystem.SystemId))
+            {
+                intelSystem.ConnectedSytemsId.Add(connection.ToSolarSystemID);
+            }
+
+            return intelSystem;
         }
     }
 }

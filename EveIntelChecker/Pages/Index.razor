@@ -48,18 +48,7 @@
     {
         this._intelSystems = new List<IntelSystem>();
 
-        IntelSystem startPoint = new IntelSystem()
-        {
-            Jumps = 0,
-            SystemName = _selectedSystem.SolarSystemName
-        };
-
-        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
-        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
-        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
-        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
-
-        StateHasChanged();
+        _intelSystems = await EveStaticDb.BuildSystemsList(_selectedSystem);
     }
 
 
