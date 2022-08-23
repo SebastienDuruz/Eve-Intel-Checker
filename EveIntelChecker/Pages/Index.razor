@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using EveIntelChecker.Models.Database
 @using ESI.NET
 @using ESI.NET.Logic
 @using EveIntelChecker.Data
@@ -10,11 +11,31 @@
 
 <PageTitle>IntelChecker</PageTitle>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge">
-    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+</MudContainer>
+<MudContainer>
+    @if(_intelSystems.Count() == 0)
+    {
+        <MudText>Select a system</MudText>
+    }
+    else
+    {
+        <MudStack AlignItems="AlignItems.Center" Spacing="0">
+            @foreach(IntelSystem system in _intelSystems)
+            {
+                <MudPaper Outlined="true" Style="width: 100%;" Class="d-flex flex-grow-1 gap-4">
+                    <MudPaper Class="flex-auto" Width="10%">@system.Jumps</MudPaper>
+                    <MudPaper Class="flex-auto" Width="80%">@system.SystemName</MudPaper>
+                    <MudPaper Class="flex-auto" Width="10%">@system.TriggerCounter</MudPaper>
+                </MudPaper>
+            }
+        </MudStack>
+    }
 </MudContainer>
 
 @code{
     private MapSolarSystem _selectedSystem;
+    private List<IntelSystem> _intelSystems = new List<IntelSystem>();
 
     private async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value)
     {
@@ -22,4 +43,24 @@
             return new List<MapSolarSystem>();
         return EveStaticDb.SolarSystems.Where(x => x.SolarSystemName.Contains(value, StringComparison.InvariantCultureIgnoreCase) || x.SolarSystemID.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
     }
+
+    private async Task BuildSystemsList()
+    {
+        this._intelSystems = new List<IntelSystem>();
+
+        IntelSystem startPoint = new IntelSystem()
+        {
+            Jumps = 0,
+            SystemName = _selectedSystem.SolarSystemName
+        };
+
+        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
+        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
+        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
+        this._intelSystems.Add(new IntelSystem() { SystemId = _selectedSystem.SolarSystemID, SystemName = _selectedSystem.SolarSystemName });
+
+        StateHasChanged();
+    }
+
+
 }

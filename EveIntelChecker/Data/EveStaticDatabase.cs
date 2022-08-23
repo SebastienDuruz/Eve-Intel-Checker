@@ -1,7 +1,7 @@
 ﻿/// Author : Sébastien Duruz
 /// Date : 23.08.2022
 
-using EveIntelChecker.Models;
+using EveIntelChecker.Models.Database;
 using Microsoft.Data.Sqlite;
 using System.Data;
 
