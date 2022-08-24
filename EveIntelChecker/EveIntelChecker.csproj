@@ -5,8 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ElectronNET.API" Version="13.5.1" />
     <PackageReference Include="ESI.NET" Version="2021.12.12" />
+    <PackageReference Include="h5.ElectronNET.API" Version="20.0.3.31598" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.8" />
     <PackageReference Include="MudBlazor" Version="6.0.14" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />

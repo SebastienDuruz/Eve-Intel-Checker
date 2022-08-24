@@ -30,9 +30,6 @@
         "filter": [ "**/*" ]
       },
       "**/*"
-    ],
-    "extraFiles": [
-      "eve-static-data.sqlite"
     ]
   }
 }
