@@ -11,7 +11,7 @@
 
 <PageTitle>IntelChecker</PageTitle>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge">
-    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+    <MudAutocomplete @ref="@Ref" T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
 </MudContainer>
 <MudContainer>
     @if(_intelSystems.Count() == 0)
@@ -34,6 +34,9 @@
 </MudContainer>
 
 @code{
+    
+    public MudAutocomplete<T> Ref { get; set; }
+
     private MapSolarSystem _selectedSystem;
     private List<IntelSystem> _intelSystems = new List<IntelSystem>();
 
