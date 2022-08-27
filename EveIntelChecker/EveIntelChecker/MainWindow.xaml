@@ -1,0 +1,20 @@
+﻿<Window x:Class="EveIntelChecker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
+        xmlns:local="clr-namespace:EveIntelChecker"
+        mc:Ignorable="d"
+        ResizeMode="CanResize"
+        MinWidth="250"
+        MaxWidth="250"
+        Title="Eve Intel Checker" Height="450" Width="250">
+    <Grid>
+        <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">
+            <blazor:BlazorWebView.RootComponents>
+                <blazor:RootComponent Selector="#app" ComponentType="{x:Type local:Index}" />
+            </blazor:BlazorWebView.RootComponents>
+        </blazor:BlazorWebView>
+    </Grid>
+</Window>

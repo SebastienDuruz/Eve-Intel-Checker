@@ -1,0 +1,56 @@
+﻿<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@page "/"
+@using EveIntelChecker.Models.Database
+@using EveIntelChecker.Data
+@using EveIntelChecker.Models
+
+@inject EveStaticDatabase EveStaticDb
+
+<PageTitle>IntelChecker</PageTitle>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+</MudContainer>
+<MudContainer>
+    @if (_intelSystems.Count() == 0)
+    {
+        <MudText>Select a system</MudText>
+    }
+    else
+    {
+        <MudStack Spacing="0">
+            @foreach (IntelSystem system in _intelSystems)
+            {
+                <MudPaper Outlined="true" Style="width: 100%;" Class="d-flex flex-grow-1 gap-1">
+                    <MudPaper Class="flex-auto" Width="10%">@system.Jumps</MudPaper>
+                    <MudPaper Class="flex-auto" Width="80%">@system.SystemName</MudPaper>
+                    <MudPaper Class="flex-auto" Width="10%">@system.TriggerCounter</MudPaper>
+                </MudPaper>
+            }
+        </MudStack>
+    }
+</MudContainer>
+
+@code {
+    private MapSolarSystem _selectedSystem;
+    private List<IntelSystem> _intelSystems = new List<IntelSystem>();
+
+    private async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return new List<MapSolarSystem>();
+        return EveStaticDb.SolarSystems.Where(x => x.SolarSystemName.Contains(value, StringComparison.InvariantCultureIgnoreCase) || x.SolarSystemID.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+    }
+
+    private void BuildSystemsList()
+    {
+        this._intelSystems = new List<IntelSystem>();
+
+        _intelSystems = EveStaticDb.BuildSystemsList(_selectedSystem);
+    }
+
+
+}
+
