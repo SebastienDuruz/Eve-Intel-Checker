@@ -75,8 +75,7 @@ namespace EveIntelChecker.Data
             List<MapSolarSystem> solarSystems = new List<MapSolarSystem>();
             string query = @"SELECT regionID, constellationID, solarSystemID, solarSystemName FROM mapSolarSystems";
 
-            solarSystems = SqliteConnection.Query<MapSolarSystem>(query);
-            return solarSystems;
+            return SqliteConnection.Query<MapSolarSystem>(query);
         }
 
         /// <summary>
@@ -88,8 +87,7 @@ namespace EveIntelChecker.Data
             List<MapSolarSystemJump> solarSystemJumps = new List<MapSolarSystemJump>();
             string query = @"SELECT fromSolarSystemID, toSolarSystemID FROM mapSolarSystemJumps";
 
-            solarSystemJumps = SqliteConnection.Query<MapSolarSystemJump>(query);
-            return solarSystemJumps;
+            return SqliteConnection.Query<MapSolarSystemJump>(query);
         }
 
         /// <summary>
@@ -101,8 +99,7 @@ namespace EveIntelChecker.Data
             List<MapRegion> regions = new List<MapRegion>();
             string query = @"SELECT regionID, regionName FROM mapRegions";
 
-            regions = SqliteConnection.Query<MapRegion>(query);
-            return regions;
+            return SqliteConnection.Query<MapRegion>(query);
         }
 
         /// <summary>
@@ -114,8 +111,7 @@ namespace EveIntelChecker.Data
             List<MapConstellation> constellations = new List<MapConstellation>();
             string query = @"SELECT regionID, constellationID, constellationName FROM mapConstellations";
 
-            constellations = SqliteConnection.Query<MapConstellation>(query);
-            return constellations;
+            return SqliteConnection.Query<MapConstellation>(query);
         }
 
         public List<IntelSystem> BuildSystemsList(MapSolarSystem root)
@@ -123,7 +119,7 @@ namespace EveIntelChecker.Data
             List<IntelSystem> intelSystems = new List<IntelSystem>();
             intelSystems.Add(ConvertMapSytemToIntelSystem(root));
 
-            for (int i = 0; i < 2; ++i)
+            for (int i = 0; i < 5; ++i)
             {
                 foreach (IntelSystem system in intelSystems.ToList())
                 {

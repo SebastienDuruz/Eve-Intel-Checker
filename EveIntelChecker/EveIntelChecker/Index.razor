@@ -6,36 +6,78 @@
 @using EveIntelChecker.Models.Database
 @using EveIntelChecker.Data
 @using EveIntelChecker.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
 
 @inject EveStaticDatabase EveStaticDb
 
 <PageTitle>IntelChecker</PageTitle>
-<MudContainer MaxWidth="MaxWidth.ExtraLarge">
-    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="d-flex flex">
+    <InputFile id="fileInput" OnChange="SelectFile" hidden multiple accept=".txt"/>
+    <MudFab HtmlTag="label" Color="@_fileIconColor" Icon="@Icons.Filled.ChatBubble" Size="Size.Small" for="fileInput" id="fileIcon"></MudFab>
+    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Variant="Variant.Text"/>
 </MudContainer>
-<MudContainer>
-    @if (_intelSystems.Count() == 0)
-    {
-        <MudText>Select a system</MudText>
-    }
-    else
-    {
-        <MudStack Spacing="0">
-            @foreach (IntelSystem system in _intelSystems)
-            {
-                <MudPaper Outlined="true" Style="width: 100%;" Class="d-flex flex-grow-1 gap-1">
-                    <MudPaper Class="flex-auto" Width="10%">@system.Jumps</MudPaper>
-                    <MudPaper Class="flex-auto" Width="80%">@system.SystemName</MudPaper>
-                    <MudPaper Class="flex-auto" Width="10%">@system.TriggerCounter</MudPaper>
-                </MudPaper>
-            }
-        </MudStack>
-    }
-</MudContainer>
+@if (_intelSystems.Count() == 0)
+{
+    <MudText>Select a system</MudText>
+}
+else
+{
+    <MudStack Spacing="0">
+        @foreach (IntelSystem system in _intelSystems)
+        {
+            <MudPaper Elevation="0" Style="width: 100%;" Class="d-flex gap-8">
+                <MudPaper Elevation="0" Class="flex-auto" Width="10%">@system.Jumps</MudPaper>
+                <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Class=" d-flex">
+                    <ActivatorContent>
+                        <MudPaper Elevation="0" Class="flex-grow-1" Width="85%">@system.SystemName</MudPaper>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
+                        <MudMenuItem Href="@($"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}")">Dotlan</MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+                <MudPaper Elevation="0" Width="5%">@system.TriggerCounter</MudPaper>
+            </MudPaper>
+        }
+    </MudStack>
+}
 
 @code {
+    private System.Threading.Timer? _readFileTimer;
     private MapSolarSystem _selectedSystem;
     private List<IntelSystem> _intelSystems = new List<IntelSystem>();
+    private string _logFilePath = "";
+    private string _lastLogFileLine = "";
+    private IBrowserFile _logFile = null;
+    private Color _fileIconColor = Color.Error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _readFileTimer = new System.Threading.Timer(async (object? stateInfo) =>
+        {
+            await ReadLogFile();
+        }, new System.Threading.AutoResetEvent(false), 1000, 1000);
+    }
+
+    private void SelectFile(InputFileChangeEventArgs e)
+    {
+        // Only the last selected file will be used
+        foreach (var file in e.GetMultipleFiles())
+            _logFile = file;
+
+        if (_logFile != null && _logFile.ContentType == "text/plain")
+        {
+            _fileIconColor = Color.Success;
+            _logFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\{_logFile.Name}";
+        }
+        else
+        {
+            _fileIconColor = Color.Error;
+            _logFile = null;
+            _logFilePath = "";
+        }
+    }
 
     private async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value)
     {
@@ -46,11 +88,31 @@
 
     private void BuildSystemsList()
     {
-        this._intelSystems = new List<IntelSystem>();
-
-        _intelSystems = EveStaticDb.BuildSystemsList(_selectedSystem);
+        this._intelSystems = EveStaticDb.BuildSystemsList(_selectedSystem);
     }
 
+    private async Task ReadLogFile()
+    {
+        // User has selected the required 
+        if(_logFile != null && _intelSystems.Count > 0)
+            if(File.Exists(_logFilePath))
+            {
+                string[] lines = await File.ReadAllLinesAsync(_logFilePath);
+                if(lines != null)
+                    if(lines[lines.Count() - 1] != _lastLogFileLine)
+                    {
+                        _lastLogFileLine = lines[lines.Count() - 1];
+                        await CheckSystemProximity();
+                        InvokeAsync(() => StateHasChanged());
+                    }
+            }
+    }
 
+    private async Task CheckSystemProximity()
+    {
+        foreach(IntelSystem intelSystem in _intelSystems)
+            if (_lastLogFileLine.Contains(intelSystem.SystemName))
+                ++intelSystem.TriggerCounter;
+    }
 }
 
