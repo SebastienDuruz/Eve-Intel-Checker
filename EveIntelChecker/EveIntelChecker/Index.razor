@@ -12,10 +12,14 @@
 @inject EveStaticDatabase EveStaticDb
 
 <PageTitle>IntelChecker</PageTitle>
-<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="d-flex flex">
-    <InputFile id="fileInput" OnChange="SelectFile" hidden multiple accept=".txt"/>
-    <MudFab HtmlTag="label" Color="@_fileIconColor" Icon="@Icons.Filled.ChatBubble" Size="Size.Small" for="fileInput" id="fileIcon"></MudFab>
-    <MudAutocomplete T="MapSolarSystem" Label="Actual position" @bind-Value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="false" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Variant="Variant.Text"/>
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="d-flex py-2 gap-4">
+    <div>
+        <InputFile id="fileInput" OnChange="SelectFile" hidden multiple accept=".txt" />
+        <MudFab HtmlTag="label" Color="@_fileIconColor" Icon="@Icons.Filled.ChatBubble" Size="Size.Small" for="fileInput" id="fileIcon"></MudFab>
+    </div>
+    <div>
+        <MudAutocomplete T="MapSolarSystem" Label="Actual position" Immediate="true" @bind-value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" AdornmentColor="Color.Primary" Variant="Variant.Outlined" />
+    </div>
 </MudContainer>
 @if (_intelSystems.Count() == 0)
 {
@@ -24,20 +28,35 @@
 else
 {
     <MudStack Spacing="0">
+        <MudPaper Elevation="0" Class="d-flex gap-7" Style="width: 100%;">
+            <MudText Class="flex-auto">Jumps</MudText>
+            <MudText Class="flex-auto">System</MudText>
+            <MudText Class="flex-auto">Triggers</MudText>
+        </MudPaper>
         @foreach (IntelSystem system in _intelSystems)
         {
-            <MudPaper Elevation="0" Style="width: 100%;" Class="d-flex gap-8">
-                <MudPaper Elevation="0" Class="flex-auto" Width="10%">@system.Jumps</MudPaper>
-                <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Class=" d-flex">
+            string classes = _clearClasses;
+            @if(system.IsRed)
+            {
+                classes += _redClasses;
+            }
+            else if(system.TriggerCounter > 0)
+            {
+                classes += _orangeClasses;
+            }
+            
+            <MudPaper Elevation="0" Class="@classes" Style="width: 100%;">
+                <MudText Class="flex-auto" Style="width: 28%;">@system.Jumps</MudText>
+                <MudMenu Class="flex-auto " Style="width: 55%;" Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
                     <ActivatorContent>
-                        <MudPaper Elevation="0" Class="flex-grow-1" Width="85%">@system.SystemName</MudPaper>
+                        <MudText>@system.SystemName</MudText>
                     </ActivatorContent>
                     <ChildContent>
                         <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
                         <MudMenuItem Href="@($"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}")">Dotlan</MudMenuItem>
                     </ChildContent>
                 </MudMenu>
-                <MudPaper Elevation="0" Width="5%">@system.TriggerCounter</MudPaper>
+                <MudText Class="flex-auto" Style="width: 5%;">@system.TriggerCounter</MudText>
             </MudPaper>
         }
     </MudStack>
@@ -48,9 +67,13 @@ else
     private MapSolarSystem _selectedSystem;
     private List<IntelSystem> _intelSystems = new List<IntelSystem>();
     private string _logFilePath = "";
+    private string _copyLogFilePath = "";
     private string _lastLogFileLine = "";
     private IBrowserFile _logFile = null;
     private Color _fileIconColor = Color.Error;
+    private string _redClasses = " mud-error-text";
+    private string _orangeClasses = " mud-secondary-text";
+    private string _clearClasses = "d-flex gap-4";
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,12 +93,14 @@ else
         {
             _fileIconColor = Color.Success;
             _logFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\{_logFile.Name}";
+            _copyLogFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\Copy_{_logFile.Name}";
         }
         else
         {
             _fileIconColor = Color.Error;
             _logFile = null;
             _logFilePath = "";
+            _copyLogFilePath = "";
         }
     }
 
@@ -97,7 +122,10 @@ else
         if(_logFile != null && _intelSystems.Count > 0)
             if(File.Exists(_logFilePath))
             {
-                string[] lines = await File.ReadAllLinesAsync(_logFilePath);
+                if (File.Exists(_copyLogFilePath))
+                    File.Delete(_copyLogFilePath);
+                File.Copy(_logFilePath, _copyLogFilePath);
+                string[] lines = await File.ReadAllLinesAsync(_copyLogFilePath);
                 if(lines != null)
                     if(lines[lines.Count() - 1] != _lastLogFileLine)
                     {

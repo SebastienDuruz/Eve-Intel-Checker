@@ -7,9 +7,9 @@
         xmlns:local="clr-namespace:EveIntelChecker"
         mc:Ignorable="d"
         ResizeMode="CanResize"
-        MinWidth="200"
-        MaxWidth="200"
-        Title="Eve Intel Checker" Height="450" Width="200">
+        MinWidth="250"
+        MaxWidth="250"
+        Title="Eve Intel Checker" Height="450" Width="250">
     <Grid>
         <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">
             <blazor:BlazorWebView.RootComponents>
