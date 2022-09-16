@@ -1,4 +1,4 @@
-﻿<MudThemeProvider />
+﻿<MudThemeProvider IsDarkMode="true" Theme="CustomTheme"/>
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -12,42 +12,34 @@
 @inject EveStaticDatabase EveStaticDb
 
 <PageTitle>IntelChecker</PageTitle>
-<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="d-flex py-2 gap-4">
-    <div>
-        <InputFile id="fileInput" OnChange="SelectFile" hidden multiple accept=".txt" />
-        <MudFab HtmlTag="label" Color="@_fileIconColor" Icon="@Icons.Filled.ChatBubble" Size="Size.Small" for="fileInput" id="fileIcon"></MudFab>
+<div Class="d-flex">
+    <div MaxWidth="MaxWidth.ExtraExtraLarge">
+        <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
+        <MudIconButton HtmlTag="label" Color="@_fileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon"></MudIconButton>
     </div>
     <div>
-        <MudAutocomplete T="MapSolarSystem" Label="Actual position" Immediate="true" @bind-value="_selectedSystem" @onselect="BuildSystemsList" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" AdornmentColor="Color.Primary" Variant="Variant.Outlined" />
+        <MudAutocomplete T="MapSolarSystem" Label="Actual position" Immediate="true" @bind-value="_selectedSystem" @onselect="BuildSystemsList" SelectValueOnTab="true" SelectOnClick="true" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" AdornmentColor="Color.Primary" Variant="Variant.Outlined" />
     </div>
-</MudContainer>
-@if (_intelSystems.Count() == 0)
-{
-    <MudText>Select a system</MudText>
-}
-else
+</div> 
+@if(_intelSystems.Count() > 0)
 {
     <MudStack Spacing="0">
         <MudPaper Elevation="0" Class="d-flex gap-7" Style="width: 100%;">
-            <MudText Class="flex-auto">Jumps</MudText>
-            <MudText Class="flex-auto">System</MudText>
-            <MudText Class="flex-auto">Triggers</MudText>
+            <MudText Class="flex-auto" Style="width: 20%;">Jmp.</MudText>
+            <MudText Class="flex-auto" Style="width: 75%;">System</MudText>
+            <MudText Class="flex-auto" Style="width: 20%;">Tri.</MudText>
         </MudPaper>
         @foreach (IntelSystem system in _intelSystems)
         {
             string classes = _clearClasses;
             @if(system.IsRed)
-            {
                 classes += _redClasses;
-            }
             else if(system.TriggerCounter > 0)
-            {
                 classes += _orangeClasses;
-            }
             
             <MudPaper Elevation="0" Class="@classes" Style="width: 100%;">
-                <MudText Class="flex-auto" Style="width: 28%;">@system.Jumps</MudText>
-                <MudMenu Class="flex-auto " Style="width: 55%;" Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
+                <MudText Class="flex-auto" Style="width: 35%;">@system.Jumps</MudText>
+                <MudMenu Class="flex-auto " Style="width: 70%;" Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
                     <ActivatorContent>
                         <MudText>@system.SystemName</MudText>
                     </ActivatorContent>
@@ -73,7 +65,18 @@ else
     private Color _fileIconColor = Color.Error;
     private string _redClasses = " mud-error-text";
     private string _orangeClasses = " mud-secondary-text";
-    private string _clearClasses = "d-flex gap-4";
+    private string _clearClasses = "d-flex";
+
+    MudTheme CustomTheme = new MudTheme()
+    {
+        Typography = new Typography()
+        {
+            Default = new Default()
+            {
+                    FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }
+            }
+        }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,6 +117,12 @@ else
     private void BuildSystemsList()
     {
         this._intelSystems = EveStaticDb.BuildSystemsList(_selectedSystem);
+    }
+
+    private void KeyboardEventHandler(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter" && _selectedSystem != null)
+            BuildSystemsList();
     }
 
     private async Task ReadLogFile()
