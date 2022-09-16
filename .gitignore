@@ -399,4 +399,4 @@ FodyWeavers.xsd
 *.appsettings.json
 appsettings.json
 EveIntelChecker/eve-static-data.sqlite
-*.db
+
