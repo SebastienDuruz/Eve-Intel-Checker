@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveIntelChecker", "EveIntelChecker\EveIntelChecker.csproj", "{C1CAFCC3-0E03-407B-AEB9-D054AE775828}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EveIntelCheckerSetup", "EveIntelCheckerSetup\EveIntelCheckerSetup.vdproj", "{519B63C7-6061-459E-852F-723171DA004A}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EveIntelCheckerSetup", "EveIntelCheckerSetup\EveIntelCheckerSetup.vdproj", "{4E722D99-B866-4D76-844E-FA4B174DB06D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{C1CAFCC3-0E03-407B-AEB9-D054AE775828}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1CAFCC3-0E03-407B-AEB9-D054AE775828}.Release|x86.ActiveCfg = Release|Any CPU
 		{C1CAFCC3-0E03-407B-AEB9-D054AE775828}.Release|x86.Build.0 = Release|Any CPU
-		{519B63C7-6061-459E-852F-723171DA004A}.Debug|Any CPU.ActiveCfg = Debug
-		{519B63C7-6061-459E-852F-723171DA004A}.Debug|x86.ActiveCfg = Debug
-		{519B63C7-6061-459E-852F-723171DA004A}.Release|Any CPU.ActiveCfg = Release
-		{519B63C7-6061-459E-852F-723171DA004A}.Release|x86.ActiveCfg = Release
+		{4E722D99-B866-4D76-844E-FA4B174DB06D}.Debug|Any CPU.ActiveCfg = Debug
+		{4E722D99-B866-4D76-844E-FA4B174DB06D}.Debug|x86.ActiveCfg = Debug
+		{4E722D99-B866-4D76-844E-FA4B174DB06D}.Release|Any CPU.ActiveCfg = Release
+		{4E722D99-B866-4D76-844E-FA4B174DB06D}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

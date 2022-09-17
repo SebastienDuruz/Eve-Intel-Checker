@@ -3,10 +3,10 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
+	<PublishReadyToRun>true</PublishReadyToRun>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
 	<RootNameSpace>EveIntelChecker</RootNameSpace>
-	<RunAOTCompilation>true</RunAOTCompilation>
   </PropertyGroup>
 
   <ItemGroup>
