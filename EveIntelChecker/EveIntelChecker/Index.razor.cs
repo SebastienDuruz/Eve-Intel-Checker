@@ -79,7 +79,7 @@ namespace EveIntelChecker
         /// <summary>
         /// Classes for IntelSystem displayed as orange
         /// </summary>
-        private string OrangeClasses { get; set; } = " mud-secondary-text";
+        private string OrangeClasses { get; set; } = " mud-warning-text";
 
         /// <summary>
         /// Classes for IntelSystem displayed as clear
@@ -106,6 +106,7 @@ namespace EveIntelChecker
         /// <returns>Result of the task</returns>
         protected override async Task OnInitializedAsync()
         {
+            // Read chat log file each sec
             ReadFileTimer = new System.Threading.Timer(async (object? stateInfo) =>
             {
                 await ReadLogFile();
@@ -190,9 +191,13 @@ namespace EveIntelChecker
             foreach (IntelSystem intelSystem in IntelSystems)
                 if (LastLogFileLine.Contains(intelSystem.SystemName))
                 {
+                    intelSystem.IsRed = true;
                     await PlayNotificationSound();
                     ++intelSystem.TriggerCounter;
                 }
+                else
+                    intelSystem.IsRed = false;
+            await InvokeAsync(() => StateHasChanged());
         }
 
         /// <summary>
