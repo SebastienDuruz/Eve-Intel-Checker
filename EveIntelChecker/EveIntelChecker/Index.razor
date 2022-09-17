@@ -22,7 +22,7 @@
         <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Refresh" Size="Size.Small" OnClick="ResetTriggers" Title="Reset the triggers counter"></MudIconButton>
     </div>
     <div>
-        <MudAutocomplete T="MapSolarSystem" @ref="SolarSystemSelector" Label="Actual position" Immediate="true" @bind-value="SelectedSystem" SelectValueOnTab="true" SelectOnClick="true" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" AdornmentColor="Color.Secondary" CoerceText="true" Variant="Variant.Outlined" />
+        <MudAutocomplete T="MapSolarSystem" @ref="SolarSystemSelector" Label="Actual position" Immediate="true" @bind-value="SelectedSystem" SelectValueOnTab="true" SelectOnClick="true" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" CoerceText="true" Variant="Variant.Outlined" />
     </div>
 </div> 
 @if(IntelSystems.Count() > 0)

@@ -5,7 +5,6 @@
 using EveIntelChecker.Models;
 using EveIntelChecker.Models.Database;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
@@ -60,6 +59,11 @@ namespace EveIntelChecker
         /// LogFile object
         /// </summary>
         private IBrowserFile LogFile { get; set; }
+
+        /// <summary>
+        /// SoundPlayer for alert trigger
+        /// </summary>
+        private SoundPlayer Player { get; set; } = new SoundPlayer("notification.wav");
 
         /// <summary>
         /// Mud componant for selecting the root system
@@ -208,7 +212,10 @@ namespace EveIntelChecker
         {
             if (IntelSystems != null)
                 foreach (IntelSystem system in IntelSystems)
+                {
                     system.TriggerCounter = 0;
+                    system.IsRed = false;
+                }
         }
 
         /// <summary>
@@ -228,8 +235,7 @@ namespace EveIntelChecker
         /// <returns>Result of the Task</returns>
         private async Task PlayNotificationSound()
         {
-            SoundPlayer player = new SoundPlayer("notification.wav");
-            player.Play();
+            Player.Play();
         }
     }
 }
