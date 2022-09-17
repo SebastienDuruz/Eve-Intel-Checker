@@ -56,6 +56,11 @@ namespace EveIntelChecker
         private string LastLogFileLine { get; set; }
 
         /// <summary>
+        /// The last time message has been send to Chat log
+        /// </summary>
+        private string LastLogFileRead { get; set; } = "";
+
+        /// <summary>
         /// LogFile object
         /// </summary>
         private IBrowserFile LogFile { get; set; }
@@ -139,6 +144,8 @@ namespace EveIntelChecker
                 LogFile = null;
                 LogFilePath = "";
                 CopyLogFilePath = "";
+                LastLogFileLine = "";
+                LastLogFileRead = "";
             }
         }
 
@@ -181,7 +188,8 @@ namespace EveIntelChecker
                         {
                             LastLogFileLine = lines[lines.Count() - 1];
                             await CheckSystemProximity();
-                            InvokeAsync(() => StateHasChanged());
+                            await ExtractTimeFromMessage(LastLogFileLine);
+                            await InvokeAsync(() => StateHasChanged());
                         }
                 }
         }
@@ -192,15 +200,24 @@ namespace EveIntelChecker
         /// <returns>Result of the task</returns>
         private async Task CheckSystemProximity()
         {
+            string newRedSystem = "";
+
+            // Check if message contains a system set to be checked
             foreach (IntelSystem intelSystem in IntelSystems)
                 if (LastLogFileLine.Contains(intelSystem.SystemName))
                 {
                     intelSystem.IsRed = true;
                     await PlayNotificationSound();
                     ++intelSystem.TriggerCounter;
+                    newRedSystem = intelSystem.SystemName;
                 }
-                else
-                    intelSystem.IsRed = false;
+
+            // If needed reset the last system set to RED
+            if(newRedSystem != "")
+                foreach(IntelSystem intelSystem in IntelSystems)
+                    if(intelSystem.SystemName != newRedSystem)
+                        intelSystem.IsRed = false;
+
             await InvokeAsync(() => StateHasChanged());
         }
 
@@ -236,6 +253,26 @@ namespace EveIntelChecker
         private async Task PlayNotificationSound()
         {
             Player.Play();
+        }
+
+        /// <summary>
+        /// Extract the time when new Log line has been detected
+        /// </summary>
+        /// <param name="message">The message from where to extract the time</param>
+        /// <returns>Time if on the expected format, empty if not</returns>
+        private async Task ExtractTimeFromMessage(string message)
+        {
+            try
+            {
+                string time = message.Split("[")[1];
+                time = time.Split("]")[0];
+                LastLogFileRead = time.Split(" ")[2];
+                await InvokeAsync(() => StateHasChanged());
+            }
+            catch(Exception)
+            {
+                
+            }
         }
     }
 }

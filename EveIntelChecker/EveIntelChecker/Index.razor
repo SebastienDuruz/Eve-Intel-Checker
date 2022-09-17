@@ -19,6 +19,10 @@
     <div class="d-flex justify-space-between" MaxWidth="MaxWidth.ExtraExtraLarge">
         <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
         <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
+        @if(LastLogFileLine != "")
+        {
+            <MudText Typo="Typo.body2" Color="Color.Success" title="Last time someone send a message to the selected chat">@LastLogFileRead</MudText>
+        }
         <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Refresh" Size="Size.Small" OnClick="ResetTriggers" Title="Reset the triggers counter"></MudIconButton>
     </div>
     <div>
