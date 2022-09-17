@@ -6,11 +6,12 @@
         xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
         xmlns:local="clr-namespace:EveIntelChecker"
         mc:Ignorable="d"
+        WindowStyle="ToolWindow"
         Topmost="True"
         ResizeMode="CanResize"
-        MinWidth="220"
-        MaxWidth="220"
-        Title="Eve Intel Checker" Height="450" Width="220">
+        MinWidth="180"
+        MaxWidth="180"
+        Title="Eve Intel Checker" Height="450" Width="180">
     <Grid>
         <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">
             <blazor:BlazorWebView.RootComponents>

@@ -10,10 +10,14 @@
 
   <ItemGroup>
     <None Remove="eve.db" />
+    <None Remove="notification.wav" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="eve.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="notification.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

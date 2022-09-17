@@ -12,6 +12,9 @@ using System.Linq;
 
 namespace EveIntelChecker.Data
 {
+    /// <summary>
+    /// Class EveStaticDatabase
+    /// </summary>
     public class EveStaticDatabase
     {
         /// <summary>
@@ -114,30 +117,35 @@ namespace EveIntelChecker.Data
             return SqliteConnection.Query<MapConstellation>(query);
         }
 
+        /// <summary>
+        /// Build the list of System to check
+        /// </summary>
+        /// <param name="root">The root system</param>
+        /// <returns>The list with systems to check</returns>
         public List<IntelSystem> BuildSystemsList(MapSolarSystem root)
         {
             List<IntelSystem> intelSystems = new List<IntelSystem>();
             intelSystems.Add(ConvertMapSytemToIntelSystem(root));
 
+            // Depth of 5 jumps by default
             for (int i = 0; i < 5; ++i)
-            {
                 foreach (IntelSystem system in intelSystems.ToList())
-                {
                     foreach (long id in system.ConnectedSytemsId)
-                    {
                         if (!intelSystems.Exists(x => x.SystemId == id))
                         {
                             IntelSystem current = ConvertMapSytemToIntelSystem(SolarSystems.Where(x => x.SolarSystemID == id).First());
                             current.Jumps = i + 1;
                             intelSystems.Add(current);
                         }
-                    }
-                }
-            }
 
             return intelSystems;
         }
 
+        /// <summary>
+        /// Convert DB model to frontend object
+        /// </summary>
+        /// <param name="system">The DB object</param>
+        /// <returns>The converted frontend object</returns>
         private IntelSystem ConvertMapSytemToIntelSystem(MapSolarSystem system)
         {
             IntelSystem intelSystem = new IntelSystem();
