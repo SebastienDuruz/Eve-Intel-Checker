@@ -10,8 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appIcon.ico" />
     <None Remove="eve.db" />
     <None Remove="notification.wav" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="appIcon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
