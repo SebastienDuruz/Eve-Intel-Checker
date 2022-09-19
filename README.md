@@ -53,7 +53,7 @@ Each time irrelevant message is sent :
 
 <img align="center" height="300" src=".\Screenshots\Undetected.png">
 
-#### Other functionalities
+### Other functionalities
 
 You can **left click** on a system to access more functionalities :
 
