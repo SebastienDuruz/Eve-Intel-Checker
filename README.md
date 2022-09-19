@@ -11,31 +11,32 @@ Download the latest release [here](https://github.com/SebastienDuruz/Eve-Intel-C
 
 ## Usage
 
-#### Eve Online Options
+### Eve Online Options
 
 Make sure **Log Chat to File** is activated. If it's not the case, activate the option and restart the Eve client.
 
-<img align="left" height="250" src=".\Screenshots\chatLogOption.png">
+<img align="center" height="250" src=".\Screenshots\ChatLogOption.png">
 
-#### Select the system you're currently in
+### Select the system you're currently in
+
 
 Use the autocomplete form to select the system. Press **Enter** to validate selection.
 
-<img align="left" height="300" src=".\Screenshots\selectSystem.png"><img align="left" height="300" src=".\Screenshots\selectedSystem.png">
+<img align="center" height="300" src=".\Screenshots\SelectSystem.png"><img align="left" height="300" src=".\Screenshots\SelectedSystem.png">
 
- #### Open chat log file
+### Open chat log file
 
 Click the red **OpenFile** icon and select the desired text file. 
 
 Chatlogs are stored on ***Document/EVE/logs/Chatlogs***
 
-<img align="left" height="300" src=".\Screenshots\openLogFile.png"><img align="left" height="120" src=".\Screenshots\selectLogFile.png"><img align="left" height="300" src=".\Screenshots\selectedLogFile.png">
+<img align="left" height="300" src=".\Screenshots\OpenLogFile.png"><img align="left" height="120" src=".\Screenshots\SelectLogFile.png"><img align="center" height="300" src=".\Screenshots\SelectedLogFile.png">
 
 Once selected, **OpenFile** icon turned green.
 
 The App is now ready to listen for new intel messages.
 
-#### App running
+### App running
 
 Each time a message contains system near your position is sent :
 
@@ -44,13 +45,13 @@ Each time a message contains system near your position is sent :
 - The system is now **red** until new relevant message is trigger
 - Triggered column is incremented
 
-<img align="left" height="300" src=".\Screenshots\Detected.png">
+<img align="center" height="300" src=".\Screenshots\Detected.png">
 
 Each time irrelevant message is sent :
 
 - Last message label is updated
 
-<img align="left" height="300" src=".\Screenshots\Undetected.png">
+<img align="center" height="300" src=".\Screenshots\Undetected.png">
 
 #### Other functionalities
 
@@ -62,7 +63,7 @@ You can **left click** on a system to access more functionalities :
 
 You can reset the **triggers counters** by pressing **Reset icon**.
 
-<img align="left" height="300" src=".\Screenshots\Reset.png"><img align="left" height="300" src=".\Screenshots\Reseted.png">
+<img align="left" height="300" src=".\Screenshots\Reset.png"><img align="center" height="300" src=".\Screenshots\Reseted.png">
 
 ## License
 
