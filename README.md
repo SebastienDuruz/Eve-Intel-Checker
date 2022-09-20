@@ -28,11 +28,11 @@ Use the autocomplete form to select the system. Press **Enter** to validate sele
 
 Click the red **OpenFile** icon and select the desired text file. 
 
-Chatlogs are stored on ***Document/EVE/logs/Chatlogs***
+Chatlogs are stored in ***Document/EVE/logs/Chatlogs***
 
 <img align="left" height="300" src=".\Screenshots\OpenLogFile.png"><img align="left" height="120" src=".\Screenshots\SelectLogFile.png"><img align="center" height="300" src=".\Screenshots\SelectedLogFile.png">
 
-Once selected, **OpenFile** icon turned green.
+Once selected, **OpenFile** icon turn green.
 
 The App is now ready to listen for new intel messages.
 
