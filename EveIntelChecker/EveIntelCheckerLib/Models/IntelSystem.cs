@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EveIntelChecker.Models
+namespace EveIntelCheckerLib.Models
 {
     public class IntelSystem
     {

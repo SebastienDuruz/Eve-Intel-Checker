@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <None Remove="appIcon.ico" />
-    <None Remove="eve.db" />
     <None Remove="notification.wav" />
   </ItemGroup>
 
@@ -22,9 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="eve.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="notification.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -34,6 +30,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.486" />
     <PackageReference Include="MudBlazor" Version="6.0.14" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EveIntelCheckerLib\EveIntelCheckerLib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace EveIntelChecker.Models.Database
+﻿namespace EveIntelCheckerLib.Models.Database
 {
     public class MapSolarSystem
     {

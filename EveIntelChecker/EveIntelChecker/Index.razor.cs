@@ -2,8 +2,8 @@
 /// Date : 17.09.2022
 /// Description : Backend of the main page
 
-using EveIntelChecker.Models;
-using EveIntelChecker.Models.Database;
+using EveIntelCheckerLib.Models;
+using EveIntelCheckerLib.Models.Database;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using System;
