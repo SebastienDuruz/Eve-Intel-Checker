@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveIntelChecker", "EveIntel
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EveIntelCheckerSetup", "EveIntelCheckerSetup\EveIntelCheckerSetup.vdproj", "{4E722D99-B866-4D76-844E-FA4B174DB06D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EveIntelCheckerLib", "EveIntelCheckerLib\EveIntelCheckerLib.csproj", "{13DBDF6C-EB04-451D-ADDA-37FE124199CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveIntelCheckerLib", "EveIntelCheckerLib\EveIntelCheckerLib.csproj", "{13DBDF6C-EB04-451D-ADDA-37FE124199CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EveIntelCheckerPages", "EveIntelCheckerPages\EveIntelCheckerPages.csproj", "{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +39,14 @@ Global
 		{13DBDF6C-EB04-451D-ADDA-37FE124199CD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13DBDF6C-EB04-451D-ADDA-37FE124199CD}.Release|x86.ActiveCfg = Release|Any CPU
 		{13DBDF6C-EB04-451D-ADDA-37FE124199CD}.Release|x86.Build.0 = Release|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Debug|x86.Build.0 = Debug|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Release|x86.ActiveCfg = Release|Any CPU
+		{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

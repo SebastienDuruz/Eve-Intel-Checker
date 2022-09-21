@@ -6,19 +6,14 @@ using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Media;
-using System.Threading.Tasks;
 
-namespace EveIntelChecker
+namespace EveIntelCheckerPages
 {
     /// <summary>
-    /// Class Index
+    /// Classe MainPage
     /// </summary>
-    public partial class Index
+    public partial class MainPage
     {
         /// <summary>
         /// The selected system (root)
@@ -28,7 +23,7 @@ namespace EveIntelChecker
         /// <summary>
         /// Property of the _selectedSytem attribute
         /// </summary>
-        private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { if (value != null) { _selectedSystem = value; } BuildSystemsList(); }}
+        private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { if (value != null) { _selectedSystem = value; } BuildSystemsList(); } }
 
         /// <summary>
         /// Timer for reading the chat log file
@@ -116,10 +111,10 @@ namespace EveIntelChecker
         protected override async Task OnInitializedAsync()
         {
             // Read chat log file each sec
-            ReadFileTimer = new System.Threading.Timer(async (object? stateInfo) =>
+            ReadFileTimer = new Timer(async (object? stateInfo) =>
             {
                 await ReadLogFile();
-            }, new System.Threading.AutoResetEvent(false), 1000, 1000);
+            }, new AutoResetEvent(false), 1000, 1000);
         }
 
         /// <summary>
@@ -168,14 +163,14 @@ namespace EveIntelChecker
         {
             this.IntelSystems = EveStaticDb.BuildSystemsList(SelectedSystem);
         }
-        
+
         /// <summary>
         /// Read the chat log file
         /// </summary>
         /// <returns>Result of the Task</returns>
         private async Task ReadLogFile()
         {
-            // User has selected the required 
+            // User has selected the required
             if (LogFile != null && IntelSystems.Count > 0)
                 if (File.Exists(LogFilePath))
                 {
@@ -213,9 +208,9 @@ namespace EveIntelChecker
                 }
 
             // If needed reset the last system set to RED
-            if(newRedSystem != "")
-                foreach(IntelSystem intelSystem in IntelSystems)
-                    if(intelSystem.SystemName != newRedSystem)
+            if (newRedSystem != "")
+                foreach (IntelSystem intelSystem in IntelSystems)
+                    if (intelSystem.SystemName != newRedSystem)
                         intelSystem.IsRed = false;
 
             await InvokeAsync(() => StateHasChanged());
@@ -269,9 +264,9 @@ namespace EveIntelChecker
                 LastLogFileRead = time.Split(" ")[2];
                 await InvokeAsync(() => StateHasChanged());
             }
-            catch(Exception)
+            catch (Exception)
             {
-                
+
             }
         }
     }

@@ -1,0 +1,61 @@
+﻿<MudThemeProvider IsDarkMode="true" Theme="CustomTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@using EveIntelCheckerLib.Data
+@using EveIntelCheckerLib.Models
+@using EveIntelCheckerLib.Models.Database
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@using System.Media
+
+@inject EveStaticDatabase EveStaticDb
+
+<PageTitle>IntelChecker</PageTitle>
+<div Class="d-flex flex-column">
+    <div class="d-flex justify-space-between" MaxWidth="MaxWidth.ExtraExtraLarge">
+        <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
+        <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
+        @if (LastLogFileLine != "")
+        {
+            <MudText Typo="Typo.body2" Color="Color.Success" title="Last time someone send a message to the selected chat">@LastLogFileRead</MudText>
+        }
+        <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Refresh" Size="Size.Small" OnClick="ResetTriggers" Title="Reset the triggers counter"></MudIconButton>
+    </div>
+    <div>
+        <MudAutocomplete T="MapSolarSystem" @ref="SolarSystemSelector" Label="Actual position" Immediate="true" @bind-value="SelectedSystem" SelectValueOnTab="true" SelectOnClick="true" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" CoerceText="true" Variant="Variant.Outlined" />
+    </div>
+</div>
+@if (IntelSystems.Count() > 0)
+{
+    <MudStack Spacing="0">
+        <MudPaper Elevation="0" Class="d-flex justify-center" Style="width: 100%;">
+            <MudText Class="flex-auto" Style="width: 30%;">Jum.</MudText>
+            <MudText Class="flex-auto" Style="width: 60%;">System</MudText>
+            <MudText Class="flex-auto" Style="width: 15%;">Tri.</MudText>
+        </MudPaper>
+        @foreach (IntelSystem system in IntelSystems)
+        {
+            string classes = ClearClasses;
+            @if (system.IsRed)
+                classes += RedClasses;
+            else if (system.TriggerCounter > 0)
+                classes += OrangeClasses;
+
+            <MudPaper Elevation="0" Class="@classes" Style="width: 100%;">
+                <MudText Typo="Typo.body2" Class="flex-auto" Style="width: 30%;">@system.Jumps</MudText>
+                <MudMenu Class="flex-auto" Style="width: 70%;" Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
+                    <ActivatorContent>
+                        <MudText Typo="Typo.body2">@system.SystemName</MudText>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
+                        <MudMenuItem Href="@($"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}")">Dotlan</MudMenuItem>
+                        <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+                <MudText Typo="Typo.body2" Class="flex-auto" Style="width: 5%;">@system.TriggerCounter</MudText>
+            </MudPaper>
+        }
+    </MudStack>
+}
