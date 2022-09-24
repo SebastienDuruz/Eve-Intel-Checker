@@ -26,34 +26,9 @@ namespace EveIntelCheckerPages
         private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { if (value != null) { _selectedSystem = value; } BuildSystemsList(); } }
 
         /// <summary>
-        /// Timer for reading the chat log file
-        /// </summary>
-        private System.Threading.Timer? ReadFileTimer { get; set; }
-
-        /// <summary>
         /// List of System to check
         /// </summary>
         private List<IntelSystem> IntelSystems { get; set; } = new List<IntelSystem>();
-
-        /// <summary>
-        /// Path of the log file
-        /// </summary>
-        private string LogFilePath { get; set; }
-
-        /// <summary>
-        /// Path of the log file copy to read
-        /// </summary>
-        private string CopyLogFilePath { get; set; }
-
-        /// <summary>
-        /// The last line of the chat log file
-        /// </summary>
-        private string LastLogFileLine { get; set; }
-
-        /// <summary>
-        /// The last time message has been send to Chat log
-        /// </summary>
-        private string LastLogFileRead { get; set; } = "";
 
         /// <summary>
         /// LogFile object
@@ -61,9 +36,19 @@ namespace EveIntelCheckerPages
         private IBrowserFile LogFile { get; set; }
 
         /// <summary>
+        /// Timer for reading the chat log file
+        /// </summary>
+        private Timer? ReadFileTimer { get; set; }
+
+        /// <summary>
+        /// The informations about current chat LogFile
+        /// </summary>
+        private ChatLogFile ChatLogFile { get; set; }
+
+        /// <summary>
         /// SoundPlayer for alert trigger
         /// </summary>
-        private SoundPlayer Player { get; set; } = new SoundPlayer("notification.wav");
+        private SoundPlayer SoundPlayer { get; set; } = new SoundPlayer("notification.wav");
 
         /// <summary>
         /// Mud componant for selecting the root system
@@ -110,6 +95,8 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the task</returns>
         protected override async Task OnInitializedAsync()
         {
+            ResetChatLogFile();
+
             // Read chat log file each sec
             ReadFileTimer = new Timer(async (object? stateInfo) =>
             {
@@ -129,18 +116,16 @@ namespace EveIntelCheckerPages
 
             if (LogFile != null && LogFile.ContentType == "text/plain")
             {
+                ChatLogFile.LogFileFullName = LogFile.Name;
+                ChatLogFile.CopyLogFileFullName = $"Copy_{LogFile.Name}";
+                ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(LogFile.Name);
                 FileIconColor = Color.Success;
-                LogFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\{LogFile.Name}";
-                CopyLogFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Copy_{LogFile.Name}";
             }
             else
             {
                 FileIconColor = Color.Error;
                 LogFile = null;
-                LogFilePath = "";
-                CopyLogFilePath = "";
-                LastLogFileLine = "";
-                LastLogFileRead = "";
+                ResetChatLogFile();
             }
         }
 
@@ -161,7 +146,7 @@ namespace EveIntelCheckerPages
         /// </summary>
         private void BuildSystemsList()
         {
-            this.IntelSystems = EveStaticDb.BuildSystemsList(SelectedSystem);
+            IntelSystems = EveStaticDb.BuildSystemsList(SelectedSystem);
         }
 
         /// <summary>
@@ -172,21 +157,27 @@ namespace EveIntelCheckerPages
         {
             // User has selected the required
             if (LogFile != null && IntelSystems.Count > 0)
-                if (File.Exists(LogFilePath))
+            {
+                // File exists (Read the file)
+                if (File.Exists($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}"))
                 {
-                    if (File.Exists(CopyLogFilePath))
-                        File.Delete(CopyLogFilePath);
-                    File.Copy(LogFilePath, CopyLogFilePath);
-                    string[] lines = await File.ReadAllLinesAsync(CopyLogFilePath);
+                    File.Copy($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}", $"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}", true);
+
+                    // Execute the main process by reading last line of the logfile
+                    string[] lines = await File.ReadAllLinesAsync($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
                     if (lines != null)
-                        if (lines[lines.Count() - 1] != LastLogFileLine)
+                        if (lines[lines.Count() - 1] != ChatLogFile.LastLogFileMessage)
                         {
-                            LastLogFileLine = lines[lines.Count() - 1];
+                            ChatLogFile.LastLogFileMessage = lines[lines.Count() - 1];
                             await CheckSystemProximity();
-                            await ExtractTimeFromMessage(LastLogFileLine);
+                            await ExtractTimeFromMessage(ChatLogFile.LastLogFileMessage);
                             await InvokeAsync(() => StateHasChanged());
                         }
                 }
+
+                // TODO : Check for new chatlog file generated by the game
+                await CheckNewLogFile();
+            }
         }
 
         /// <summary>
@@ -199,7 +190,7 @@ namespace EveIntelCheckerPages
 
             // Check if message contains a system set to be checked
             foreach (IntelSystem intelSystem in IntelSystems)
-                if (LastLogFileLine.Contains(intelSystem.SystemName))
+                if (ChatLogFile.LastLogFileMessage.Contains(intelSystem.SystemName))
                 {
                     intelSystem.IsRed = true;
                     await PlayNotificationSound();
@@ -235,10 +226,52 @@ namespace EveIntelCheckerPages
         /// </summary>
         /// <param name="system">The system to define as root</param>
         /// <returns>Result of the Task</returns>
-        private async Task UpdateRootSystem(IntelSystem system)
+        private void UpdateRootSystem(IntelSystem system)
         {
             SelectedSystem = EveStaticDb.SolarSystems.Where(x => x.SolarSystemName == system.SystemName).FirstOrDefault();
             SolarSystemSelector.Text = SelectedSystem.SolarSystemName;
+        }
+
+        /// <summary>
+        /// Check if a new chatlog file has been created by the game.
+        /// Change the chatlog file information if needed
+        /// </summary>
+        /// <returns>True if changed, false if nothing changed</returns>
+        private async Task CheckNewLogFile()
+        {
+            if(ChatLogFile.LogFileFolder != "" && ChatLogFile.LogFileShortName != "" && LogFile != null)
+            {
+                // Get the logfiles corresponding to the selected chat file
+                List<string> chatLogFiles = Directory.GetFiles(ChatLogFile.LogFileFolder, $"{ChatLogFile.LogFileShortName}*.txt").ToList();
+                string[] splitedCurrent = ChatLogFile.LogFileFullName.Split("_");
+
+                // Replace the logfile by the most recent if it's not the current that is used
+                foreach (string chatLogFile in chatLogFiles)
+                {
+                    // Only check different files
+                    if($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}" != chatLogFile)
+                    {
+                        string[] splitedToCheck = chatLogFile.Split("_");
+
+                        // Must be same client ID
+                        if (splitedCurrent[3] != splitedToCheck[3])
+                            continue;
+
+                        // Creation date is too low
+                        if (long.Parse(splitedToCheck[1]) < long.Parse(splitedCurrent[1]))
+                            continue;
+
+                        // same creation date but hour is too low
+                        if (splitedToCheck[1] == splitedCurrent[1] && long.Parse(splitedToCheck[2]) < long.Parse(splitedCurrent[2]))
+                            continue;
+
+                        // NEW FILE DETECTED do the necessary changes
+                        ChatLogFile.LogFileFullName = chatLogFile.Split("\\").Last();
+                        ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
+                        ChatLogFile.CopyLogFileFullName = $"Copy_{ChatLogFile.LogFileFullName}";
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -247,7 +280,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task PlayNotificationSound()
         {
-            Player.Play();
+            SoundPlayer.Play();
         }
 
         /// <summary>
@@ -261,13 +294,41 @@ namespace EveIntelCheckerPages
             {
                 string time = message.Split("[")[1];
                 time = time.Split("]")[0];
-                LastLogFileRead = time.Split(" ")[2];
+                ChatLogFile.LastLogFileRead = time.Split(" ")[2];
                 await InvokeAsync(() => StateHasChanged());
             }
             catch (Exception)
             {
 
             }
+        }
+
+        /// <summary>
+        /// Extract the chat name from a filename
+        /// </summary>
+        /// <param name="fileName">The full filename</param>
+        /// <returns>Extracted chat name or empty if not in correct format</returns>
+        private string ExtractShortNameFromFullName(string fileName)
+        {
+            try
+            {
+                string chatName = fileName.Split("_")[0];
+                return chatName;
+            }
+            catch(Exception)
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Reset the ChatLogFile to default with folder values
+        /// </summary>
+        private void ResetChatLogFile()
+        {
+            ChatLogFile = new ChatLogFile();
+            ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+            ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\";
         }
     }
 }

@@ -54,10 +54,10 @@ namespace EveIntelCheckerLib.Data
         {
             CreateConnection();
 
-            SolarSystems = this.ReadSolarSystems();
-            SolarSystemJumps = this.ReadSolarSystemsJumps();
-            Regions = this.ReadRegions();
-            Constellations = this.ReadConstellations();
+            SolarSystems = ReadSolarSystems();
+            SolarSystemJumps = ReadSolarSystemsJumps();
+            Regions = ReadRegions();
+            Constellations = ReadConstellations();
         }
 
         /// <summary>
