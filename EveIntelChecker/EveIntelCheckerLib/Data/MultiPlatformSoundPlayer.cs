@@ -50,7 +50,6 @@ namespace EveIntelCheckerLib.Data
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 OperatingSystem = OperatingSystemType.Mac;
-                throw new NotImplementedException("Mac sound not implemented");
             }
             else if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -60,7 +59,6 @@ namespace EveIntelCheckerLib.Data
             else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 OperatingSystem |= OperatingSystemType.Linux;
-                throw new NotImplementedException("Linux sound not implemented");
             }
         }
 

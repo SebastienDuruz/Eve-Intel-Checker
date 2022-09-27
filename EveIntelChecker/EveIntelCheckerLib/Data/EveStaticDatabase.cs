@@ -20,7 +20,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// Path of the DB file
         /// </summary>
-        private static string DbPath { get; } = Path.Combine(Environment.ProcessPath.Replace("EveIntelChecker.exe", ""), "eve.db");
+        private static string DbPath { get; } = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "eve.db"));
 
         /// <summary>
         /// Connection object for SQLite Database
