@@ -26,6 +26,9 @@ namespace EveIntelCheckerLib.Data
             Linux
         }
 
+        /// <summary>
+        /// The current OS
+        /// </summary>
         private OperatingSystemType OperatingSystem { get; set; }
 
         /// <summary>
