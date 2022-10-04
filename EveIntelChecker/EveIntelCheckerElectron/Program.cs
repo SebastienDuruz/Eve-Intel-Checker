@@ -2,6 +2,9 @@ using EveIntelCheckerLib.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Services;
+using ElectronNET;
+using ElectronNET.API;
+using EveIntelCheckerElectron.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<EveStaticDatabase>();
 builder.Services.AddMudServices();
+
+builder.WebHost.UseElectron(args);
 
 var app = builder.Build();
 
@@ -29,5 +34,9 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+// Support Electron
+if (HybridSupport.IsElectronActive)
+    await ElectronHandler.CreateElectronWindow();
 
 app.Run();
