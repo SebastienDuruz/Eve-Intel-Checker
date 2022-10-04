@@ -55,7 +55,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// SoundPlayer for alert trigger
         /// </summary>
-        private MultiPlatformSoundPlayer SoundPlayer { get; set; }
+        private EveIntelCheckerLib.Data.CustomSoundPlayer SoundPlayer { get; set; }
 
         /// <summary>
         /// Mud componant for selecting the root system
@@ -104,7 +104,7 @@ namespace EveIntelCheckerPages
         {
             SetChatLogFile();
 
-            SoundPlayer = new MultiPlatformSoundPlayer("notification.wav");
+            SoundPlayer = new EveIntelCheckerLib.Data.CustomSoundPlayer("notification.wav");
 
             // Read chat log file each sec
             ReadFileTimer = new Timer(async (object? stateInfo) =>

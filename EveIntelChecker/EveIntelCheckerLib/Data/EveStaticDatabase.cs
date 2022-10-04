@@ -4,10 +4,8 @@
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using SQLite;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 
 namespace EveIntelCheckerLib.Data
@@ -18,9 +16,14 @@ namespace EveIntelCheckerLib.Data
     public class EveStaticDatabase
     {
         /// <summary>
+        /// The current operating system specific settings
+        /// </summary>
+        private OperatingSystemSelector OperatingSystem { get; set; }
+
+        /// <summary>
         /// Path of the DB file
         /// </summary>
-        private static string DbPath { get; } = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "eve.db"));
+        private static string DbPath { get; set; }
 
         /// <summary>
         /// Connection object for SQLite Database
@@ -52,6 +55,19 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public EveStaticDatabase()
         {
+            OperatingSystem = new OperatingSystemSelector();
+            
+            // Select the correct filepath for SQLite DB
+            switch(OperatingSystem.CurrentOS)
+            {
+                case OperatingSystemSelector.OperatingSystemType.Windows:
+                    DbPath = "eve.db";
+                    break;
+                case OperatingSystemSelector.OperatingSystemType.Mac:
+                    DbPath = "eve.db"; // TODO : Change for Mac folder path
+                    break;
+            }
+
             CreateConnection();
 
             SolarSystems = ReadSolarSystems();
