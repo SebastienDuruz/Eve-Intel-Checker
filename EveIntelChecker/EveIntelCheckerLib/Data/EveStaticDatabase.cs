@@ -4,8 +4,11 @@
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace EveIntelCheckerLib.Data
@@ -51,20 +54,24 @@ namespace EveIntelCheckerLib.Data
         public List<MapConstellation> Constellations { get; set; }
 
         /// <summary>
-        /// Default Constructor
+        /// Custom Constructor
         /// </summary>
-        public EveStaticDatabase()
+        /// <param name="isElectron">True if built with Electron, False if not</param>
+        public EveStaticDatabase(bool isElectron = false)
         {
             OperatingSystem = new OperatingSystemSelector();
-            
+
             // Select the correct filepath for SQLite DB
             switch(OperatingSystem.CurrentOS)
             {
                 case OperatingSystemSelector.OperatingSystemType.Windows:
-                    DbPath = "eve.db";
+                    if (isElectron)
+                        DbPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron.exe", "eve.db");
+                    else
+                        DbPath = "eve.db";
                     break;
                 case OperatingSystemSelector.OperatingSystemType.Mac:
-                    DbPath = "eve.db"; // TODO : Change for Mac folder path
+                    DbPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron", "eve.db"); // TODO : Check if working for Mac folder path
                     break;
             }
 

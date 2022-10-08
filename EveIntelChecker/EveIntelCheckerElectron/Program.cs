@@ -1,17 +1,14 @@
-using EveIntelCheckerLib.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using MudBlazor.Services;
-using ElectronNET;
 using ElectronNET.API;
 using EveIntelCheckerElectron.Data;
+using EveIntelCheckerLib.Data;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<EveStaticDatabase>();
+builder.Services.AddSingleton(new EveStaticDatabase(true));
 builder.Services.AddMudServices();
 
 builder.WebHost.UseElectron(args);

@@ -1,13 +1,7 @@
 ﻿/// Author : Sébastien Duruz
 /// Date : 04.10.2022
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Media;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EveIntelCheckerLib.Data
 {

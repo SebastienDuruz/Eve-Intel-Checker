@@ -1,9 +1,11 @@
 ﻿/// Author : Sébastien Duruz
 /// Date : 25.09.2022
 
+using NAudio.Wave;
 using System.Data.Common;
 using System.Media;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -18,14 +20,19 @@ namespace EveIntelCheckerLib.Data
         private OperatingSystemSelector OperatingSystem { get; set; }
 
         /// <summary>
-        /// The path of the sound to play
+        /// The audio file to play
         /// </summary>
-        private string SoundPath { get; set; }
+        private AudioFileReader AudioFile { get; set; }
 
         /// <summary>
         /// SoundPlayer for Windows platform
         /// </summary>
         private SoundPlayer WinSoundPlayer { get; set; }
+
+        /// <summary>
+        /// SoundPlayer for Mac platform using NAudio
+        /// </summary>
+        private WaveOutEvent MacSoundPlayer { get; set; }
 
         /// <summary>
         /// Custom Constructor
@@ -34,16 +41,18 @@ namespace EveIntelCheckerLib.Data
         public CustomSoundPlayer(string soundPath)
         {
             OperatingSystem = new OperatingSystemSelector();
-            SoundPath = soundPath;
+            AudioFile = new AudioFileReader(soundPath);
 
-            // Create the correct instance for current OS
-            if (OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
+            // Select the correct Soundplayer for the current OperatingSystem
+            switch(OperatingSystem.CurrentOS)
             {
-                // TODO : Implement sounds
-            }
-            else if(OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Windows)
-            {
-                WinSoundPlayer = new System.Media.SoundPlayer(soundPath);
+                case OperatingSystemSelector.OperatingSystemType.Mac:
+                    MacSoundPlayer = new WaveOutEvent();
+                    MacSoundPlayer.Init(AudioFile);
+                    break;
+                case OperatingSystemSelector.OperatingSystemType.Windows:
+                    WinSoundPlayer = new SoundPlayer(soundPath);
+                    break;
             }
         }
 
@@ -58,7 +67,7 @@ namespace EveIntelCheckerLib.Data
                     WinSoundPlayer.Play();
                     break;
                 case OperatingSystemSelector.OperatingSystemType.Mac:
-                    // TODO : implement player
+                    MacSoundPlayer.Play();
                     break;
             }
         }

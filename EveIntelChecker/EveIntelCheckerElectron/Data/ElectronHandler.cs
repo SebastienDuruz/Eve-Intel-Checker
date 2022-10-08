@@ -33,12 +33,11 @@ namespace EveIntelCheckerElectron.Data
                     MinWidth = 200,
                     MaxWidth = 200,
                     Width = 200,
-                    Title = "PI2"
+                    Title = "Eve Intel Checker"
                 });
 
-            AppMainWindow.OnReadyToShow += () => AppMainWindow.Show();
-
             // Add events to mainWindow
+            AppMainWindow.OnReadyToShow += () => AppMainWindow.Show();
             AppMainWindow.OnClosed += () => Electron.App.Quit();
         }
 

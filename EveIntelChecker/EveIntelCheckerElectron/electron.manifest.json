@@ -1,0 +1,35 @@
+{
+  "executable": "EveIntelCheckerElectron",
+  "splashscreen": {
+    "imageFile": ""
+  },
+  "name": "EveIntelCheckerElectron",
+  "author": "",
+  "singleInstance": false,
+  "environment": "Production",
+  "build": {
+    "appId": "com.EveIntelCheckerElectron.app",
+    "productName": "EveIntelCheckerElectron",
+    "copyright": "Copyright © 2022",
+    "buildVersion": "1.0.2",
+    "compression": "maximum",
+    "directories": {
+      "output": "../../../bin/Desktop"
+    },
+    "extraResources": [
+      {
+        "from": "./bin",
+        "to": "bin",
+        "filter": [ "**/*" ]
+      }
+    ],
+    "files": [
+      {
+        "from": "./ElectronHostHook/node_modules",
+        "to": "ElectronHostHook/node_modules",
+        "filter": [ "**/*" ]
+      },
+      "**/*"
+    ]
+  }
+}
