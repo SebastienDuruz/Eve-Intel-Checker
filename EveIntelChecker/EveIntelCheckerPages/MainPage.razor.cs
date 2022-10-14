@@ -103,6 +103,7 @@ namespace EveIntelCheckerPages
         protected override async Task OnInitializedAsync()
         {
             SetChatLogFile();
+            LoadUserSettingsLastLog();
 
             SoundPlayer = new EveIntelCheckerLib.Data.CustomSoundPlayer("notification.wav");
 
@@ -125,16 +126,47 @@ namespace EveIntelCheckerPages
 
             if (LogFile != null && LogFile.ContentType == "text/plain")
             {
+                // Update chat logs values
                 ChatLogFile.LogFileFullName = LogFile.Name;
-                ChatLogFile.CopyLogFileFullName = $"Copy_{LogFile.Name}";
-                ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(LogFile.Name);
+                ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+                ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                 FileIconColor = Color.Success;
+
+                // Update the settings file
+                UserSettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                UserSettingsReader.WriteUserSettings();
             }
             else
             {
                 FileIconColor = Color.Error;
                 LogFile = null;
                 SetChatLogFile();
+            }
+        }
+
+        /// <summary>
+        /// Load the userSettings last logfile at the initial start
+        /// </summary>
+        private void LoadUserSettingsLastLog()
+        {
+            // Start by reading the UserSettings
+            UserSettingsReader.ReadUserSettings();
+
+            // If a filename is found
+            if(!String.IsNullOrWhiteSpace(UserSettingsReader.UserSettingsValues.LastFileName))
+            {
+                // Chatlog file exists
+                if(File.Exists(Path.Combine(ChatLogFile.LogFileFolder, UserSettingsReader.UserSettingsValues.LastFileName)))
+                {
+                    ChatLogFile.LogFileFullName = UserSettingsReader.UserSettingsValues.LastFileName;
+                    ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
+                    ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+                    FileIconColor = Color.Success;
+                }
+                else
+                {
+                    FileIconColor = Color.Error;
+                }
             }
         }
 
@@ -277,7 +309,11 @@ namespace EveIntelCheckerPages
                         // NEW FILE DETECTED do the necessary changes
                         ChatLogFile.LogFileFullName = chatLogFile.Split("\\").Last();
                         ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
-                        ChatLogFile.CopyLogFileFullName = $"Copy_{ChatLogFile.LogFileFullName}";
+                        ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+
+                        // Set the file to settings
+                        UserSettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                        UserSettingsReader.WriteUserSettings();
                     }
                 }
             }
@@ -328,6 +364,16 @@ namespace EveIntelCheckerPages
             {
                 return "";
             }
+        }
+
+        /// <summary>
+        /// Build the copy filename from full filename
+        /// </summary>
+        /// <param name="fileName">The filename to use</param>
+        /// <returns>Copy filename</returns>
+        private string BuildCopyFromFullName(string fileName)
+        {
+            return $"Copy_{fileName}";
         }
 
         /// <summary>

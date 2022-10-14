@@ -17,6 +17,7 @@ namespace EveIntelChecker
             serviceCollection.AddWpfBlazorWebView();
             serviceCollection.AddMudServices();
             serviceCollection.AddSingleton<EveStaticDatabase>();
+            serviceCollection.AddSingleton<UserSettingsReader>();
             Resources.Add("services", serviceCollection.BuildServiceProvider());
         }
     }

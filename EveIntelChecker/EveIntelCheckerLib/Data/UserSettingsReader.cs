@@ -23,6 +23,9 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public UserSettings UserSettingsValues { get; set; }
 
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
         public UserSettingsReader()
         {
             ReadUserSettings();
@@ -30,6 +33,7 @@ namespace EveIntelCheckerLib.Data
 
         /// <summary>
         /// Read the userSettings json file, create it if not exists
+        /// Load the content into UserSettings Object
         /// </summary>
         public void ReadUserSettings()
         {
@@ -41,7 +45,7 @@ namespace EveIntelCheckerLib.Data
                 }
                 catch (Exception ex)
                 {
-                    // TODO : Do somethng with exception triggered
+                    // TODO : Do something with exception triggered
                 }
             }
             else

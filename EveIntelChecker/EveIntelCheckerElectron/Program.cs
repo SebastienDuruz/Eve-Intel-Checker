@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton(new EveStaticDatabase(true));
+builder.Services.AddSingleton<UserSettingsReader>();
 builder.Services.AddMudServices();
 
 builder.WebHost.UseElectron(args);
