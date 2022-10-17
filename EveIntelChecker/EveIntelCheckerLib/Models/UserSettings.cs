@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EveIntelCheckerLib.Models
+﻿namespace EveIntelCheckerLib.Models
 {
     /// <summary>
     /// Class UserSettings
@@ -15,5 +9,10 @@ namespace EveIntelCheckerLib.Models
         /// Last file opened by the application
         /// </summary>
         public string LastFileName { get; set; } = "";
+
+        /// <summary>
+        /// The last system selected by the user (only valid system)
+        /// </summary>
+        public string LastSelectedSystem { get; set; } = "";
     }
 }

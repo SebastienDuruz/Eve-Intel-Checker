@@ -38,9 +38,9 @@ namespace EveIntelCheckerPages
         private List<IntelSystem> IntelSystems { get; set; } = new List<IntelSystem>();
 
         /// <summary>
-        /// LogFile object
+        /// Does a LogFile is currently loaded
         /// </summary>
-        private IBrowserFile LogFile { get; set; }
+        private bool LogFileLoaded { get; set; }
 
         /// <summary>
         /// Timer for reading the chat log file
@@ -107,6 +107,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the task</returns>
         protected override async Task OnInitializedAsync()
         {
+            LogFileLoaded = false;
             OperatingSystem = new OperatingSystemSelector();
             SetChatLogFile();
             LoadUserSettingsLastLog();
@@ -126,14 +127,18 @@ namespace EveIntelCheckerPages
         /// <param name="e">args of the event caller</param>
         private void SelectFile(InputFileChangeEventArgs e)
         {
+            IBrowserFile logFile = null;
+
             // Only the last selected file will be used
             foreach (var file in e.GetMultipleFiles())
-                LogFile = file;
+            {
+                logFile = file;
+            }
 
-            if (LogFile != null && LogFile.ContentType == "text/plain")
+            if (logFile != null && logFile.ContentType == "text/plain")
             {
                 // Update chat logs values
-                ChatLogFile.LogFileFullName = LogFile.Name;
+                ChatLogFile.LogFileFullName = logFile.Name;
                 ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
                 ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                 FileIconColor = Color.Success;
@@ -141,11 +146,12 @@ namespace EveIntelCheckerPages
                 // Update the settings file
                 UserSettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
                 UserSettingsReader.WriteUserSettings();
+                LogFileLoaded = true;
             }
             else
             {
                 FileIconColor = Color.Error;
-                LogFile = null;
+                LogFileLoaded = false;
                 SetChatLogFile();
             }
         }
@@ -168,11 +174,22 @@ namespace EveIntelCheckerPages
                     ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                     ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
                     FileIconColor = Color.Success;
+                    LogFileLoaded = true;
                 }
                 else
                 {
+                    LogFileLoaded = false;
                     FileIconColor = Color.Error;
                 }
+            }
+
+            // Select the system if it exists in the DB
+            if(!String.IsNullOrWhiteSpace(UserSettingsReader.UserSettingsValues.LastSelectedSystem) 
+                && EveStaticDb.SolarSystems.Exists(x => x.SolarSystemName == UserSettingsReader.UserSettingsValues.LastSelectedSystem))
+            {
+                SolarSystemSelector.Value = EveStaticDb.SolarSystems.Where(x => x.SolarSystemName == UserSettingsReader.UserSettingsValues.LastSelectedSystem).First();
+                SolarSystemSelector.Text = UserSettingsReader.UserSettingsValues.LastSelectedSystem;
+                SelectedSystem = SolarSystemSelector.Value;
             }
         }
 
@@ -193,7 +210,12 @@ namespace EveIntelCheckerPages
         /// </summary>
         private void BuildSystemsList()
         {
+            // Build the list of systems
             IntelSystems = EveStaticDb.BuildSystemsList(SelectedSystem);
+
+            // Update the userSettings with new selected system
+            UserSettingsReader.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
+            UserSettingsReader.WriteUserSettings();
         }
 
         /// <summary>
@@ -203,7 +225,7 @@ namespace EveIntelCheckerPages
         private async Task ReadLogFile()
         {
             // User has selected the required
-            if (LogFile != null && IntelSystems.Count > 0)
+            if (LogFileLoaded && IntelSystems.Count > 0)
             {
                 // File exists (Read the file)
                 if (File.Exists($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}"))
@@ -286,7 +308,7 @@ namespace EveIntelCheckerPages
         /// <returns>True if changed, false if nothing changed</returns>
         private async Task CheckNewLogFile()
         {
-            if(ChatLogFile.LogFileFolder != "" && ChatLogFile.LogFileShortName != "" && LogFile != null)
+            if(ChatLogFile.LogFileFolder != "" && ChatLogFile.LogFileShortName != "" && LogFileLoaded)
             {
                 // Get the logfiles corresponding to the selected chat file
                 List<string> chatLogFiles = Directory.GetFiles(ChatLogFile.LogFileFolder, $"{ChatLogFile.LogFileShortName}*.txt").ToList();
