@@ -1,11 +1,12 @@
 ﻿/// Author : Sébastien Duruz
 /// Date : 25.09.2022
 
-using NAudio.Wave;
 using System.Data.Common;
+using System.IO;
 using System.Media;
 using System.Runtime.InteropServices;
 using System.Threading;
+using NetCoreAudio;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -20,11 +21,6 @@ namespace EveIntelCheckerLib.Data
         private OperatingSystemSelector OperatingSystem { get; set; }
 
         /// <summary>
-        /// The audio file to play
-        /// </summary>
-        private AudioFileReader AudioFile { get; set; }
-
-        /// <summary>
         /// SoundPlayer for Windows platform
         /// </summary>
         private SoundPlayer WinSoundPlayer { get; set; }
@@ -32,7 +28,12 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// SoundPlayer for Mac platform using NAudio
         /// </summary>
-        private WaveOutEvent MacSoundPlayer { get; set; }
+        private Player MacSoundPlayer { get; set; }
+
+        /// <summary>
+        /// FilePath of the audio file (Used only on MacOS)
+        /// </summary>
+        private string AudioFilePath { get; set; }
 
         /// <summary>
         /// Custom Constructor
@@ -41,17 +42,23 @@ namespace EveIntelCheckerLib.Data
         public CustomSoundPlayer(string soundPath)
         {
             OperatingSystem = new OperatingSystemSelector();
-            AudioFile = new AudioFileReader(soundPath);
+
+            if(OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Windows)
+                AudioFilePath = $"Assets\\{soundPath}";
+            else if(OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
+            {
+                //AudioFilePath = Path.Combine(Directory.GetCurrentDirectory(), $"bin/Debug/net6.0/Assets/{soundPath}");
+                AudioFilePath = $"Assets/{soundPath}";
+            }
 
             // Select the correct Soundplayer for the current OperatingSystem
-            switch(OperatingSystem.CurrentOS)
+            switch (OperatingSystem.CurrentOS)
             {
                 case OperatingSystemSelector.OperatingSystemType.Mac:
-                    MacSoundPlayer = new WaveOutEvent();
-                    MacSoundPlayer.Init(AudioFile);
+                    MacSoundPlayer = new Player();
                     break;
                 case OperatingSystemSelector.OperatingSystemType.Windows:
-                    WinSoundPlayer = new SoundPlayer(soundPath);
+                    WinSoundPlayer = new SoundPlayer(AudioFilePath);
                     break;
             }
         }
@@ -67,7 +74,7 @@ namespace EveIntelCheckerLib.Data
                     WinSoundPlayer.Play();
                     break;
                 case OperatingSystemSelector.OperatingSystemType.Mac:
-                    MacSoundPlayer.Play();
+                    MacSoundPlayer.Play(AudioFilePath);
                     break;
             }
         }

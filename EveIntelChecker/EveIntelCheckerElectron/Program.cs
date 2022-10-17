@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton(new EveStaticDatabase(true));
+builder.Services.AddSingleton(new EveStaticDatabase(false));
 builder.Services.AddSingleton<UserSettingsReader>();
 builder.Services.AddMudServices();
 

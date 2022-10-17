@@ -53,6 +53,11 @@ namespace EveIntelCheckerPages
         private ChatLogFile ChatLogFile { get; set; }
 
         /// <summary>
+        /// Object that contains the current OS run by the user
+        /// </summary>
+        private OperatingSystemSelector OperatingSystem { get; set; }
+
+        /// <summary>
         /// SoundPlayer for alert trigger
         /// </summary>
         private EveIntelCheckerLib.Data.CustomSoundPlayer SoundPlayer { get; set; }
@@ -102,6 +107,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the task</returns>
         protected override async Task OnInitializedAsync()
         {
+            OperatingSystem = new OperatingSystemSelector();
             SetChatLogFile();
             LoadUserSettingsLastLog();
 
@@ -382,8 +388,16 @@ namespace EveIntelCheckerPages
         private void SetChatLogFile()
         {
             ChatLogFile = new ChatLogFile();
-            ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
-            ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\";
+            if (OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Windows)
+            {
+                ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+                ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\";
+            }
+            else if (OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
+            {
+                ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
+                ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/";
+            }
         }
     }
 }

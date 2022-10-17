@@ -66,12 +66,15 @@ namespace EveIntelCheckerLib.Data
             {
                 case OperatingSystemSelector.OperatingSystemType.Windows:
                     if (isElectron)
-                        DbPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron.exe", "eve.db");
+                        DbPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron.exe", "Assets\\eve.db");
                     else
-                        DbPath = "eve.db";
+                        DbPath = "Assets\\eve.db";
                     break;
                 case OperatingSystemSelector.OperatingSystemType.Mac:
-                    DbPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron", "eve.db"); // TODO : Check if working for Mac folder path
+                    if (isElectron)
+                        DbPath = "Assets/eve.db"; // TODO : Check if working for Mac folder path
+                    else
+                        DbPath = Path.Combine(Directory.GetCurrentDirectory(), "bin/Debug/net6.0/Assets/eve.db"); // TODO : Check if working for Mac folder path
                     break;
             }
 
