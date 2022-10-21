@@ -16,7 +16,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// File path of the userSettings file
         /// </summary>
-        private string _filePath = "userSettings.json";
+        private string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userSettings.json");
 
         /// <summary>
         /// Objects that contains the settings values
@@ -45,6 +45,7 @@ namespace EveIntelCheckerLib.Data
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     // TODO : Do something with exception triggered
                 }
             }
@@ -60,7 +61,14 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public void WriteUserSettings()
         {
-            File.WriteAllText(_filePath, JsonConvert.SerializeObject(UserSettingsValues));
+            try
+            {
+                File.WriteAllText(_filePath, JsonConvert.SerializeObject(UserSettingsValues));
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

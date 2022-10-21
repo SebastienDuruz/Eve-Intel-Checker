@@ -8,15 +8,13 @@
   <ItemGroup>
     <None Remove="NetCoreAudio" />
     <None Remove="Assets\" />
-    <None Remove="Assets\eve.db" />
-    <None Remove="Assets\notification.wav" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\eve.db">
+    <EmbeddedResource Include="eve.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Assets\notification.wav">
+    <EmbeddedResource Include="notification.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -27,9 +25,5 @@
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
     <PackageReference Include="System.Windows.Extensions" Version="6.0.0" />
     <PackageReference Include="NetCoreAudio" Version="1.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\" />
   </ItemGroup>
 </Project>

@@ -44,11 +44,11 @@ namespace EveIntelCheckerLib.Data
             OperatingSystem = new OperatingSystemSelector();
 
             if(OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Windows)
-                AudioFilePath = $"Assets\\{soundPath}";
+                AudioFilePath = soundPath;
             else if(OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
             {
                 //AudioFilePath = Path.Combine(Directory.GetCurrentDirectory(), $"bin/Debug/net6.0/Assets/{soundPath}");
-                AudioFilePath = $"Assets/{soundPath}";
+                AudioFilePath = soundPath;
             }
 
             // Select the correct Soundplayer for the current OperatingSystem
