@@ -1,12 +1,8 @@
 ﻿/// Author : Sébastien Duruz
 /// Date : 25.09.2022
 
-using System.Data.Common;
-using System.IO;
-using System.Media;
-using System.Runtime.InteropServices;
-using System.Threading;
 using NetCoreAudio;
+using System.Media;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -42,14 +38,7 @@ namespace EveIntelCheckerLib.Data
         public CustomSoundPlayer(string soundPath)
         {
             OperatingSystem = new OperatingSystemSelector();
-
-            if(OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Windows)
-                AudioFilePath = soundPath;
-            else if(OperatingSystem.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
-            {
-                //AudioFilePath = Path.Combine(Directory.GetCurrentDirectory(), $"bin/Debug/net6.0/Assets/{soundPath}");
-                AudioFilePath = soundPath;
-            }
+            AudioFilePath = soundPath;
 
             // Select the correct Soundplayer for the current OperatingSystem
             switch (OperatingSystem.CurrentOS)
