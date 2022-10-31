@@ -4,6 +4,7 @@ A compact desktop tool used to filter relevant messages on Intel chat channels.
 ## Requirements
 
 - Windows 10 / 11
+- Mac (Work in progress)
 
 ## Installation
 
