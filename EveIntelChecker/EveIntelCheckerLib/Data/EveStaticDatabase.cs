@@ -3,7 +3,7 @@
 
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
-using SQLite;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -24,14 +24,9 @@ namespace EveIntelCheckerLib.Data
         private OperatingSystemSelector OperatingSystem { get; set; }
 
         /// <summary>
-        /// Path of the DB file
+        /// Path of the DB export files
         /// </summary>
-        private static string DbPath { get; set; }
-
-        /// <summary>
-        /// Connection object for SQLite Database
-        /// </summary>
-        private SQLiteConnection SqliteConnection { get; set; }
+        private static string FolderPath { get; set; }
 
         /// <summary>
         /// List of SolarSystems
@@ -66,78 +61,91 @@ namespace EveIntelCheckerLib.Data
             {
                 case OperatingSystemSelector.OperatingSystemType.Windows:
                     if (isElectron)
-                        DbPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron.exe", "eve.db");
+                        FolderPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron.exe", "Data/Export");
                     else
-                        DbPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelChecker.exe", "eve.db");
+                        FolderPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelChecker.exe", "Data/Export");
                     break;
                 case OperatingSystemSelector.OperatingSystemType.Mac:
-                    DbPath = Path.Combine(Directory.GetCurrentDirectory(), "eve.db");
+                    FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data/Export");
                     break;
             }
 
-            CreateConnection();
-
             SolarSystems = ReadSolarSystems();
-            SolarSystemJumps = ReadSolarSystemsJumps();
+            SolarSystemJumps = ReadSolarSystemJumps();
             Regions = ReadRegions();
             Constellations = ReadConstellations();
         }
 
         /// <summary>
-        /// Establish the connection with the SQLite Database
+        /// Read the solar systems export file
         /// </summary>
-        /// <returns>An object that contains the connection to Sqlite DB</returns>
-        private void CreateConnection()
+        /// <returns>List of solar systems</returns>
+        public List<MapSolarSystem> ReadSolarSystems()
         {
-            SqliteConnection = new SQLiteConnection(DbPath);
+            try
+            {
+                return JsonConvert.DeserializeObject<List<MapSolarSystem>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystems.json")));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<MapSolarSystem>();
+            }
+           
         }
 
         /// <summary>
-        /// Read the SolarSystems from Sqlite DB
+        /// Read the solar systems jumps export file
         /// </summary>
-        /// <returns>List of SolarSystems</returns>
-        private List<MapSolarSystem> ReadSolarSystems()
+        /// <returns>List of solar systems</returns>
+        public List<MapSolarSystemJump> ReadSolarSystemJumps()
         {
-            List<MapSolarSystem> solarSystems = new List<MapSolarSystem>();
-            string query = @"SELECT regionID, constellationID, solarSystemID, solarSystemName FROM mapSolarSystems";
+            try
+            {
+                return JsonConvert.DeserializeObject<List<MapSolarSystemJump>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystemJumps.json")));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<MapSolarSystemJump>();
+            }
 
-            return SqliteConnection.Query<MapSolarSystem>(query);
         }
 
         /// <summary>
-        /// Read the JumpGates from Sqlite DB
+        /// Read the region export file
         /// </summary>
-        /// <returns>List of JumpGates</returns>
-        private List<MapSolarSystemJump> ReadSolarSystemsJumps()
+        /// <returns>List of solar systems</returns>
+        public List<MapRegion> ReadRegions()
         {
-            List<MapSolarSystemJump> solarSystemJumps = new List<MapSolarSystemJump>();
-            string query = @"SELECT fromSolarSystemID, toSolarSystemID FROM mapSolarSystemJumps";
+            try
+            {
+                return JsonConvert.DeserializeObject<List<MapRegion>>(File.ReadAllText(Path.Combine(FolderPath, "mapRegions.json")));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<MapRegion>();
+            }
 
-            return SqliteConnection.Query<MapSolarSystemJump>(query);
         }
 
         /// <summary>
-        /// Read the Regions from Sqlite DB
+        /// Read the constellations export file
         /// </summary>
-        /// <returns>List of Regions</returns>
-        private List<MapRegion> ReadRegions()
+        /// <returns>List of solar systems</returns>
+        public List<MapConstellation> ReadConstellations()
         {
-            List<MapRegion> regions = new List<MapRegion>();
-            string query = @"SELECT regionID, regionName FROM mapRegions";
+            try
+            {
+                return JsonConvert.DeserializeObject<List<MapConstellation>>(File.ReadAllText(Path.Combine(FolderPath, "mapConstellations.json")));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<MapConstellation>();
+            }
 
-            return SqliteConnection.Query<MapRegion>(query);
-        }
-
-        /// <summary>
-        /// Read the Constellations from Sqlite DB
-        /// </summary>
-        /// <returns>List of Constellations</returns>
-        private List<MapConstellation> ReadConstellations()
-        {
-            List<MapConstellation> constellations = new List<MapConstellation>();
-            string query = @"SELECT regionID, constellationID, constellationName FROM mapConstellations";
-
-            return SqliteConnection.Query<MapConstellation>(query);
         }
 
         /// <summary>

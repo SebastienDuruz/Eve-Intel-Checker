@@ -6,12 +6,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\Export\mapConstellations.json" />
+    <None Remove="Data\Export\mapRegions.json" />
+    <None Remove="Data\Export\mapSolarSystemJumps.json" />
+    <None Remove="Data\Export\mapSolarSystems.json" />
     <None Remove="NetCoreAudio" />
     <None Remove="Assets\" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="eve.db">
+    <EmbeddedResource Include="Data\Export\mapConstellations.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Export\mapRegions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Export\mapSolarSystemJumps.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Export\mapSolarSystems.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="notification.wav">
