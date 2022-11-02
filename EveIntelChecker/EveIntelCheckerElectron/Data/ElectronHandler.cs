@@ -27,6 +27,7 @@ namespace EveIntelCheckerElectron.Data
                 new BrowserWindowOptions()
                 {
                     AutoHideMenuBar = true,
+                    AlwaysOnTop = true,
                     MinHeight = 100,
                     MaxHeight = 1200,
                     Height = 300,
