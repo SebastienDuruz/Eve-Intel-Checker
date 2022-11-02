@@ -35,7 +35,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
     <PackageReference Include="System.Windows.Extensions" Version="6.0.0" />
     <PackageReference Include="NetCoreAudio" Version="1.7.0" />
   </ItemGroup>

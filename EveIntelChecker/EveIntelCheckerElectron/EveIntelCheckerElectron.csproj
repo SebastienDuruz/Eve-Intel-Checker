@@ -5,8 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="h5.ElectronNET.API" Version="21.1.0.33389" />
-    <PackageReference Include="MudBlazor" Version="6.0.16" />
+    <PackageReference Include="h5.ElectronNET.API" Version="21.2.0.33598" />
+    <PackageReference Include="MudBlazor" Version="6.0.17" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EveIntelCheckerLib\EveIntelCheckerLib.csproj" />

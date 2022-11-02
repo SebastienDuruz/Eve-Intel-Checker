@@ -19,11 +19,6 @@ namespace EveIntelCheckerLib.Data
     public class EveStaticDatabase
     {
         /// <summary>
-        /// The current operating system specific settings
-        /// </summary>
-        private OperatingSystemSelector OperatingSystem { get; set; }
-
-        /// <summary>
         /// Path of the DB export files
         /// </summary>
         private static string FolderPath { get; set; }
@@ -54,21 +49,7 @@ namespace EveIntelCheckerLib.Data
         /// <param name="isElectron">True if built with Electron, False if not</param>
         public EveStaticDatabase(bool isElectron = false)
         {
-            OperatingSystem = new OperatingSystemSelector();
-
-            // Select the correct filepath for SQLite DB
-            switch(OperatingSystem.CurrentOS)
-            {
-                case OperatingSystemSelector.OperatingSystemType.Windows:
-                    if (isElectron)
-                        FolderPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelCheckerElectron.exe", "Data/Export");
-                    else
-                        FolderPath = Process.GetCurrentProcess().MainModule.FileName.Replace("EveIntelChecker.exe", "Data/Export");
-                    break;
-                case OperatingSystemSelector.OperatingSystemType.Mac:
-                    FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data/Export");
-                    break;
-            }
+            FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data/Export");
 
             SolarSystems = ReadSolarSystems();
             SolarSystemJumps = ReadSolarSystemJumps();
