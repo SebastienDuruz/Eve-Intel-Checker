@@ -1,10 +1,10 @@
 # EveIntelChecker
 A compact desktop tool used to filter relevant messages on Intel chat channels.
 
-## Requirements
+## Working on
 
 - Windows 10 / 11
-- Mac (Work in progress)
+- MacOS Intel / ARM
 
 ## Installation
 
