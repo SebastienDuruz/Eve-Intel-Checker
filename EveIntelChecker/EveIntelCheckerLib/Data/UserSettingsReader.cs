@@ -43,10 +43,11 @@ namespace EveIntelCheckerLib.Data
                 {
                     UserSettingsValues = JsonConvert.DeserializeObject<UserSettings>(File.ReadAllText(_filePath));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine(ex.Message);
-                    // TODO : Do something with exception triggered
+                    // Reset the settings by recreating a file
+                    WriteUserSettings();
+                    UserSettingsValues = new UserSettings();
                 }
             }
             else
