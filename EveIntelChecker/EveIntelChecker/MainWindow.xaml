@@ -9,9 +9,8 @@
         WindowStyle="ToolWindow"
         Topmost="True"
         ResizeMode="CanResize"
-        MinWidth="180"
-        MaxWidth="180"
-        Title="Eve Intel Checker" Height="450" Width="180">
+        MinWidth="170"
+        Title="Eve Intel Checker" Height="300" Width="170">
     <Grid>
         <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">
             <blazor:BlazorWebView.RootComponents>

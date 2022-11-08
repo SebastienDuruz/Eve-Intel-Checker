@@ -29,11 +29,9 @@ namespace EveIntelCheckerElectron.Data
                     AutoHideMenuBar = true,
                     AlwaysOnTop = true,
                     MinHeight = 100,
-                    MaxHeight = 1200,
                     Height = 300,
-                    MinWidth = 200,
-                    MaxWidth = 200,
-                    Width = 200,
+                    MinWidth = 180,
+                    Width = 180,
                     Title = "Eve Intel Checker"
                 });
 

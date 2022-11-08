@@ -85,7 +85,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Classes for IntelSystem displayed as clear
         /// </summary>
-        private string ClearClasses { get; set; } = "d-flex";
+        private string ClearClasses { get; set; } = "d-flex justify-space-around align-center flex-grow-1 gap-8";
 
         /// <summary>
         /// Custom theme for MudBlazor

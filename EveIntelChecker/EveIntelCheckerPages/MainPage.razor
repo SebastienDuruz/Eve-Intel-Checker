@@ -29,11 +29,11 @@
 </div>
 @if (IntelSystems.Count() > 0)
 {
-    <MudStack Spacing="0">
-        <MudPaper Elevation="0" Class="d-flex justify-center" Style="width: 100%;">
-            <MudText Class="flex-auto" Style="width: 30%;">Jum.</MudText>
-            <MudText Class="flex-auto" Style="width: 60%;">System</MudText>
-            <MudText Class="flex-auto" Style="width: 15%;">Tri.</MudText>
+    <MudStack Spacing="0" Class="mx-2">
+        <MudPaper Elevation="0" Class="d-flex justify-space-around align-center flex-grow-1 gap-8" Style="width: 100%;">
+            <MudText>J</MudText>
+            <MudText Class="flex-shrink-1 align-content-center align-center" Align="Align.Start" Style="width: 100%;">System</MudText>
+            <MudText>T</MudText>
         </MudPaper>
         @foreach (IntelSystem system in IntelSystems)
         {
@@ -44,10 +44,10 @@
                 classes += OrangeClasses;
 
             <MudPaper Elevation="0" Class="@classes" Style="width: 100%;">
-                <MudText Typo="Typo.body2" Class="flex-auto" Style="width: 30%;">@system.Jumps</MudText>
-                <MudMenu Class="flex-auto" Style="width: 70%;" Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
+                <MudText Typo="Typo.body2">@system.Jumps</MudText>
+                <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
                     <ActivatorContent>
-                        <MudText Typo="Typo.body2">@system.SystemName</MudText>
+                        <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
                     </ActivatorContent>
                     <ChildContent>
                         <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
@@ -55,7 +55,7 @@
                         <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
                     </ChildContent>
                 </MudMenu>
-                <MudText Typo="Typo.body2" Class="flex-auto" Style="width: 5%;">@system.TriggerCounter</MudText>
+                <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
             </MudPaper>
         }
     </MudStack>
