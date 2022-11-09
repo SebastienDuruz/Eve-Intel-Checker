@@ -8,11 +8,13 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
 @using System.Media
+@using Microsoft.JSInterop
 
 @inject EveStaticDatabase EveStaticDb
 @inject UserSettingsReader UserSettingsReader
+@inject IJSRuntime JSRuntime
 
-<PageTitle>EveIntelChecker</PageTitle>
+<PageTitle>Eve Intel Checker</PageTitle>
 
 <div Class="d-flex flex-column">
     <div class="d-flex justify-space-between" MaxWidth="MaxWidth.ExtraExtraLarge">
@@ -87,5 +89,8 @@ else
     else
     {
         <MudText>Not yet implemented</MudText>
+        <div id="graphDiv">
+
+        </div>
     }
 }

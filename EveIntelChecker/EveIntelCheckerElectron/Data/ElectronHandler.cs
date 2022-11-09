@@ -3,6 +3,7 @@
 
 using ElectronNET.API;
 using ElectronNET.API.Entities;
+using EveIntelCheckerLib.Data;
 
 namespace EveIntelCheckerElectron.Data
 {
@@ -20,7 +21,7 @@ namespace EveIntelCheckerElectron.Data
         /// Create the Electron Window
         /// </summary>
         /// <returns>Results of the task</returns>
-        public async static Task CreateElectronWindow()
+        public async static Task CreateElectronWindow(int width, int height)
         {
             Electron.ReadAuth();
             AppMainWindow = await Electron.WindowManager.CreateWindowAsync(
@@ -29,15 +30,15 @@ namespace EveIntelCheckerElectron.Data
                     AutoHideMenuBar = true,
                     AlwaysOnTop = true,
                     MinHeight = 100,
-                    Height = 300,
-                    MinWidth = 180,
-                    Width = 180,
+                    Height = height,
+                    MinWidth = 170,
+                    Width = width,
                     Title = "Eve Intel Checker"
                 });
 
             // Add events to mainWindow
             AppMainWindow.OnReadyToShow += () => AppMainWindow.Show();
-            AppMainWindow.OnClosed += () => Electron.App.Quit();
+            AppMainWindow.OnClosed += () => CloseApplication();
         }
 
         public async static void ReloadMainWindow()
@@ -50,6 +51,19 @@ namespace EveIntelCheckerElectron.Data
                 AppMainWindow.Minimize();
                 AppMainWindow.Restore();
             }
+        }
+
+        /// <summary>
+        /// Save the application dimensions before closing the app
+        /// </summary>
+        public static void CloseApplication()
+        {
+            UserSettingsReader userSettings = new UserSettingsReader();
+            int[] windowSize = AppMainWindow.GetSizeAsync().Result;
+            userSettings.UserSettingsValues.WindowWidth = windowSize[0];
+            userSettings.UserSettingsValues.WindowHeight = windowSize[1];
+            userSettings.WriteUserSettings();
+            Electron.App.Quit();
         }
     }
 }

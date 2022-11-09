@@ -117,7 +117,7 @@ namespace EveIntelCheckerPages
             SetChatLogFile();
             LoadUserSettingsLastLog();
 
-            SoundPlayer = new EveIntelCheckerLib.Data.CustomSoundPlayer("notification.wav");
+            SoundPlayer = new CustomSoundPlayer("notification.wav");
 
             // Read chat log file each sec
             ReadFileTimer = new Timer(async (object? stateInfo) =>

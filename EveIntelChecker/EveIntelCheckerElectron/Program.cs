@@ -5,11 +5,13 @@ using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+UserSettingsReader userSettings = new UserSettingsReader();
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton(new EveStaticDatabase(HybridSupport.IsElectronActive));
-builder.Services.AddSingleton<UserSettingsReader>();
+builder.Services.AddSingleton(userSettings);
 builder.Services.AddMudServices();
 
 builder.WebHost.UseElectron(args);
@@ -35,6 +37,6 @@ app.MapFallbackToPage("/_Host");
 
 // Support Electron
 if (HybridSupport.IsElectronActive)
-    await ElectronHandler.CreateElectronWindow();
+    await ElectronHandler.CreateElectronWindow((int)userSettings.UserSettingsValues.WindowWidth, (int)userSettings.UserSettingsValues.WindowHeight);
 
 app.Run();
