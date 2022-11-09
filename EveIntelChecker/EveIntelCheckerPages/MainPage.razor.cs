@@ -30,7 +30,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Property of the _selectedSytem attribute
         /// </summary>
-        private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { if (value != null) { _selectedSystem = value; } BuildSystemsList(); } }
+        private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { if (value != null) { _selectedSystem = value; } BuildSystems(); } }
 
         /// <summary>
         /// List of System to check
@@ -86,6 +86,11 @@ namespace EveIntelCheckerPages
         /// Classes for IntelSystem displayed as clear
         /// </summary>
         private string ClearClasses { get; set; } = "d-flex justify-space-around align-center flex-grow-1 gap-8";
+
+        /// <summary>
+        /// Set to true if Settings panel is open
+        /// </summary>
+        private bool SettingsPageOpened { get; set; } = false;
 
         /// <summary>
         /// Custom theme for MudBlazor
@@ -208,10 +213,10 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Build the list of systems to display
         /// </summary>
-        private void BuildSystemsList()
+        private void BuildSystems()
         {
             // Build the list of systems
-            IntelSystems = EveStaticDb.BuildSystemsList(SelectedSystem);
+            IntelSystems = EveStaticDb.BuildSystemsList(SelectedSystem, UserSettingsReader.UserSettingsValues.SystemsDepth);
 
             // Update the userSettings with new selected system
             UserSettingsReader.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
@@ -419,6 +424,20 @@ namespace EveIntelCheckerPages
             {
                 ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
                 ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/";
+            }
+        }
+
+        /// <summary>
+        /// Open or Close the Settings panel, save the settings if settings panel as been closed
+        /// </summary>
+        private void OpenCloseSettingsPanel()
+        {
+            SettingsPageOpened = !SettingsPageOpened;
+            if (!SettingsPageOpened)
+            {
+                UserSettingsReader.WriteUserSettings();
+                if (_selectedSystem != null)
+                    BuildSystems();
             }
         }
     }

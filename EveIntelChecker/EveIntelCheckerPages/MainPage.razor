@@ -1,4 +1,4 @@
-﻿<MudThemeProvider IsDarkMode="true" Theme="CustomTheme" />
+﻿<MudThemeProvider IsDarkMode="UserSettingsReader.UserSettingsValues.DarkMode" Theme="CustomTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -13,6 +13,7 @@
 @inject UserSettingsReader UserSettingsReader
 
 <PageTitle>EveIntelChecker</PageTitle>
+
 <div Class="d-flex flex-column">
     <div class="d-flex justify-space-between" MaxWidth="MaxWidth.ExtraExtraLarge">
         <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
@@ -21,42 +22,70 @@
         {
             <MudText Typo="Typo.body2" Color="Color.Success" title="Last time someone send a message to the selected chat">@ChatLogFile.LastLogFileRead</MudText>
         }
-        <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Refresh" Size="Size.Small" OnClick="ResetTriggers" Title="Reset the triggers counter"></MudIconButton>
+        <div>
+            <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Refresh" Size="Size.Small" OnClick="ResetTriggers" Title="Reset the triggers counter"></MudIconButton>
+            <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Settings" Size="Size.Small" Title="Open/Close Settings panel" OnClick="() => OpenCloseSettingsPanel()"></MudIconButton>
+        </div>
     </div>
-    <div>
+    <div class="d-flex mx-1">
         <MudAutocomplete T="MapSolarSystem" @ref="SolarSystemSelector" Label="Actual position" Immediate="true" @bind-value="SelectedSystem" SelectValueOnTab="true" SelectOnClick="true" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" CoerceText="true" Variant="Variant.Outlined" />
     </div>
 </div>
-@if (IntelSystems.Count() > 0)
-{
-    <MudStack Spacing="0" Class="mx-2">
-        <MudPaper Elevation="0" Class="d-flex justify-space-around align-center flex-grow-1 gap-8" Style="width: 100%;">
-            <MudText>J</MudText>
-            <MudText Class="flex-shrink-1 align-content-center align-center" Align="Align.Start" Style="width: 100%;">System</MudText>
-            <MudText>T</MudText>
-        </MudPaper>
-        @foreach (IntelSystem system in IntelSystems)
-        {
-            string classes = ClearClasses;
-            @if (system.IsRed)
-                classes += RedClasses;
-            else if (system.TriggerCounter > 0)
-                classes += OrangeClasses;
 
-            <MudPaper Elevation="0" Class="@classes" Style="width: 100%;">
-                <MudText Typo="Typo.body2">@system.Jumps</MudText>
-                <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
-                    <ActivatorContent>
-                        <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
-                    </ActivatorContent>
-                    <ChildContent>
-                        <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
-                        <MudMenuItem Href="@($"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}")">Dotlan</MudMenuItem>
-                        <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
-                    </ChildContent>
-                </MudMenu>
-                <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
-            </MudPaper>
+@if(SettingsPageOpened)
+{
+    <div class="d-flex flex-column mx-1 my-4">
+        <div class="d-flex justify-space-between align-center align-content-center">
+            <MudSwitch @bind-Checked="UserSettingsReader.UserSettingsValues.DarkMode" Color="Color.Success" />
+            <MudText Align="Align.Center">Dark mode</MudText>
+        </div>
+        <div class="d-flex justify-space-between align-center align-content-center">
+            <MudSwitch @bind-Checked="UserSettingsReader.UserSettingsValues.CompactMode" Color="Color.Success" />
+            <MudText Align="Align.Center">Compact mode</MudText>
+        </div>
+        <MudNumericField Style="height: 40px;" Class="flex-shrink-1" @bind-Value="UserSettingsReader.UserSettingsValues.SystemsDepth" Immediate="true" Min="1" Max="10" Label="Jumps from root" Variant="Variant.Outlined" Step="1"/>
+    </div>
+}
+else
+{
+    @if (UserSettingsReader.UserSettingsValues.CompactMode)
+    {
+        @if (IntelSystems.Count() > 0)
+        {
+            <MudStack Spacing="0" Class="mx-2">
+                <MudPaper Elevation="0" Class="d-flex justify-space-around align-center flex-grow-1 gap-8" Style="width: 100%;">
+                    <MudText>J</MudText>
+                    <MudText Class="flex-shrink-1 align-content-center align-center" Align="Align.Start" Style="width: 100%;">System</MudText>
+                    <MudText>T</MudText>
+                </MudPaper>
+                @foreach (IntelSystem system in IntelSystems)
+                {
+                    string classes = ClearClasses;
+                    @if (system.IsRed)
+                        classes += RedClasses;
+                    else if (system.TriggerCounter > 0)
+                        classes += OrangeClasses;
+
+                    <MudPaper Elevation="0" Class="@classes" Style="width: 100%;">
+                        <MudText Typo="Typo.body2">@system.Jumps</MudText>
+                        <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
+                            <ActivatorContent>
+                                <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
+                                <MudMenuItem Href="@($"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}")">Dotlan</MudMenuItem>
+                                <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
+                            </ChildContent>
+                        </MudMenu>
+                        <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
+                    </MudPaper>
+                }
+            </MudStack>
         }
-    </MudStack>
+    }
+    else
+    {
+        <MudText>Not yet implemented</MudText>
+    }
 }

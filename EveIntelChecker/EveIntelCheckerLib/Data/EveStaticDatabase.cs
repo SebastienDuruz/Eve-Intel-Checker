@@ -133,14 +133,15 @@ namespace EveIntelCheckerLib.Data
         /// Build the list of System to check
         /// </summary>
         /// <param name="root">The root system</param>
+        /// <param name="systemDepth">The jumps to take before stopping the generation</param>
         /// <returns>The list with systems to check</returns>
-        public List<IntelSystem> BuildSystemsList(MapSolarSystem root)
+        public List<IntelSystem> BuildSystemsList(MapSolarSystem root, int systemDepth)
         {
             List<IntelSystem> intelSystems = new List<IntelSystem>();
             intelSystems.Add(ConvertMapSytemToIntelSystem(root));
 
             // Depth of 5 jumps by default
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < systemDepth; ++i)
                 foreach (IntelSystem system in intelSystems.ToList())
                     foreach (long id in system.ConnectedSytemsId)
                         if (!intelSystems.Exists(x => x.SystemId == id))
