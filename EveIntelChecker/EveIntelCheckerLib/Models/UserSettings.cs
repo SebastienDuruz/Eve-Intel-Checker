@@ -21,6 +21,16 @@
         public int SystemsDepth { get; set; } = 5;
 
         /// <summary>
+        /// The numbers of jumps to notifiate with Danger notification
+        /// </summary>
+        public int DangerNotification { get; set; } = 2;
+
+        /// <summary>
+        /// The numbers of jumps to ignore the base notification
+        /// </summary>
+        public int IgnoreNotification { get; set; } = 5;
+
+        /// <summary>
         /// Width of the main Window
         /// </summary>
         public double WindowWidth { get; set; } = 170;

@@ -117,7 +117,7 @@ namespace EveIntelCheckerPages
             SetChatLogFile();
             LoadUserSettingsLastLog();
 
-            SoundPlayer = new CustomSoundPlayer("notification.wav");
+            SoundPlayer = new CustomSoundPlayer("notification.wav", "danger.wav");
 
             // Read chat log file each sec
             ReadFileTimer = new Timer(async (object? stateInfo) =>
@@ -267,7 +267,11 @@ namespace EveIntelCheckerPages
                 if (ChatLogFile.LastLogFileMessage.Contains(intelSystem.SystemName))
                 {
                     intelSystem.IsRed = true;
-                    await PlayNotificationSound();
+                    // Play specific sounds if needed by the user settings
+                    if (intelSystem.Jumps <= UserSettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps <= UserSettingsReader.UserSettingsValues.DangerNotification)
+                        await PlayNotificationSound(true);
+                    else if (intelSystem.Jumps <= UserSettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps > UserSettingsReader.UserSettingsValues.DangerNotification)
+                        await PlayNotificationSound(false);
                     ++intelSystem.TriggerCounter;
                     newRedSystem = intelSystem.SystemName;
                 }
@@ -356,9 +360,9 @@ namespace EveIntelCheckerPages
         /// Play a sound on new trigger
         /// </summary>
         /// <returns>Result of the Task</returns>
-        private async Task PlayNotificationSound()
+        private async Task PlayNotificationSound(bool isDanger)
         {
-            SoundPlayer.PlaySound();
+            SoundPlayer.PlaySound(isDanger);
         }
 
         /// <summary>
