@@ -93,6 +93,11 @@ namespace EveIntelCheckerPages
         private bool SettingsPageOpened { get; set; } = false;
 
         /// <summary>
+        /// Define if a settings as been changed by user (recreate or not the Systems list)
+        /// </summary>
+        private bool SettingsChanged { get; set; } = false;
+
+        /// <summary>
         /// Custom theme for MudBlazor
         /// </summary>
         MudTheme CustomTheme = new MudTheme()
@@ -440,9 +445,53 @@ namespace EveIntelCheckerPages
             if (!SettingsPageOpened)
             {
                 UserSettingsReader.WriteUserSettings();
-                if (_selectedSystem != null)
+                if (_selectedSystem != null && SettingsChanged)
+                {
                     BuildSystems();
+                    SettingsChanged = false;
+                }
             }
+        }
+
+        /// <summary>
+        /// Update the value of DarkMode
+        /// </summary>
+        private void DarkModeChanged(bool newValue)
+        {
+            UserSettingsReader.UserSettingsValues.DarkMode = newValue;
+            UserSettingsReader.WriteUserSettings();
+        }
+
+        /// <summary>
+        /// Update the value of SystemsDepth
+        /// </summary>
+        private void SystemsDepthChanged(int newValue)
+        {
+            UserSettingsReader.UserSettingsValues.SystemsDepth = newValue;
+            SettingsChanged = true;
+            UserSettingsReader.WriteUserSettings();
+        }
+
+        /// <summary>
+        /// Update the value of DangerNotification
+        /// </summary>
+        private void DangerNotificationChanged(int newValue)
+        {
+            UserSettingsReader.UserSettingsValues.DangerNotification = newValue;
+            if (UserSettingsReader.UserSettingsValues.IgnoreNotification < newValue)
+                UserSettingsReader.UserSettingsValues.IgnoreNotification = newValue;
+            UserSettingsReader.WriteUserSettings();
+        }
+
+        /// <summary>
+        /// Update the value of IgnoreNotification
+        /// </summary>
+        private void IgnoreNotificationChanged(int newValue)
+        {
+            UserSettingsReader.UserSettingsValues.IgnoreNotification = newValue;
+            if (UserSettingsReader.UserSettingsValues.DangerNotification > newValue)
+                UserSettingsReader.UserSettingsValues.DangerNotification = newValue;
+            UserSettingsReader.WriteUserSettings();
         }
     }
 }

@@ -126,7 +126,6 @@ namespace EveIntelCheckerLib.Data
                 Console.WriteLine(ex.Message);
                 return new List<MapConstellation>();
             }
-
         }
 
         /// <summary>

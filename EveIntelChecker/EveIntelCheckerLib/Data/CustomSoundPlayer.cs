@@ -2,7 +2,6 @@
 /// Date : 25.09.2022
 
 using NetCoreAudio;
-using System.Media;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -12,32 +11,17 @@ namespace EveIntelCheckerLib.Data
     public class CustomSoundPlayer
     {
         /// <summary>
-        /// The current operating system specific settings
+        /// SoundPlayer using NAudio
         /// </summary>
-        private OperatingSystemSelector OperatingSystem { get; set; }
+        private Player SoundPlayer { get; set; }
 
         /// <summary>
-        /// SoundPlayer for Windows platform
-        /// </summary>
-        private SoundPlayer DangerSoundPlayer { get; set; }
-
-        /// <summary>
-        /// SoundPlayer for Windows platform
-        /// </summary>
-        private SoundPlayer NormalSoundPlayer { get; set; }
-
-        /// <summary>
-        /// SoundPlayer for Mac platform using NAudio
-        /// </summary>
-        private Player MacSoundPlayer { get; set; }
-
-        /// <summary>
-        /// FilePath of the danger audio file (Used only on MacOS)
+        /// FilePath of the danger audio file
         /// </summary>
         private string DangerAudioFilePath { get; set; }
 
         /// <summary>
-        /// FilePath of the normal audio file (Used only on MacOS)
+        /// FilePath of the normal audio file
         /// </summary>
         private string NormalAudioFilePath { get; set; }
 
@@ -47,21 +31,9 @@ namespace EveIntelCheckerLib.Data
         /// <param name="soundPath">The path of the sound to use</param>
         public CustomSoundPlayer(string normalSoundPath, string dangerSoundPath)
         {
-            OperatingSystem = new OperatingSystemSelector();
             DangerAudioFilePath = dangerSoundPath;
             NormalAudioFilePath = normalSoundPath;
-
-            // Select the correct Soundplayer for the current OperatingSystem
-            switch (OperatingSystem.CurrentOS)
-            {
-                case OperatingSystemSelector.OperatingSystemType.Mac:
-                    MacSoundPlayer = new Player();
-                    break;
-                case OperatingSystemSelector.OperatingSystemType.Windows:
-                    DangerSoundPlayer = new SoundPlayer(DangerAudioFilePath);
-                    NormalSoundPlayer = new SoundPlayer(NormalAudioFilePath);
-                    break;
-            }
+            SoundPlayer = new Player();
         }
 
         /// <summary>
@@ -69,21 +41,10 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public void PlaySound(bool isDanger)
         {
-            switch(OperatingSystem.CurrentOS)
-            {
-                case OperatingSystemSelector.OperatingSystemType.Windows:
-                    if (isDanger)
-                        DangerSoundPlayer.Play();
-                    else
-                        NormalSoundPlayer.Play();
-                    break;
-                case OperatingSystemSelector.OperatingSystemType.Mac:
-                    if (isDanger)
-                        MacSoundPlayer.Play(DangerAudioFilePath);
-                    else
-                        MacSoundPlayer.Play(NormalAudioFilePath);
-                    break;
-            }
+            if (isDanger)
+                SoundPlayer.Play(DangerAudioFilePath);
+            else
+                SoundPlayer.Play(NormalAudioFilePath);
         }
     }
 }
