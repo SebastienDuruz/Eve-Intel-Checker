@@ -31,6 +31,11 @@
         public int IgnoreNotification { get; set; } = 5;
 
         /// <summary>
+        /// The Volume of the notification
+        /// </summary>
+        public int NotificationVolume { get; set; } = 100;
+
+        /// <summary>
         /// Width of the main Window
         /// </summary>
         public double WindowWidth { get; set; } = 170;
@@ -41,7 +46,7 @@
         public double WindowHeight { get; set; } = 300;
 
         /// <summary>
-        /// Compact mode is the default display mode, if set to false display a Node graph
+        /// Compact mode is the default display mode, if set to false display a Node graph, not currently used
         /// </summary>
         public bool CompactMode { get; set; } = true;
 

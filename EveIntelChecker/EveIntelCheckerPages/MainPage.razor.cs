@@ -456,6 +456,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Update the value of DarkMode
         /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
         private void DarkModeChanged(bool newValue)
         {
             UserSettingsReader.UserSettingsValues.DarkMode = newValue;
@@ -465,6 +466,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Update the value of SystemsDepth
         /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
         private void SystemsDepthChanged(int newValue)
         {
             UserSettingsReader.UserSettingsValues.SystemsDepth = newValue;
@@ -475,6 +477,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Update the value of DangerNotification
         /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
         private void DangerNotificationChanged(int newValue)
         {
             UserSettingsReader.UserSettingsValues.DangerNotification = newValue;
@@ -486,12 +489,24 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Update the value of IgnoreNotification
         /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
         private void IgnoreNotificationChanged(int newValue)
         {
             UserSettingsReader.UserSettingsValues.IgnoreNotification = newValue;
             if (UserSettingsReader.UserSettingsValues.DangerNotification > newValue)
                 UserSettingsReader.UserSettingsValues.DangerNotification = newValue;
             UserSettingsReader.WriteUserSettings();
+        }
+
+        /// <summary>
+        /// Update the value of NotificationVolume
+        /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
+        private void NotificationVolumeChanged(int newValue)
+        {
+            UserSettingsReader.UserSettingsValues.NotificationVolume = newValue;
+            UserSettingsReader.WriteUserSettings();
+            SoundPlayer.PlaySound(true, UserSettingsReader.UserSettingsValues.NotificationVolume);
         }
     }
 }

@@ -36,22 +36,26 @@
 
 @if(SettingsPageOpened)
 {
-    <div class="d-flex flex-column mx-2 my-4">
+    <div class="d-flex flex-column mx-2 my-2">
         <div class="d-flex justify-space-between align-center align-content-center">
             <MudSwitch Checked="UserSettingsReader.UserSettingsValues.DarkMode" CheckedChanged="(bool x) => DarkModeChanged(x)" Color="Color.Primary" />
             <MudText Align="Align.Center" Typo="Typo.body2">Dark mode</MudText>
         </div>
         <MudText Typo="Typo.body2">Jumps from root : @(UserSettingsReader.UserSettingsValues.SystemsDepth)</MudText>
-        <div class="mx-2">
-                <MudSlider Class="flex-shrink-1" Size="Size.Medium" Value="UserSettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+        <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
         </div>
         <MudText Typo="Typo.body2">Danger notifications : @(UserSettingsReader.UserSettingsValues.DangerNotification)</MudText>
-        <div class="mx-2">
-                <MudSlider Class="flex-shrink-1" Size="Size.Medium" Value="UserSettingsReader.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+        <div class="mx-3">
+            <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
         </div>
         <MudText Typo="Typo.body2">Mute notifications : @(UserSettingsReader.UserSettingsValues.IgnoreNotification)</MudText>
-        <div class="mx-2">
-                <MudSlider Class="flex-shrink-1" Size="Size.Medium" Value="UserSettingsReader.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+        <div class="mx-3">
+            <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+        </div>
+        <MudText Typo="Typo.body2">Volume : @(UserSettingsReader.UserSettingsValues.NotificationVolume)</MudText>
+        <div class="mx-3">
+            <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="true" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
         </div>
     </div>
 }

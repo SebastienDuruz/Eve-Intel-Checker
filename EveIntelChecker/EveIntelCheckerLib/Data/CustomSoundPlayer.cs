@@ -2,6 +2,7 @@
 /// Date : 25.09.2022
 
 using NetCoreAudio;
+using System;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -39,8 +40,11 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// Play the sound selected with corresponding player
         /// </summary>
-        public void PlaySound(bool isDanger)
+        /// <param name="isDanger">Play Danger notification or normal notification</param>
+        /// <param name="volume">Volume applied to the notification</param>
+        public async void PlaySound(bool isDanger, int volume = 100)
         {
+            await SoundPlayer.SetVolume((byte)volume);
             if (isDanger)
                 SoundPlayer.Play(DangerAudioFilePath);
             else
