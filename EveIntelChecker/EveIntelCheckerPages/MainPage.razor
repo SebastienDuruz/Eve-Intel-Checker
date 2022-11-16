@@ -55,7 +55,7 @@
         </div>
         <MudText Typo="Typo.body2">Volume : @(UserSettingsReader.UserSettingsValues.NotificationVolume)</MudText>
         <div class="mx-3">
-            <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="true" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
         </div>
     </div>
 }
