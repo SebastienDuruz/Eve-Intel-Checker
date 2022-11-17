@@ -33,7 +33,7 @@ namespace EveIntelCheckerElectron.Data
                     Height = height,
                     MinWidth = 170,
                     Width = width,
-                    Title = "Eve Intel Checker"
+                    Title = "Eve Intel Checker",
                 });
 
             // Add events to mainWindow

@@ -41,9 +41,9 @@
             <MudSwitch Checked="UserSettingsReader.UserSettingsValues.DarkMode" CheckedChanged="(bool x) => DarkModeChanged(x)" Color="Color.Primary" />
             <MudText Align="Align.Center" Typo="Typo.body2">Dark mode</MudText>
         </div>
-        <MudText Typo="Typo.body2">Jumps from root : @(UserSettingsReader.UserSettingsValues.SystemsDepth)</MudText>
+            <MudText Typo="Typo.body2">Jumps from root : @(UserSettingsReader.UserSettingsValues.SystemsDepth)</MudText>
         <div class="mx-3">
-                <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            <MudSlider Size="Size.Small" Value="UserSettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
         </div>
         <MudText Typo="Typo.body2">Danger notifications : @(UserSettingsReader.UserSettingsValues.DangerNotification)</MudText>
         <div class="mx-3">
