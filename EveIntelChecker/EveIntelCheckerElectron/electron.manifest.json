@@ -11,7 +11,7 @@
     "appId": "com.EveIntelCheckerElectron.app",
     "productName": "EveIntelCheckerElectron",
     "copyright": "Copyright © 2022",
-    "buildVersion": "1.0.4",
+    "buildVersion": "1.0.5",
     "compression": "maximum",
     "directories": {
       "output": "../../../bin/Desktop"
