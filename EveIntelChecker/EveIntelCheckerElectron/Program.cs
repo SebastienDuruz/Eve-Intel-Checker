@@ -5,7 +5,7 @@ using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-UserSettingsReader userSettings = new UserSettingsReader();
+UserSettingsReader userSettings = UserSettingsReader.Instance;
 
 // Add services to the container.
 builder.Services.AddRazorPages();

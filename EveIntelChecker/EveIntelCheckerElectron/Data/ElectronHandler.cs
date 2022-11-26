@@ -58,7 +58,7 @@ namespace EveIntelCheckerElectron.Data
         /// </summary>
         public static void CloseApplication()
         {
-            UserSettingsReader userSettings = new UserSettingsReader();
+            UserSettingsReader userSettings = UserSettingsReader.Instance;
             int[] windowSize = AppMainWindow.GetSizeAsync().Result;
             userSettings.UserSettingsValues.WindowWidth = windowSize[0];
             userSettings.UserSettingsValues.WindowHeight = windowSize[1];

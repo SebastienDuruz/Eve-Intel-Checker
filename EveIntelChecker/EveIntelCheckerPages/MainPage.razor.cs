@@ -118,7 +118,7 @@ namespace EveIntelCheckerPages
         protected override async Task OnInitializedAsync()
         {
             LogFileLoaded = false;
-            OperatingSystem = new OperatingSystemSelector();
+            OperatingSystem = OperatingSystemSelector.Instance;
             SetChatLogFile();
             LoadUserSettingsLastLog();
 

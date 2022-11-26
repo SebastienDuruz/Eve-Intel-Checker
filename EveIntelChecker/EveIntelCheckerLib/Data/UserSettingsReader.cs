@@ -14,6 +14,16 @@ namespace EveIntelCheckerLib.Data
     public class UserSettingsReader
     {
         /// <summary>
+        /// Padlock for thread safe Singleton operations
+        /// </summary>
+        private static readonly object _padLock = new object();
+
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
+        private static UserSettingsReader _instance = null;
+
+        /// <summary>
         /// File path of the userSettings file
         /// </summary>
         private string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userSettings.json");
@@ -26,9 +36,25 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// Default Constructor
         /// </summary>
-        public UserSettingsReader()
+        private UserSettingsReader()
         {
             ReadUserSettings();
+        }
+
+        /// <summary>
+        /// Get the singleton instance
+        /// </summary>
+        public static UserSettingsReader Instance
+        {
+            get
+            {
+                lock (_padLock)
+                {
+                    if (_instance == null)
+                        _instance = new UserSettingsReader();
+                    return _instance;
+                }
+            }
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace EveIntelChecker
         {
             InitializeComponent();
 
-            UserSettingsReader userSettings = new UserSettingsReader();
+            UserSettingsReader userSettings = UserSettingsReader.Instance;
             this.Width = userSettings.UserSettingsValues.WindowWidth;
             this.Height = userSettings.UserSettingsValues.WindowHeight;
 
@@ -38,7 +38,7 @@ namespace EveIntelChecker
         /// <param name="e">args collection</param>
         private void WindowOnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            UserSettingsReader userSettings = new UserSettingsReader();
+            UserSettingsReader userSettings = UserSettingsReader.Instance;
             userSettings.UserSettingsValues.WindowWidth = this.Width;
             userSettings.UserSettingsValues.WindowHeight = this.Height;
             userSettings.WriteUserSettings();

@@ -2,7 +2,6 @@
 /// Date : 25.09.2022
 
 using NetCoreAudio;
-using System;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -27,6 +26,11 @@ namespace EveIntelCheckerLib.Data
         private string NormalAudioFilePath { get; set; }
 
         /// <summary>
+        /// The current volume applied to the sound player
+        /// </summary>
+        private byte CurrentVolume { get; set; }
+
+        /// <summary>
         /// Custom Constructor
         /// </summary>
         /// <param name="soundPath">The path of the sound to use</param>
@@ -34,6 +38,7 @@ namespace EveIntelCheckerLib.Data
         {
             DangerAudioFilePath = dangerSoundPath;
             NormalAudioFilePath = normalSoundPath;
+            CurrentVolume = 100;
             SoundPlayer = new Player();
         }
 
@@ -44,7 +49,15 @@ namespace EveIntelCheckerLib.Data
         /// <param name="volume">Volume applied to the notification</param>
         public async void PlaySound(bool isDanger, int volume = 100)
         {
-            await SoundPlayer.SetVolume((byte)volume);
+            if(volume != CurrentVolume)
+            {
+                if (OperatingSystemSelector.Instance.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
+                    await SoundPlayer.SetVolume((byte)volume, "EveIntelCheckerElectron");
+                else
+                    await SoundPlayer.SetVolume((byte)volume);
+                CurrentVolume = (byte)volume;
+            }
+
             if (isDanger)
                 SoundPlayer.Play(DangerAudioFilePath);
             else
