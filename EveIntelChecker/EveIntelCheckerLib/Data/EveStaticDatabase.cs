@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -18,6 +17,16 @@ namespace EveIntelCheckerLib.Data
     /// </summary>
     public class EveStaticDatabase
     {
+        /// <summary>
+        /// Padlock for thread safe Singleton operations
+        /// </summary>
+        private static readonly object _padLock = new object();
+
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
+        private static EveStaticDatabase _instance = null;
+
         /// <summary>
         /// Path of the DB export files
         /// </summary>
@@ -47,7 +56,7 @@ namespace EveIntelCheckerLib.Data
         /// Custom Constructor
         /// </summary>
         /// <param name="isElectron">True if built with Electron, False if not</param>
-        public EveStaticDatabase(bool isElectron = false)
+        private EveStaticDatabase()
         {
             FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data/Export");
 
@@ -55,6 +64,22 @@ namespace EveIntelCheckerLib.Data
             SolarSystemJumps = ReadSolarSystemJumps();
             Regions = ReadRegions();
             Constellations = ReadConstellations();
+        }
+
+        /// <summary>
+        /// Get the singleton instance
+        /// </summary>
+        public static EveStaticDatabase Instance
+        {
+            get
+            {
+                lock (_padLock)
+                {
+                    if (_instance == null)
+                        _instance = new EveStaticDatabase();
+                    return _instance;
+                }
+            }
         }
 
         /// <summary>
@@ -72,7 +97,6 @@ namespace EveIntelCheckerLib.Data
                 Console.WriteLine(ex.Message);
                 return new List<MapSolarSystem>();
             }
-           
         }
 
         /// <summary>
@@ -90,7 +114,6 @@ namespace EveIntelCheckerLib.Data
                 Console.WriteLine(ex.Message);
                 return new List<MapSolarSystemJump>();
             }
-
         }
 
         /// <summary>
@@ -108,7 +131,6 @@ namespace EveIntelCheckerLib.Data
                 Console.WriteLine(ex.Message);
                 return new List<MapRegion>();
             }
-
         }
 
         /// <summary>

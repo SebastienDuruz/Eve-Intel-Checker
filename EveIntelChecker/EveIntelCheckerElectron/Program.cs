@@ -6,11 +6,12 @@ using MudBlazor.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 UserSettingsReader userSettings = UserSettingsReader.Instance;
+EveStaticDatabase staticDatabase = EveStaticDatabase.Instance;
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton(new EveStaticDatabase(HybridSupport.IsElectronActive));
+builder.Services.AddSingleton(staticDatabase);
 builder.Services.AddSingleton(userSettings);
 builder.Services.AddMudServices();
 

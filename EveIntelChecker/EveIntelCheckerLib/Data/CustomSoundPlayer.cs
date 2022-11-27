@@ -51,9 +51,8 @@ namespace EveIntelCheckerLib.Data
         {
             if(volume != CurrentVolume && volume != -1)
             {
-                if (OperatingSystemSelector.Instance.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
-                    await SoundPlayer.SetVolume((byte)volume, "EveIntelCheckerElectron");
-                else
+                // Currently only working on Windows, issue with mac -> Sound always reset master
+                if (OperatingSystemSelector.Instance.CurrentOS != OperatingSystemSelector.OperatingSystemType.Mac)
                     await SoundPlayer.SetVolume((byte)volume);
                 CurrentVolume = (byte)volume;
             }
