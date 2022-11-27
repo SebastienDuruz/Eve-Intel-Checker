@@ -47,9 +47,9 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         /// <param name="isDanger">Play Danger notification or normal notification</param>
         /// <param name="volume">Volume applied to the notification</param>
-        public async void PlaySound(bool isDanger, int volume = 100)
+        public async void PlaySound(bool isDanger, int volume = -1)
         {
-            if(volume != CurrentVolume)
+            if(volume != CurrentVolume && volume != -1)
             {
                 if (OperatingSystemSelector.Instance.CurrentOS == OperatingSystemSelector.OperatingSystemType.Mac)
                     await SoundPlayer.SetVolume((byte)volume, "EveIntelCheckerElectron");
