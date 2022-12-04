@@ -17,16 +17,12 @@ namespace EveIntelChecker
         {
             InitializeComponent();
 
-            EveStaticDatabase staticDatabase = EveStaticDatabase.Instance;
-            UserSettingsReader userSettings = UserSettingsReader.Instance;
-            this.Width = userSettings.UserSettingsValues.WindowWidth;
-            this.Height = userSettings.UserSettingsValues.WindowHeight;
+            this.Width = UserSettingsReader.Instance.UserSettingsValues.WindowWidth;
+            this.Height = UserSettingsReader.Instance.UserSettingsValues.WindowHeight;
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWpfBlazorWebView();
             serviceCollection.AddMudServices();
-            serviceCollection.AddSingleton(staticDatabase);
-            serviceCollection.AddSingleton(userSettings);
             Resources.Add("services", serviceCollection.BuildServiceProvider());
 
         }

@@ -58,11 +58,10 @@ namespace EveIntelCheckerElectron.Data
         /// </summary>
         public static void CloseApplication()
         {
-            UserSettingsReader userSettings = UserSettingsReader.Instance;
             int[] windowSize = AppMainWindow.GetSizeAsync().Result;
-            userSettings.UserSettingsValues.WindowWidth = windowSize[0];
-            userSettings.UserSettingsValues.WindowHeight = windowSize[1];
-            userSettings.WriteUserSettings();
+            UserSettingsReader.Instance.UserSettingsValues.WindowWidth = windowSize[0];
+            UserSettingsReader.Instance.UserSettingsValues.WindowHeight = windowSize[1];
+            UserSettingsReader.Instance.WriteUserSettings();
             Electron.App.Quit();
         }
     }
