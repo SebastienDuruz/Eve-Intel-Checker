@@ -5,6 +5,7 @@
 using EveIntelCheckerLib.Data;
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
+using EveIntelCheckerLib.Models.Map;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -94,6 +96,11 @@ namespace EveIntelCheckerPages
         private bool SettingsChanged { get; set; } = false;
 
         /// <summary>
+        /// Object that contains the build data ready to be used by JS (building the map)
+        /// </summary>
+        private (MapNode[], MapLink[]) MapSystemsData { get; set; }
+
+        /// <summary>
         /// Custom theme for MudBlazor
         /// </summary>
         MudTheme CustomTheme = new MudTheme()
@@ -131,11 +138,15 @@ namespace EveIntelCheckerPages
         /// </summary>
         /// <param name="firstRender">Is first render</param>
         /// <returns>result of the task</returns>
-        protected override Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
-                JSRuntime.InvokeVoidAsync("buildMap");
-            return base.OnAfterRenderAsync(firstRender);
+            {
+                await JSRuntime.InvokeVoidAsync("setNodes", MapSystemsData.Item1);
+                await JSRuntime.InvokeVoidAsync("setLinks", MapSystemsData.Item2);
+                await JSRuntime.InvokeVoidAsync("buildMap");
+            }
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         /// <summary>
@@ -225,10 +236,12 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Build the list of systems to display
         /// </summary>
-        private void BuildSystems()
+        private async void BuildSystems()
         {
             // Build the list of systems
             IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, UserSettingsReader.Instance.UserSettingsValues.SystemsDepth);
+
+            MapSystemsData = BuildMapNodes();
 
             // Update the userSettings with new selected system
             UserSettingsReader.Instance.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
@@ -457,9 +470,6 @@ namespace EveIntelCheckerPages
                     BuildSystems();
                     SettingsChanged = false;
                 }
-
-                if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
-                    await JSRuntime.InvokeVoidAsync("destroyMap");
             }
         }
 
@@ -470,6 +480,16 @@ namespace EveIntelCheckerPages
         private void DarkModeChanged(bool newValue)
         {
             UserSettingsReader.Instance.UserSettingsValues.DarkMode = newValue;
+            UserSettingsReader.Instance.WriteUserSettings();
+        }
+
+        /// <summary>
+        /// Update the value of compactMode
+        /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
+        private void CompactModeChanged(bool newValue)
+        {
+            UserSettingsReader.Instance.UserSettingsValues.CompactMode = newValue;
             UserSettingsReader.Instance.WriteUserSettings();
         }
 
@@ -518,5 +538,41 @@ namespace EveIntelCheckerPages
             UserSettingsReader.Instance.WriteUserSettings();
             SoundPlayer.PlaySound(true, UserSettingsReader.Instance.UserSettingsValues.NotificationVolume);
         }
+
+        /// <summary>
+        /// Build the data required by the Javascript map
+        /// </summary>
+        /// <returns></returns>
+        private (MapNode[], MapLink[]) BuildMapNodes()
+        {
+            MapNode[] mapNodes = new MapNode[IntelSystems.Count];
+            //MapLink[] mapLinks = new MapLink[IntelSystems.Count];
+            List<MapLink> mapLinks = new List<MapLink>();
+            int linksCounter = 0;
+
+            for (int i = 0; i < IntelSystems.Count; ++i)
+            {
+                mapNodes[i] = new MapNode()
+                {
+                    Id = (int)IntelSystems[i].SystemId,
+                    Label = IntelSystems[i].SystemName,
+                    Color = "black"
+                };
+
+                Console.Error.WriteLine(mapNodes[i].Id);
+
+                foreach(int connectedSystem in IntelSystems[i].ConnectedSytemsId)
+                {
+                    mapLinks.Add(new MapLink()
+                    {
+                        From = IntelSystems[i].SystemId,
+                        To = connectedSystem
+                    });
+                }
+            }
+
+            return (mapNodes, mapLinks.ToArray());
+        }
+
     }
 }

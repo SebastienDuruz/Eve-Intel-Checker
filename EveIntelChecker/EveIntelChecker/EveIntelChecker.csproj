@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <Content Update="wwwroot\js\buildGraph.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

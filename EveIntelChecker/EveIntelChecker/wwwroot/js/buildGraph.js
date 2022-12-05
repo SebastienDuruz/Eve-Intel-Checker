@@ -4,45 +4,70 @@
  * Description : Map generator for Eve Intel Checker
  */
 
-// create an array with nodes
-var nodes = new vis.DataSet([
-    { id: 1, label: 'PBD' },
-    { id: 2, label: '9GI' },
-    { id: 3, label: 'L-1' },
-    { id: 4, label: 'DBT' },
-    { id: 5, label: 'PND' },
-    { id: 6, label: '3G-' }
-]);
-
-// create an array with edges
-var edges = new vis.DataSet([
-    { from: 1, to: 2 },
-    { from: 2, to: 4 },
-    { from: 2, to: 3 },
-    { from: 4, to: 5 },
-    { from: 4, to: 6 }
-]);
-
-// provide the data in the vis format
-var data = {
-    nodes: nodes,
-    edges: edges
-};
-var options = {
-    height: '100%',
-    width: '100%'
-};
-
 var container
 var map
 
-function buildMap() {
+var options = {
+    height: '100%',
+    width: '100%',
+    clickToUse: false,
+    physics: {
+        enabled: false,
+    },
+    nodes: {
+        borderWidth: 1,
+        borderWidthSelected: 1,
+        chosen: false,
+        color: {
+            border: '#E0E0E0',
+            background: '#272c34ff',
+            highlight: {
+                border: '#E0E0E0',
+                background: '#272c34ff'
+            },
+            hover: {
+                border: '#E0E0E0',
+                background: '#272c34ff'
+            }
+        },
+        font: {
+            color: '#E0E0E0',
+            size: 14, // px
+            face: 'arial'
+        },
+        fixed: true,
+        shape: 'box'
+    },
+    layout: {
+        randomSeed: '0.45384121392550325:1670224726446',
+        improvedLayout: true,
+        hierarchical: {
+            enabled: true,
+            levelSeparation: 100,
+            nodeSpacing: 100,
+            treeSpacing: 100,
+            blockShifting: true,
+            edgeMinimization: true,
+            parentCentralization: true,
+            direction: 'UD',        // UD, DU, LR, RL
+            sortMethod: 'hubsize',  // hubsize, directed
+            shakeTowards: 'roots'  // roots, leaves
+        }
+    }
+};
+
+
+
+function buildMap(nodes, edges) {
+    // create an array with nodes
+    
+
+    // provide the data in the vis format
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+
     container = document.getElementById('canvasMap');
     map = new vis.Network(container, data, options);
 }
-
-function destroyMap() {
-    map.hide()
-}
-
-console.log("hello")

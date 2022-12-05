@@ -7,8 +7,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -59,6 +61,10 @@ namespace EveIntelCheckerLib.Data
         private EveStaticDatabase()
         {
             FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data/Export");
+         
+            // TODO : Fix for developpement purpose only !
+            if (!Directory.Exists(FolderPath))
+                FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""), "Data\\Export");
 
             SolarSystems = ReadSolarSystems();
             SolarSystemJumps = ReadSolarSystemJumps();
@@ -161,7 +167,6 @@ namespace EveIntelCheckerLib.Data
             List<IntelSystem> intelSystems = new List<IntelSystem>();
             intelSystems.Add(ConvertMapSytemToIntelSystem(root));
 
-            // Depth of 5 jumps by default
             for (int i = 0; i < systemDepth; ++i)
                 foreach (IntelSystem system in intelSystems.ToList())
                     foreach (long id in system.ConnectedSytemsId)
