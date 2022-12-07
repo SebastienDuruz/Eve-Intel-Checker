@@ -141,11 +141,7 @@ namespace EveIntelCheckerPages
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
-            {
-                await JSRuntime.InvokeVoidAsync("setNodes", MapSystemsData.Item1);
-                await JSRuntime.InvokeVoidAsync("setLinks", MapSystemsData.Item2);
-                await JSRuntime.InvokeVoidAsync("buildMap");
-            }
+                JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
             await base.OnAfterRenderAsync(firstRender);
         }
 
@@ -273,6 +269,8 @@ namespace EveIntelCheckerPages
                             await InvokeAsync(() => StateHasChanged());
                         }
                 }
+
+                MapSystemsData = BuildMapNodes();
 
                 // Check for new chatlog file
                 await CheckNewLogFile();
@@ -494,6 +492,16 @@ namespace EveIntelCheckerPages
         }
 
         /// <summary>
+        /// Update the value of TopMost
+        /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
+        private void TopMostChanged(bool newValue)
+        {
+            UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost = newValue;
+            UserSettingsReader.Instance.WriteUserSettings();
+        }
+
+        /// <summary>
         /// Update the value of SystemsDepth
         /// </summary>
         /// <param name="newValue">The new value to be applied</param>
@@ -550,24 +558,47 @@ namespace EveIntelCheckerPages
             List<MapLink> mapLinks = new List<MapLink>();
             int linksCounter = 0;
 
+            // Build nodes with Id starting by 1
             for (int i = 0; i < IntelSystems.Count; ++i)
             {
-                mapNodes[i] = new MapNode()
-                {
-                    Id = (int)IntelSystems[i].SystemId,
-                    Label = IntelSystems[i].SystemName,
-                    Color = "black"
-                };
+                mapNodes[i] = new MapNode();
 
-                Console.Error.WriteLine(mapNodes[i].Id);
+                mapNodes[i].Color.Background = "#424242ff";
+                if (IntelSystems[i].IsRed)
+                    mapNodes[i].Color.Background = "#f64e62ff";
+                else if (IntelSystems[i].TriggerCounter > 0)
+                    mapNodes[i].Color.Background = "#ffa800ff";
 
-                foreach(int connectedSystem in IntelSystems[i].ConnectedSytemsId)
+                if (IntelSystems[i].Jumps == 0)
+                    mapNodes[i].Shape = "ellipse";
+
+                mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n{IntelSystems[i].TriggerCounter}";
+                mapNodes[i].Id = i + 1;
+            }
+
+            foreach (IntelSystem system in IntelSystems)
+            {
+                foreach (long link in system.ConnectedSytemsId)
                 {
-                    mapLinks.Add(new MapLink()
+                    MapLink systemLink = new MapLink();
+
+                    try
                     {
-                        From = IntelSystems[i].SystemId,
-                        To = connectedSystem
-                    });
+                        systemLink.From = mapNodes.Where(x => x.Label.Contains(system.SystemName)).FirstOrDefault().Id;
+                        IntelSystem systemToConnect = IntelSystems.Where(x => x.SystemId == link).FirstOrDefault();
+                       
+                        // Only if system is still on the generation
+                        if(systemToConnect != null)
+                        {
+                            systemLink.To = mapNodes.Where(x => x.Label.Contains(systemToConnect.SystemName)).FirstOrDefault().Id;
+                            if (!mapLinks.Exists(x => x.From == systemLink.From && x.To == systemLink.To) && !mapLinks.Exists(x => x.From == systemLink.To && x.To == systemLink.From))
+                                mapLinks.Add(systemLink);
+                        }
+                    }
+                    catch(Exception)
+                    {
+                        // TODO : Do something with exception
+                    }
                 }
             }
 

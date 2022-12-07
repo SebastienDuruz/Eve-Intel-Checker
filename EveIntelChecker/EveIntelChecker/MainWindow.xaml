@@ -7,7 +7,6 @@
         xmlns:local="clr-namespace:EveIntelChecker"
         mc:Ignorable="d"
         WindowStyle="ToolWindow"
-        Topmost="True"
         ResizeMode="CanResize"
         MinWidth="170"
         Title="Eve Intel Checker" Height="300" Width="170"

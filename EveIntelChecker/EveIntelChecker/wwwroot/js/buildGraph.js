@@ -4,70 +4,99 @@
  * Description : Map generator for Eve Intel Checker
  */
 
-var container
-var map
-
-var options = {
+let container
+let map
+let links
+let nodes
+let options = {
     height: '100%',
     width: '100%',
     clickToUse: false,
     physics: {
-        enabled: false,
+        stabilization: {
+            enabled: false,
+            fit: false
+        }
     },
     nodes: {
-        borderWidth: 1,
-        borderWidthSelected: 1,
+        borderWidth: 2,
+        borderWidthSelected: 2,
         chosen: false,
         color: {
             border: '#E0E0E0',
-            background: '#272c34ff',
-            highlight: {
-                border: '#E0E0E0',
-                background: '#272c34ff'
-            },
-            hover: {
-                border: '#E0E0E0',
-                background: '#272c34ff'
-            }
+            background: '#27272fff',
         },
         font: {
-            color: '#E0E0E0',
-            size: 14, // px
-            face: 'arial'
+            color: '#FFFFFF',
+            size: 18, // px
+            face: 'roboto'
         },
         fixed: true,
         shape: 'box'
     },
     layout: {
-        randomSeed: '0.45384121392550325:1670224726446',
         improvedLayout: true,
+        randomSeed: 2,
         hierarchical: {
-            enabled: true,
-            levelSeparation: 100,
-            nodeSpacing: 100,
-            treeSpacing: 100,
-            blockShifting: true,
+            enabled: false,
+            levelSeparation: 150,
+            nodeSpacing: 150,
+            treeSpacing: 250,
+            blockShifting: false,
             edgeMinimization: true,
             parentCentralization: true,
-            direction: 'UD',        // UD, DU, LR, RL
-            sortMethod: 'hubsize',  // hubsize, directed
+            direction: 'DU',        // UD, DU, LR, RL
+            sortMethod: 'directed',  // hubsize, directed
             shakeTowards: 'roots'  // roots, leaves
         }
+    },
+    interaction: {
+        dragNodes: false,
+        dragView: false,
+        hideEdgesOnDrag: false,
+        hideEdgesOnZoom: false,
+        hideNodesOnDrag: false,
+        hover: false,
+        hoverConnectedEdges: true,
+        keyboard: {
+            enabled: false,
+            speed: { x: 10, y: 10, zoom: 0.02 },
+            bindToWindow: true,
+            autoFocus: true,
+        },
+        multiselect: false,
+        navigationButtons: false,
+        selectable: true,
+        selectConnectedEdges: true,
+        tooltipDelay: 300,
+        zoomSpeed: 1,
+        zoomView: false
     }
 };
 
+/**
+ * Autofit the StarMap on resize
+ * */
+document.getElementsByTagName("BODY")[0].onresize = function () { fitMap() };
+window.onresize = function () { fitMap() };
+function fitMap() {
+    if (map != null) {
+        map.fit();
+    }
+}
 
 
-function buildMap(nodes, edges) {
-    // create an array with nodes
-    
-
-    // provide the data in the vis format
+/**
+ * Build new map by settings new data
+ * */
+function buildMap(nodesToBuild, linksToBuild) {
     var data = {
-        nodes: nodes,
-        edges: edges
+        nodes: nodesToBuild,
+        edges: linksToBuild
     };
 
     container = document.getElementById('canvasMap');
     map = new vis.Network(container, data, options);
 }
+
+

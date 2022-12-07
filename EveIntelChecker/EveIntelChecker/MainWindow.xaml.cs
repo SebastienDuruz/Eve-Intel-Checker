@@ -19,6 +19,7 @@ namespace EveIntelChecker
 
             this.Width = UserSettingsReader.Instance.UserSettingsValues.WindowWidth;
             this.Height = UserSettingsReader.Instance.UserSettingsValues.WindowHeight;
+            this.Topmost = UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost;
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWpfBlazorWebView();
