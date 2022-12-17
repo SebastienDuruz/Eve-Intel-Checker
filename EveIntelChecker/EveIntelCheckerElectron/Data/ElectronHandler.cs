@@ -21,18 +21,18 @@ namespace EveIntelCheckerElectron.Data
         /// Create the Electron Window
         /// </summary>
         /// <returns>Results of the task</returns>
-        public async static Task CreateElectronWindow(int width, int height)
+        public async static Task CreateElectronWindow()
         {
             Electron.ReadAuth();
             AppMainWindow = await Electron.WindowManager.CreateWindowAsync(
                 new BrowserWindowOptions()
                 {
                     AutoHideMenuBar = true,
-                    AlwaysOnTop = true,
+                    AlwaysOnTop = UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
-                    Height = height,
+                    Height = (int)UserSettingsReader.Instance.UserSettingsValues.WindowHeight,
                     MinWidth = 170,
-                    Width = width,
+                    Width = (int)UserSettingsReader.Instance.UserSettingsValues.WindowWidth,
                     Title = "Eve Intel Checker",
                 });
 
@@ -58,11 +58,10 @@ namespace EveIntelCheckerElectron.Data
         /// </summary>
         public static void CloseApplication()
         {
-            UserSettingsReader userSettings = UserSettingsReader.Instance;
             int[] windowSize = AppMainWindow.GetSizeAsync().Result;
-            userSettings.UserSettingsValues.WindowWidth = windowSize[0];
-            userSettings.UserSettingsValues.WindowHeight = windowSize[1];
-            userSettings.WriteUserSettings();
+            UserSettingsReader.Instance.UserSettingsValues.WindowWidth = windowSize[0];
+            UserSettingsReader.Instance.UserSettingsValues.WindowHeight = windowSize[1];
+            UserSettingsReader.Instance.WriteUserSettings();
             Electron.App.Quit();
         }
     }

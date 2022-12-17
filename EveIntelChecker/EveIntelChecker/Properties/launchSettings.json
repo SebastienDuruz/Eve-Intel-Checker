@@ -2,7 +2,7 @@
   "profiles": {
     "EveIntelChecker": {
       "commandName": "Project",
-      "nativeDebugging": false,
+      "nativeDebugging": true,
       "jsWebView2Debugging": true
     }
   }

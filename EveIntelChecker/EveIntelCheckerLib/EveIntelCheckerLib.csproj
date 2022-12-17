@@ -31,7 +31,7 @@
     <EmbeddedResource Include="Data\Export\mapSolarSystems.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="notification.wav">
+    <EmbeddedResource Include="notif.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
