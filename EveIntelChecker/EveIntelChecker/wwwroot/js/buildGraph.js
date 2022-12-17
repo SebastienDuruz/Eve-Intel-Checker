@@ -72,6 +72,7 @@ let options = {
  * Autofit the StarMap
  * */
 
+window.onresize = function () { fitMap() };
 function fitMap() {
     if (map != undefined) {
         map.fit();
@@ -103,8 +104,8 @@ function buildMap(nodesToBuild, linksToBuild) {
         }
     });
 }
-
 function setData(nodesToBuild) {
     nodes = new vis.DataSet(nodesToBuild);
     map.setData({ nodes: nodes, edges: links });
 }
+
