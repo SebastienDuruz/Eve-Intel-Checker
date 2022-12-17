@@ -13,8 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Media;
-using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -124,7 +122,7 @@ namespace EveIntelCheckerPages
             SetChatLogFile();
             LoadUserSettingsLastLog();
 
-            SoundPlayer = new CustomSoundPlayer("notification.wav", "danger.wav");
+            SoundPlayer = new CustomSoundPlayer("notif.wav", "danger.wav");
 
             // Read chat log file each sec
             ReadFileTimer = new Timer(async (object? stateInfo) =>
@@ -266,11 +264,8 @@ namespace EveIntelCheckerPages
                             ChatLogFile.LastLogFileMessage = lines[lines.Count() - 1];
                             await CheckSystemProximity();
                             await ExtractTimeFromMessage(ChatLogFile.LastLogFileMessage);
-                            await InvokeAsync(() => StateHasChanged());
                         }
                 }
-
-                MapSystemsData = BuildMapNodes();
 
                 // Check for new chatlog file
                 await CheckNewLogFile();
@@ -301,10 +296,19 @@ namespace EveIntelCheckerPages
 
             // If needed reset the last system set to RED
             if (newRedSystem != "")
+            {
                 foreach (IntelSystem intelSystem in IntelSystems)
                     if (intelSystem.SystemName != newRedSystem)
                         intelSystem.IsRed = false;
 
+                // rebuild the systems data for StarMap
+                if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+                {
+                    MapSystemsData = BuildMapNodes();
+                    JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                }
+            }
+            
             await InvokeAsync(() => StateHasChanged());
         }
 
@@ -320,6 +324,17 @@ namespace EveIntelCheckerPages
                     system.TriggerCounter = 0;
                     system.IsRed = false;
                 }
+
+            MapSystemsData = BuildMapNodes();
+        }
+
+        /// <summary>
+        /// Reset the triggers counter to 0
+        /// </summary>
+        /// <returns>Result of the Task</returns>
+        private async Task ResizeMap()
+        {
+            await JSRuntime.InvokeVoidAsync("fitMap");
         }
 
         /// <summary>
@@ -397,10 +412,14 @@ namespace EveIntelCheckerPages
         {
             try
             {
-                string time = message.Split("[")[1];
-                time = time.Split("]")[0];
-                ChatLogFile.LastLogFileRead = time.Split(" ")[2];
-                await InvokeAsync(() => StateHasChanged());
+                // Only if message have correct format
+                if(message.Contains("[") && message.Contains("]"))
+                {
+                    string time = message.Split("[")[1];
+                    time = time.Split("]")[0];
+                    ChatLogFile.LastLogFileRead = time.Split(" ")[2];
+                    await InvokeAsync(() => StateHasChanged());
+                }
             }
             catch (Exception)
             {
@@ -554,7 +573,6 @@ namespace EveIntelCheckerPages
         private (MapNode[], MapLink[]) BuildMapNodes()
         {
             MapNode[] mapNodes = new MapNode[IntelSystems.Count];
-            //MapLink[] mapLinks = new MapLink[IntelSystems.Count];
             List<MapLink> mapLinks = new List<MapLink>();
             int linksCounter = 0;
 
@@ -570,10 +588,16 @@ namespace EveIntelCheckerPages
                     mapNodes[i].Color.Background = "#ffa800ff";
 
                 if (IntelSystems[i].Jumps == 0)
+                {
                     mapNodes[i].Shape = "ellipse";
+                    mapNodes[i].BorderWidth = 2;
+                }
 
-                mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n{IntelSystems[i].TriggerCounter}";
+                mapNodes[i].Font.Multi = true;
+                mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n<code>J:{IntelSystems[i].Jumps} T:{IntelSystems[i].TriggerCounter}</code>";
                 mapNodes[i].Id = i + 1;
+                mapNodes[i].Region = IntelSystems[i].SystemDomainName;
+                mapNodes[i].System = IntelSystems[i].SystemName;
             }
 
             foreach (IntelSystem system in IntelSystems)
@@ -597,7 +621,6 @@ namespace EveIntelCheckerPages
                     }
                     catch(Exception)
                     {
-                        // TODO : Do something with exception
                     }
                 }
             }

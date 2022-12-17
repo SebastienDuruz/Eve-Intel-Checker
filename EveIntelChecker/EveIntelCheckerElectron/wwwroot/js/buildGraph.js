@@ -4,57 +4,44 @@
  * Description : Map generator for Eve Intel Checker
  */
 
-var container
-var map
-
-var links
-var nodes
-
-let MIN_ZOOM = 1
-let MAX_ZOOM = 1
-let lastZoomPosition = { x: 0, y: 0 }
-
-var options = {
+let container
+let map
+let links
+let nodes
+let options = {
     height: '100%',
     width: '100%',
     clickToUse: false,
     physics: {
-        stabilization: {
-            enabled: false,
-            fit: false
-        }
+        enabled: true,
+        barnesHut: {
+            avoidOverlap: 0.1
+        },
     },
     nodes: {
-        borderWidth: 2,
-        borderWidthSelected: 2,
+        borderWidth: 1,
+        borderWidthSelected: 1,
+        margin: 5,
         chosen: false,
         color: {
             border: '#E0E0E0',
-            background: '#27272fff',
+            background: '#424242ff',
+            highlight: {
+                border: '#E0E0E0',
+                background: '#424242ff'
+            },
         },
         font: {
             color: '#FFFFFF',
             size: 18, // px
             face: 'roboto'
         },
-        fixed: true,
+        fixed: false,
         shape: 'box'
     },
     layout: {
         improvedLayout: true,
-        randomSeed: 2,
-        hierarchical: {
-            enabled: false,
-            levelSeparation: 150,
-            nodeSpacing: 150,
-            treeSpacing: 250,
-            blockShifting: false,
-            edgeMinimization: true,
-            parentCentralization: true,
-            direction: 'DU',        // UD, DU, LR, RL
-            sortMethod: 'directed',  // hubsize, directed
-            shakeTowards: 'roots'  // roots, leaves
-        }
+        randomSeed: 2
     },
     interaction: {
         dragNodes: false,
@@ -63,7 +50,7 @@ var options = {
         hideEdgesOnZoom: false,
         hideNodesOnDrag: false,
         hover: false,
-        hoverConnectedEdges: true,
+        hoverConnectedEdges: false,
         keyboard: {
             enabled: false,
             speed: { x: 10, y: 10, zoom: 0.02 },
@@ -73,22 +60,29 @@ var options = {
         multiselect: false,
         navigationButtons: false,
         selectable: true,
-        selectConnectedEdges: true,
+        selectConnectedEdges: false,
         tooltipDelay: 300,
         zoomSpeed: 1,
         zoomView: false
     }
 };
 
-document.getElementsByTagName("BODY")[0].onresize = function () { fitMap() };
-
+/**
+ * Autofit the StarMap
+ * */
 function fitMap() {
-    if (map != null) {
+    if (map != undefined) {
         map.fit();
+        map.stabilize();
     }
 }
 
+
+/**
+ * Build new map by settings new data
+ * */
 function buildMap(nodesToBuild, linksToBuild) {
+
     var data = {
         nodes: nodesToBuild,
         edges: linksToBuild
@@ -96,6 +90,15 @@ function buildMap(nodesToBuild, linksToBuild) {
 
     container = document.getElementById('canvasMap');
     map = new vis.Network(container, data, options);
+
+    // Set doubleclick event : Open Dotlan webpage
+    //map.on("doubleClick", function (params) {
+    //    let nodeId = params.nodes[0];
+    //    if (nodeId != null) {
+    //        const node = data.nodes.find(element => element.id == nodeId);
+    //        const region = node.region;
+    //        const system = node.system;
+    //        window.open("https://evemaps.dotlan.net/map/" + region.replace(' ', '_') + "/" + system, '_blank');
+    //    }
+    //});
 }
-
-

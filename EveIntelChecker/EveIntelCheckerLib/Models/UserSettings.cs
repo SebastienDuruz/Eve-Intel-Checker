@@ -46,12 +46,12 @@
         public double WindowHeight { get; set; } = 300;
 
         /// <summary>
-        /// Window is TopMost ?
+        /// Window is TopMost ? (default -> true)
         /// </summary>
         public bool WindowIsTopMost { get; set; } = true;
 
         /// <summary>
-        /// Compact mode is the default display mode, if set to false display a Node graph, not currently used
+        /// Compact mode is the default display mode, if set to false display a Node graph
         /// </summary>
         public bool CompactMode { get; set; } = true;
 
