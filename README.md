@@ -77,6 +77,7 @@ Each time irrelevant message is sent :
 ### Other functionalities
 #### Settings Menu
 You can open/close application settings by clicking on the **settings icon**.
+
 <img align="left" height="300" src=".\Screenshots\OpenSettings.png"><img align="center" height="375" src=".\Screenshots\OpenedSettings.png">
 ##### Jumps from root
 Max jumps to check from the root system (your current position)
@@ -104,7 +105,7 @@ You can reset the **triggers counters** by pressing **Reset icon**.
 
 #### Starmap Mode (BETA)
 - On **Windows** you can **double click** on a system to access **Dotlan** system page
-- You can manually center the map anytime by clicking the **Align icon**
+- You can manually center the map by clicking the **Align icon**
 <img align="center" height="400" src=".\Screenshots\StarMap.png">
 
 ## License
