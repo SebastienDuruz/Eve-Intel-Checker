@@ -75,7 +75,23 @@ Each time irrelevant message is sent :
 <img align="center" height="300" src=".\Screenshots\Undetected.png">
 
 ### Other functionalities
+#### Settings Menu
+You can open/close application settings by clicking on the **settings icon**.
+<img align="left" height="300" src=".\Screenshots\OpenSettings.png"><img align="center" height="375" src=".\Screenshots\OpenedSettings.png">
+##### Jumps from root
+Max jumps to check from the root system (your current position)
+##### Danger notifications
+Max jumps before switching from **Danger** to **Classic** sound alert
+##### Mute notifications
+Max jumps before muting sound alerts (only visual modifications will continue to trigger)
+##### Volume (only for Windows)
+Volume of the sound alerts
+##### Compact mode
+Default mode is compact. An alternative but **still in BETA** mode is available. This mode display a network map instead of a list
+##### Always on top
+By default the application stay **Top most** you can disable this behaviour. An application restart is **required** to apply this settings
 
+#### Compact Mode
 You can **left click** on a system to access more functionalities :
 
 - Access **ZKillboard** system page
@@ -86,6 +102,12 @@ You can reset the **triggers counters** by pressing **Reset icon**.
 
 <img align="left" height="300" src=".\Screenshots\Reset.png"><img align="center" height="300" src=".\Screenshots\Reseted.png">
 
+#### Starmap Mode (BETA)
+- On **Windows** you can **double click** on a system to access **Dotlan** system page
+- You can manually center the map anytime by clicking the **Align icon**
+<img align="center" height="400" src=".\Screenshots\StarMap.png">
+
 ## License
 
 **EveIntelChecker** is open-sourced software licensed under [GNU General Public License v3.0](LICENSE)
+
