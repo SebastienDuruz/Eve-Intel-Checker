@@ -25,7 +25,6 @@ namespace EveIntelChecker
             serviceCollection.AddWpfBlazorWebView();
             serviceCollection.AddMudServices();
             Resources.Add("services", serviceCollection.BuildServiceProvider());
-
         }
 
         /// <summary>
