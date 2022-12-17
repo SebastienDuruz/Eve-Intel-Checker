@@ -2,6 +2,7 @@
 /// Date : 25.09.2022
 
 using NetCoreAudio;
+using System;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -26,11 +27,6 @@ namespace EveIntelCheckerLib.Data
         private string NormalAudioFilePath { get; set; }
 
         /// <summary>
-        /// The current volume applied to the sound player
-        /// </summary>
-        private byte CurrentVolume { get; set; }
-
-        /// <summary>
         /// Custom Constructor
         /// </summary>
         /// <param name="soundPath">The path of the sound to use</param>
@@ -38,7 +34,6 @@ namespace EveIntelCheckerLib.Data
         {
             DangerAudioFilePath = dangerSoundPath;
             NormalAudioFilePath = normalSoundPath;
-            CurrentVolume = 100;
             SoundPlayer = new Player();
         }
 
@@ -49,18 +44,15 @@ namespace EveIntelCheckerLib.Data
         /// <param name="volume">Volume applied to the notification</param>
         public async void PlaySound(bool isDanger, int volume = -1)
         {
-            if(volume != CurrentVolume && volume != -1)
-            {
+            if(volume != -1)
                 // Currently only working on Windows, issue with mac -> Sound always reset master
                 if (OperatingSystemSelector.Instance.CurrentOS != OperatingSystemSelector.OperatingSystemType.Mac)
                     await SoundPlayer.SetVolume((byte)volume);
-                CurrentVolume = (byte)volume;
-            }
 
             if (isDanger)
-                SoundPlayer.Play(DangerAudioFilePath);
+                await SoundPlayer.Play(DangerAudioFilePath);
             else
-                SoundPlayer.Play(NormalAudioFilePath);
+                await SoundPlayer.Play(NormalAudioFilePath);
         }
     }
 }

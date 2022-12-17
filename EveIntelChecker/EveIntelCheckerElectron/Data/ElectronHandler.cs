@@ -21,7 +21,7 @@ namespace EveIntelCheckerElectron.Data
         /// Create the Electron Window
         /// </summary>
         /// <returns>Results of the task</returns>
-        public async static Task CreateElectronWindow(int width, int height)
+        public async static Task CreateElectronWindow()
         {
             Electron.ReadAuth();
             AppMainWindow = await Electron.WindowManager.CreateWindowAsync(
@@ -30,9 +30,9 @@ namespace EveIntelCheckerElectron.Data
                     AutoHideMenuBar = true,
                     AlwaysOnTop = UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
-                    Height = height,
+                    Height = (int)UserSettingsReader.Instance.UserSettingsValues.WindowHeight,
                     MinWidth = 170,
-                    Width = width,
+                    Width = (int)UserSettingsReader.Instance.UserSettingsValues.WindowWidth,
                     Title = "Eve Intel Checker",
                 });
 

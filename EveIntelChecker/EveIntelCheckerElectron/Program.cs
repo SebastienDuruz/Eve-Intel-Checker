@@ -33,6 +33,6 @@ app.MapFallbackToPage("/_Host");
 
 // Support Electron
 if (HybridSupport.IsElectronActive)
-    await ElectronHandler.CreateElectronWindow((int)UserSettingsReader.Instance.UserSettingsValues.WindowWidth, (int)UserSettingsReader.Instance.UserSettingsValues.WindowHeight);
+    await ElectronHandler.CreateElectronWindow();
 
 app.Run();
