@@ -4,11 +4,31 @@ A compact desktop tool used to filter relevant messages on Intel chat channels.
 ## Working on
 
 - Windows 10 / 11
-- MacOS Intel / ARM
+- MacOS Intel / ARM (*Manual building required*)
 
 ## Installation
 
 Download the latest release [here](https://github.com/SebastienDuruz/Eve-Intel-Checker/releases)
+
+### Build for MacOS
+On **Mac** the application use [Electron.NET](https://github.com/ElectronNET/Electron.NET) as replacement for WPF. Make sure you have all the dependencies required for this library.
+
+Once that's done execute the following commands :
+```
+git clone https://github.com/SebastienDuruz/Eve-Intel-Checker.git
+cd Eve-Intel-Checker/EveIntelChecker/EveIntelCheckerElectron
+export PATH="$PATH:/Users/YOUR_USERNAME/.dotnet/tools"
+```
+Finally build the project for the targeted architecture :
+#### MacOS Intel
+```
+electronize-h5 build /target osx
+```
+#### MacOS ARM
+```
+electronize-h5 build /target osx-arm
+```
+
 
 ## Usage
 
