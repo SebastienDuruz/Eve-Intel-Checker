@@ -52,13 +52,10 @@
                 <div class="mx-3">
                     <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
                 </div>
-                @if (OperatingSystemSelector.Instance.CurrentOS != OperatingSystemSelector.OperatingSystemType.Mac)
-                {
-                    <MudText Typo="Typo.body2">Volume : @(UserSettingsReader.Instance.UserSettingsValues.NotificationVolume)</MudText>
-                    <div class="mx-3">
-                        <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                    </div>
-                }
+                <MudText Typo="Typo.body2">Volume : @(UserSettingsReader.Instance.UserSettingsValues.NotificationVolume)</MudText>
+                <div class="mx-3">
+                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+                </div>
             <div class="d-flex justify-space-between align-center align-content-center">
                 <MudSwitch Checked="UserSettingsReader.Instance.UserSettingsValues.CompactMode" CheckedChanged="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Compact mode</MudText>

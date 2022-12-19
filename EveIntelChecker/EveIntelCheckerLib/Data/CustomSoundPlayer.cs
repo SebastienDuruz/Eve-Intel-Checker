@@ -45,9 +45,7 @@ namespace EveIntelCheckerLib.Data
         public async void PlaySound(bool isDanger, int volume = -1)
         {
             if(volume != -1)
-                // Currently only working on Windows, issue with mac -> Sound always reset master
-                if (OperatingSystemSelector.Instance.CurrentOS != OperatingSystemSelector.OperatingSystemType.Mac)
-                    SoundPlayer.SetVolume((byte)volume);
+                SoundPlayer.SetVolume((byte)volume);
 
             if (isDanger)
                 SoundPlayer.Play(DangerAudioFilePath);
