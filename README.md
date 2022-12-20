@@ -11,20 +11,33 @@ A compact desktop tool used to filter relevant messages on Intel chat channels.
 Download the latest release [here](https://github.com/SebastienDuruz/Eve-Intel-Checker/releases)
 
 ### Build for MacOS
-On **Mac** the application use [Electron.NET](https://github.com/ElectronNET/Electron.NET) as replacement for WPF. Make sure you have all the dependencies required for this library.
+On **MacOS** the application use [Electron.NET](https://github.com/ElectronNET/Electron.NET) as replacement for WPF. Make sure you have **all the dependencies** required for this library.
 
-Once that's done execute the following commands :
+Install Electron.NET Dotnet tool :
+```
+dotnet tool install --global h5.ElectronNET.CLI
+```
+
+Add Dotnet tools to your PATH (this command may vary depending on your system) :
+```
+export PATH="$PATH:/Users/YOUR_USERNAME/.dotnet/tools"
+or
+export PATH="$HOME/.dotnet/tools:$PATH"
+```
+
+Download the source code and moving into the correct folder :
 ```
 git clone https://github.com/SebastienDuruz/Eve-Intel-Checker.git
 cd Eve-Intel-Checker/EveIntelChecker/EveIntelCheckerElectron
-export PATH="$PATH:/Users/YOUR_USERNAME/.dotnet/tools"
 ```
+
 Finally build the project for the targeted architecture :
-#### MacOS Intel
+
+*MacOS Intel*
 ```
 electronize-h5 build /target osx
 ```
-#### MacOS ARM
+*MacOS ARM*
 ```
 electronize-h5 build /target osx-arm
 ```
@@ -85,7 +98,7 @@ Max jumps to check from the root system (your current position)
 Max jumps before switching from **Danger** to **Classic** sound alert
 ##### Mute notifications
 Max jumps before muting sound alerts (only visual modifications will continue to trigger)
-##### Volume (only for Windows)
+##### Volume
 Volume of the sound alerts
 ##### Compact mode
 Default mode is compact. An alternative but **still in BETA** mode is available. This mode display a network map instead of a list
