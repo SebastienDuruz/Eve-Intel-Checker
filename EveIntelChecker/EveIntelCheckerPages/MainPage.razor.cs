@@ -7,6 +7,7 @@ using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using EveIntelCheckerLib.Models.Map;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System;
@@ -99,6 +100,16 @@ namespace EveIntelCheckerPages
         private (MapNode[], MapLink[]) MapSystemsData { get; set; }
 
         /// <summary>
+        /// Contains the Top Label used to show last readed message timestamp
+        /// </summary>
+        private MudText LastReadMudText { get; set; }
+
+        /// <summary>
+        /// Name of the client related to the loaded chatlog file
+        /// </summary>
+        private string LoadedClientName { get; set; } = "";
+
+        /// <summary>
         /// Custom theme for MudBlazor
         /// </summary>
         MudTheme CustomTheme = new MudTheme()
@@ -129,6 +140,8 @@ namespace EveIntelCheckerPages
             {
                 await ReadLogFile();
             }, new AutoResetEvent(false), 1000, 1000);
+
+            await InvokeAsync(() => StateHasChanged());
         }
 
         /// <summary>
@@ -169,6 +182,7 @@ namespace EveIntelCheckerPages
                 UserSettingsReader.Instance.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
                 UserSettingsReader.Instance.WriteUserSettings();
                 LogFileLoaded = true;
+                SetClientName();
             }
             else
             {
@@ -197,6 +211,7 @@ namespace EveIntelCheckerPages
                     ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
                     FileIconColor = Color.Success;
                     LogFileLoaded = true;
+                    SetClientName();
                 }
                 else
                 {
@@ -385,6 +400,7 @@ namespace EveIntelCheckerPages
                         ChatLogFile.LogFileFullName = chatLogFile.Split("\\").Last();
                         ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                         ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+                        SetClientName();
 
                         // Set the file to settings
                         UserSettingsReader.Instance.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
@@ -564,6 +580,31 @@ namespace EveIntelCheckerPages
             UserSettingsReader.Instance.UserSettingsValues.NotificationVolume = newValue;
             UserSettingsReader.Instance.WriteUserSettings();
             SoundPlayer.PlaySound(true, UserSettingsReader.Instance.UserSettingsValues.NotificationVolume);
+        }
+
+        /// <summary>
+        /// Set the ClientName from loaded chatlog file
+        /// </summary>
+        private void SetClientName()
+        {
+            if(File.Exists($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}"))
+            {
+                try
+                {
+                    // Fetch the content of the chatlog file
+                    string[] fileContent = File.ReadAllLines($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}");
+
+                    // Extract the required data
+                    string channelName = fileContent[7].Split(":")[1].Trim();
+                    string characterName = fileContent[8].Split(":")[1].Trim();
+
+                    LoadedClientName = $"{characterName} > {channelName}";
+                }
+                catch
+                {
+                    LoadedClientName = "Wrong File Format";
+                }
+            }
         }
 
         /// <summary>

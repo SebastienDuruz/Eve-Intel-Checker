@@ -1,5 +1,5 @@
 # EveIntelChecker
-A compact desktop tool used to filter relevant messages on Intel chat channels.
+A compact desktop tool that filters relevant messages across Intel chat channels.
 
 ## Working on
 
@@ -31,7 +31,7 @@ git clone https://github.com/SebastienDuruz/Eve-Intel-Checker.git
 cd Eve-Intel-Checker/EveIntelChecker/EveIntelCheckerElectron
 ```
 
-Finally build the project for the targeted architecture :
+Build the project for the targeted architecture :
 
 *MacOS Intel*
 ```
@@ -42,6 +42,10 @@ electronize-h5 build /target osx
 electronize-h5 build /target osx-arm
 ```
 
+Finally, access the built application :
+```
+cd bin/Desktop/TARGETED_ARCHITECTURE
+```
 
 ## Usage
 
@@ -69,6 +73,8 @@ Chatlogs are stored in ***Document/EVE/logs/Chatlogs***
 Once selected, **OpenFile** icon turn green.
 
 The App is now ready to listen for new intel messages.
+
+The application automatically checks for a new version of the **same chatlog** file. So Once the chat log file is configured, you should no longer have to do anything.
 
 ### App running
 
@@ -120,6 +126,11 @@ You can reset the **triggers counters** by pressing **Reset icon**.
 - On **Windows** you can **double click** on a system to access **Dotlan** system page
 - You can manually center the map by clicking the **Align icon**
 <img align="center" height="400" src=".\Screenshots\StarMap.png">
+
+### Custom alert sounds
+Both alert sounds can be found in the root of the installation folder, next to the executable.
+
+You can replace *danger.wav* and *notif.wav* by any other ***.wav*** sound file, but file names have to still **be identical**.
 
 ## License
 

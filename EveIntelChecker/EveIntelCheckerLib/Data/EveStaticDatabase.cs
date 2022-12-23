@@ -60,11 +60,11 @@ namespace EveIntelCheckerLib.Data
         /// <param name="isElectron">True if built with Electron, False if not</param>
         private EveStaticDatabase()
         {
-            FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data/Export");
+            FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data");
          
             // TODO : Fix for developpement purpose only !
             if (!Directory.Exists(FolderPath))
-                FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""), "Data\\Export");
+                FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""), "Data");
 
             SolarSystems = ReadSolarSystems();
             SolarSystemJumps = ReadSolarSystemJumps();

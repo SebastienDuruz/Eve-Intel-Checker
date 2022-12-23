@@ -8,8 +8,8 @@
         mc:Ignorable="d"
         WindowStyle="ToolWindow"
         ResizeMode="CanResize"
-        MinWidth="170"
-        Title="Eve Intel Checker" Height="300" Width="170"
+        MinWidth="180"
+        Title="Eve Intel Checker" Height="300" Width="220"
         Closing="WindowOnClosing">
     <Grid>
         <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">

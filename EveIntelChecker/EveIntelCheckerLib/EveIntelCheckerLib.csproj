@@ -6,11 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="danger.wav" />
-    <None Remove="Data\Export\mapConstellations.json" />
-    <None Remove="Data\Export\mapRegions.json" />
-    <None Remove="Data\Export\mapSolarSystemJumps.json" />
-    <None Remove="Data\Export\mapSolarSystems.json" />
     <None Remove="NetCoreAudio" />
     <None Remove="Assets\" />
   </ItemGroup>
@@ -19,16 +14,16 @@
     <EmbeddedResource Include="danger.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\Export\mapConstellations.json">
+    <EmbeddedResource Include="Data\mapConstellations.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\Export\mapRegions.json">
+    <EmbeddedResource Include="Data\mapRegions.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\Export\mapSolarSystemJumps.json">
+    <EmbeddedResource Include="Data\mapSolarSystemJumps.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\Export\mapSolarSystems.json">
+    <EmbeddedResource Include="Data\mapSolarSystems.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="notif.wav">
@@ -38,13 +33,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+    <PackageReference Include="NetCoreAudio" Version="1.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.Windows.Extensions" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="NetCoreAudio">
-      <HintPath>..\..\CustomPackages\NetCoreAudio.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

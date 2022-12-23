@@ -31,7 +31,7 @@ namespace EveIntelCheckerElectron.Data
                     AlwaysOnTop = UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
                     Height = (int)UserSettingsReader.Instance.UserSettingsValues.WindowHeight,
-                    MinWidth = 170,
+                    MinWidth = 180,
                     Width = (int)UserSettingsReader.Instance.UserSettingsValues.WindowWidth,
                     Title = "Eve Intel Checker",
                 });

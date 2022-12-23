@@ -12,8 +12,6 @@
 
 @inject IJSRuntime JSRuntime
 
-<PageTitle>Eve Intel Checker</PageTitle>
-
 <div style="height:100vh;">
     <div Class="d-flex flex-column" style="height:71px;">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
@@ -21,7 +19,7 @@
             <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
             @if (ChatLogFile.LastLogFileMessage != "")
             {
-                <MudText Typo="Typo.body2" Style="font-weight: bold;" Color="Color.Success" title="Last time someone send a message to the selected chat">@ChatLogFile.LastLogFileRead</MudText>
+                <MudText Tag="LastReadMudText" Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="@LoadedClientName">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
                 @if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)

@@ -2,7 +2,7 @@
 /// Date : 25.09.2022
 
 using NetCoreAudio;
-using System;
+using System.IO;
 
 namespace EveIntelCheckerLib.Data
 {
