@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace EveIntelCheckerPages
@@ -587,18 +588,33 @@ namespace EveIntelCheckerPages
         /// </summary>
         private void SetClientName()
         {
-            if(File.Exists($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}"))
+            if(File.Exists($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}"))
             {
                 try
                 {
                     // Fetch the content of the chatlog file
-                    string[] fileContent = File.ReadAllLines($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}");
+                    string[] fileContent = File.ReadAllLines($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
+                    string channelName = String.Empty;
+                    string characterName = String.Empty;
 
-                    // Extract the required data
-                    string channelName = fileContent[7].Split(":")[1].Trim();
-                    string characterName = fileContent[8].Split(":")[1].Trim();
+                    foreach(string line in fileContent ) 
+                    {
+                        // Extract the required data
+                        if (line.Contains("Channel Name:"))
+                        {
+                            channelName = line.Split(":")[1].Trim();
+                        }
 
+                        if (line.Contains("Listener:"))
+                        {
+                            characterName = fileContent[8].Split(":")[1].Trim();
+                            
+                            // Not required to read the remaining lines
+                            break;
+                        }
+                    }
                     LoadedClientName = $"{characterName} > {channelName}";
+                    StateHasChanged();
                 }
                 catch
                 {
