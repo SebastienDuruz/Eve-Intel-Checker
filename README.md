@@ -25,7 +25,7 @@ or
 export PATH="$HOME/.dotnet/tools:$PATH"
 ```
 
-Download the source code and moving into the correct folder :
+Download the source code and move into the correct folder :
 ```
 git clone https://github.com/SebastienDuruz/Eve-Intel-Checker.git
 cd Eve-Intel-Checker/EveIntelChecker/EveIntelCheckerElectron
