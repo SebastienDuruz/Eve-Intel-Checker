@@ -20,6 +20,8 @@ namespace EveIntelChecker
             this.Width = UserSettingsReader.Instance.UserSettingsValues.WindowWidth;
             this.Height = UserSettingsReader.Instance.UserSettingsValues.WindowHeight;
             this.Topmost = UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost;
+            this.Top = UserSettingsReader.Instance.UserSettingsValues.WindowTop;
+            this.Left = UserSettingsReader.Instance.UserSettingsValues.WindowLeft;
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWpfBlazorWebView();
@@ -38,6 +40,8 @@ namespace EveIntelChecker
             UserSettingsReader userSettings = UserSettingsReader.Instance;
             userSettings.UserSettingsValues.WindowWidth = this.Width;
             userSettings.UserSettingsValues.WindowHeight = this.Height;
+            userSettings.UserSettingsValues.WindowTop = this.Top;
+            userSettings.UserSettingsValues.WindowLeft = this.Left;
             userSettings.WriteUserSettings();
         }
     }

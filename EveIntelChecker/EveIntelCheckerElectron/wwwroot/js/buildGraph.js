@@ -6,17 +6,23 @@
 
 let container
 let map
-let links
+let edges
 let nodes
 let options = {
+    autoResize: true,
     height: '100%',
     width: '100%',
     clickToUse: false,
     physics: {
         enabled: true,
+        solver: 'barnesHut',
         barnesHut: {
-            avoidOverlap: 0.1
+            avoidOverlap: 0.2
         },
+        stabilization: {
+            enabled: true,
+            fit: true
+        }
     },
     nodes: {
         borderWidth: 1,
@@ -34,7 +40,8 @@ let options = {
         font: {
             color: '#FFFFFF',
             size: 18, // px
-            face: 'roboto'
+            face: 'roboto',
+            multi: true
         },
         fixed: false,
         shape: 'box'
@@ -45,60 +52,48 @@ let options = {
     },
     interaction: {
         dragNodes: false,
-        dragView: false,
+        dragView: true,
         hideEdgesOnDrag: false,
         hideEdgesOnZoom: false,
         hideNodesOnDrag: false,
         hover: false,
         hoverConnectedEdges: false,
-        keyboard: {
-            enabled: false,
-            speed: { x: 10, y: 10, zoom: 0.02 },
-            bindToWindow: true,
-            autoFocus: true,
-        },
         multiselect: false,
         navigationButtons: false,
-        selectable: true,
+        selectable: false,
         selectConnectedEdges: false,
-        tooltipDelay: 300,
+        tooltipDelay: 50,
         zoomSpeed: 1,
-        zoomView: false
+        zoomView: true
+    },
+    edges: {
+        smooth: {
+            type: 'discrete',
+            forceDirection: 'none'
+        }
     }
 };
 
 /**
- * Autofit the StarMap
- * */
-function fitMap() {
-    if (map != undefined) {
-        map.fit();
-        map.stabilize();
-    }
-}
-
-
-/**
  * Build new map by settings new data
  * */
-function buildMap(nodesToBuild, linksToBuild) {
+function buildMap(nodesToBuild, edgesToBuild) {
 
+    nodes = new vis.DataSet(nodesToBuild)
+    edges = new vis.DataSet(edgesToBuild)
     var data = {
-        nodes: nodesToBuild,
-        edges: linksToBuild
+        nodes: nodes,
+        edges: edges
     };
 
     container = document.getElementById('canvasMap');
     map = new vis.Network(container, data, options);
-
-    // Set doubleclick event : Open Dotlan webpage
-    //map.on("doubleClick", function (params) {
-    //    let nodeId = params.nodes[0];
-    //    if (nodeId != null) {
-    //        const node = data.nodes.find(element => element.id == nodeId);
-    //        const region = node.region;
-    //        const system = node.system;
-    //        window.open("https://evemaps.dotlan.net/map/" + region.replace(' ', '_') + "/" + system, '_blank');
-    //    }
-    //});
 }
+function setData(nodesToUpdate) {
+    console.log(nodes)
+    for (let i = 1; i < nodesToUpdate.length + 1; i++) {
+        nodes.update([{ id: i, color: { background: nodesToUpdate[i - 1].color.background } }]);
+        nodes.update([{ id: i, label: nodesToUpdate[i - 1].label }]);
+    }
+}
+

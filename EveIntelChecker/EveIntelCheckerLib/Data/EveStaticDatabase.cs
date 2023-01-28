@@ -63,7 +63,7 @@ namespace EveIntelCheckerLib.Data
             FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data");
          
             // TODO : Fix for developpement purpose only !
-            if (!Directory.Exists(FolderPath))
+            if (!Directory.Exists(FolderPath) || !File.Exists(Path.Combine(FolderPath, "mapRegion.json")))
                 FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""), "Data");
 
             SolarSystems = ReadSolarSystems();

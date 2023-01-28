@@ -150,9 +150,8 @@ namespace EveIntelCheckerPages
         {
             if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
             {
-                JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
-                //else
-                //    JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                if(firstRender)
+                    JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
             }
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -252,6 +251,8 @@ namespace EveIntelCheckerPages
             IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, UserSettingsReader.Instance.UserSettingsValues.SystemsDepth);
 
             MapSystemsData = BuildMapNodes();
+            if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+                JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
             // Update the userSettings with new selected system
             UserSettingsReader.Instance.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
@@ -321,7 +322,7 @@ namespace EveIntelCheckerPages
                 if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
                 {
                     MapSystemsData = BuildMapNodes();
-                    await InvokeAsync(() => StateHasChanged());
+                    JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
                 }
             }
         }
@@ -340,6 +341,8 @@ namespace EveIntelCheckerPages
                 }
 
             MapSystemsData = BuildMapNodes();
+            if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+                JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
         }
 
         /// <summary>
@@ -348,7 +351,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task ResizeMap()
         {
-            //await JSRuntime.InvokeVoidAsync("fitMap");
+            JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
         }
 
         /// <summary>
@@ -504,17 +507,9 @@ namespace EveIntelCheckerPages
                     BuildSystems();
                     SettingsChanged = false;
                 }
+                if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+                    await InvokeAsync(() => StateHasChanged());
             }
-        }
-
-        /// <summary>
-        /// Update the value of DarkMode
-        /// </summary>
-        /// <param name="newValue">The new value to be applied</param>
-        private void DarkModeChanged(bool newValue)
-        {
-            UserSettingsReader.Instance.UserSettingsValues.DarkMode = newValue;
-            UserSettingsReader.Instance.WriteUserSettings();
         }
 
         /// <summary>
@@ -607,7 +602,7 @@ namespace EveIntelCheckerPages
 
                         if (line.Contains("Listener:"))
                         {
-                            characterName = fileContent[8].Split(":")[1].Trim();
+                            characterName = line.Split(":")[1].Trim();
                             
                             // Not required to read the remaining lines
                             break;
@@ -642,7 +637,7 @@ namespace EveIntelCheckerPages
                 if (IntelSystems[i].IsRed)
                     mapNodes[i].Color.Background = "#f64e62ff";
                 else if (IntelSystems[i].TriggerCounter > 0)
-                    mapNodes[i].Color.Background = "#ffa800ff";
+                    mapNodes[i].Color.Background = "#d68000";
 
                 if (IntelSystems[i].Jumps == 0)
                 {

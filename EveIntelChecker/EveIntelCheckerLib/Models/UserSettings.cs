@@ -46,6 +46,16 @@
         public double WindowHeight { get; set; } = 300;
 
         /// <summary>
+        /// Default TOP position of the main Window
+        /// </summary>
+        public double WindowTop { get; set; } = 0;
+
+        /// <summary>
+        /// Default LEFT position of the main Window
+        /// </summary>
+        public double WindowLeft { get; set; } = 0;
+
+        /// <summary>
         /// Window is TopMost ? (default -> true)
         /// </summary>
         public bool WindowIsTopMost { get; set; } = true;

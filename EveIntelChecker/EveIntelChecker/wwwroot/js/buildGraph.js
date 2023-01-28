@@ -6,7 +6,7 @@
 
 let container
 let map
-let links
+let edges
 let nodes
 let options = {
     autoResize: true,
@@ -17,7 +17,7 @@ let options = {
         enabled: true,
         solver: 'barnesHut',
         barnesHut: {
-            avoidOverlap: 0.5
+            avoidOverlap: 0.1
         },
         stabilization: {
             enabled: true,
@@ -30,7 +30,7 @@ let options = {
         margin: 5,
         chosen: false,
         color: {
-            border: '#E0E0E0',
+            border: '#FFFFFF',
             background: '#424242ff',
             highlight: {
                 border: '#E0E0E0',
@@ -40,7 +40,8 @@ let options = {
         font: {
             color: '#FFFFFF',
             size: 18, // px
-            face: 'roboto'
+            face: 'roboto',
+            multi: true
         },
         fixed: false,
         shape: 'box'
@@ -50,7 +51,7 @@ let options = {
         randomSeed: 2
     },
     interaction: {
-        dragNodes: false,
+        dragNodes: true,
         dragView: true,
         hideEdgesOnDrag: false,
         hideEdgesOnZoom: false,
@@ -59,7 +60,7 @@ let options = {
         hoverConnectedEdges: false,
         multiselect: false,
         navigationButtons: false,
-        selectable: true,
+        selectable: false,
         selectConnectedEdges: false,
         tooltipDelay: 50,
         zoomSpeed: 1,
@@ -76,31 +77,23 @@ let options = {
 /**
  * Build new map by settings new data
  * */
-function buildMap(nodesToBuild, linksToBuild) {
-    
+function buildMap(nodesToBuild, edgesToBuild) {
+
+    nodes = new vis.DataSet(nodesToBuild)
+    edges = new vis.DataSet(edgesToBuild)
     var data = {
-        nodes: nodesToBuild,
-        edges: linksToBuild
+        nodes: nodes,
+        edges: edges
     };
 
     container = document.getElementById('canvasMap');
     map = new vis.Network(container, data, options);
-
-    // Set doubleclick event : Open Dotlan webpage
-    map.on("doubleClick", function (params) {
-        let nodeId = params.nodes[0];
-        if (nodeId != null) {
-            const node = data.nodes.find(element => element.id == nodeId);
-            const region = node.region;
-            const system = node.system;
-            window.open("https://evemaps.dotlan.net/map/" + region.replace(' ', '_') + "/" + system, '_blank');
-        }
-    });
 }
 function setData(nodesToUpdate) {
-    for (let i = 0; i < nodesToUpdate.length; ++i) {
-        nodes[i].color.background = nodesToUpdate[i].color.background
-        nodes.update([{ id: nodes[i].id, color: { background: nodes[i].color.background } }])
+    console.log(nodes)
+    for (let i = 1; i < nodesToUpdate.length + 1; i++) {
+        nodes.update([{ id: i, color: { background: nodesToUpdate[i - 1].color.background } }]);
+        nodes.update([{ id: i, label: nodesToUpdate[i - 1].label }]);
     }
 }
 
