@@ -15,9 +15,14 @@ let options = {
     clickToUse: false,
     physics: {
         enabled: true,
+        solver: 'barnesHut',
         barnesHut: {
-            avoidOverlap: 0.1
+            avoidOverlap: 0.5
         },
+        stabilization: {
+            enabled: true,
+            fit: true
+        }
     },
     nodes: {
         borderWidth: 1,
@@ -46,7 +51,7 @@ let options = {
     },
     interaction: {
         dragNodes: false,
-        dragView: false,
+        dragView: true,
         hideEdgesOnDrag: false,
         hideEdgesOnZoom: false,
         hideNodesOnDrag: false,
@@ -58,7 +63,7 @@ let options = {
         selectConnectedEdges: false,
         tooltipDelay: 50,
         zoomSpeed: 1,
-        zoomView: false
+        zoomView: true
     },
     edges: {
         smooth: {
@@ -67,18 +72,6 @@ let options = {
         }
     }
 };
-
-/**
- * Autofit the StarMap
- * */
-
-window.onresize = function () { fitMap() };
-function fitMap() {
-    if (map != undefined) {
-        map.fit();
-        map.stabilize();
-    }
-}
 
 /**
  * Build new map by settings new data
@@ -104,8 +97,10 @@ function buildMap(nodesToBuild, linksToBuild) {
         }
     });
 }
-function setData(nodesToBuild) {
-    nodes = new vis.DataSet(nodesToBuild);
-    map.setData({ nodes: nodes, edges: links });
+function setData(nodesToUpdate) {
+    for (let i = 0; i < nodesToUpdate.length; ++i) {
+        nodes[i].color.background = nodesToUpdate[i].color.background
+        nodes.update([{ id: nodes[i].id, color: { background: nodes[i].color.background } }])
+    }
 }
 

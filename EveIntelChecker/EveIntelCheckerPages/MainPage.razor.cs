@@ -7,7 +7,6 @@ using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using EveIntelCheckerLib.Models.Map;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System;
@@ -15,7 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace EveIntelCheckerPages
@@ -128,7 +126,7 @@ namespace EveIntelCheckerPages
         /// After the component as been Initialized
         /// </summary>
         /// <returns>Result of the task</returns>
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             LogFileLoaded = false;
             SetChatLogFile();
@@ -141,8 +139,6 @@ namespace EveIntelCheckerPages
             {
                 await ReadLogFile();
             }, new AutoResetEvent(false), 1000, 1000);
-
-            await InvokeAsync(() => StateHasChanged());
         }
 
         /// <summary>
@@ -153,7 +149,11 @@ namespace EveIntelCheckerPages
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+            {
                 JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+                //else
+                //    JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+            }
             await base.OnAfterRenderAsync(firstRender);
         }
 
@@ -321,11 +321,9 @@ namespace EveIntelCheckerPages
                 if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
                 {
                     MapSystemsData = BuildMapNodes();
-                    JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                    await InvokeAsync(() => StateHasChanged());
                 }
             }
-            
-            await InvokeAsync(() => StateHasChanged());
         }
 
         /// <summary>
@@ -350,7 +348,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task ResizeMap()
         {
-            await JSRuntime.InvokeVoidAsync("fitMap");
+            //await JSRuntime.InvokeVoidAsync("fitMap");
         }
 
         /// <summary>
@@ -435,6 +433,8 @@ namespace EveIntelCheckerPages
                     string time = message.Split("[")[1];
                     time = time.Split("]")[0];
                     ChatLogFile.LastLogFileRead = time.Split(" ")[2];
+
+                    // TODO : Find a solution to avoid this StateHasChanged, it cause issue with starmap
                     await InvokeAsync(() => StateHasChanged());
                 }
             }
@@ -614,12 +614,12 @@ namespace EveIntelCheckerPages
                         }
                     }
                     LoadedClientName = $"{characterName} > {channelName}";
-                    StateHasChanged();
                 }
                 catch
                 {
                     LoadedClientName = "Wrong File Format";
                 }
+                StateHasChanged();
             }
         }
 
