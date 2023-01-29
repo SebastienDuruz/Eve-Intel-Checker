@@ -109,6 +109,11 @@ namespace EveIntelCheckerPages
         private string LoadedClientName { get; set; } = "";
 
         /// <summary>
+        /// Set to true if settings panel just closed
+        /// </summary>
+        private bool MapRebuildRequired { get; set; } = false;
+
+        /// <summary>
         /// Custom theme for MudBlazor
         /// </summary>
         MudTheme CustomTheme = new MudTheme()
@@ -150,8 +155,13 @@ namespace EveIntelCheckerPages
         {
             if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
             {
-                if(firstRender)
+                if(firstRender || MapRebuildRequired)
+                {
                     JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+
+                    // Reset the value, avoiding rebuild at every rendering
+                    MapRebuildRequired = false;
+                }
             }
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -190,6 +200,8 @@ namespace EveIntelCheckerPages
                 LogFileLoaded = false;
                 SetChatLogFile();
             }
+
+            StateHasChanged();
         }
 
         /// <summary>
@@ -404,6 +416,8 @@ namespace EveIntelCheckerPages
                         ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
                         SetClientName();
 
+                        await InvokeAsync(() => StateHasChanged());
+
                         // Set the file to settings
                         UserSettingsReader.Instance.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
                         UserSettingsReader.Instance.WriteUserSettings();
@@ -496,19 +510,21 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Open or Close the Settings panel, save the settings if settings panel as been closed
         /// </summary>
-        private async void OpenCloseSettingsPanel()
+        private async Task OpenCloseSettingsPanel()
         {
             SettingsPageOpened = !SettingsPageOpened;
             if (!SettingsPageOpened)
             {
+                // Required to rebuild the map
+                MapRebuildRequired = true;
+
+                // Apply changes
                 UserSettingsReader.Instance.WriteUserSettings();
                 if (_selectedSystem != null && SettingsChanged)
                 {
                     BuildSystems();
                     SettingsChanged = false;
                 }
-                if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
-                    await InvokeAsync(() => StateHasChanged());
             }
         }
 
@@ -614,7 +630,6 @@ namespace EveIntelCheckerPages
                 {
                     LoadedClientName = "Wrong File Format";
                 }
-                StateHasChanged();
             }
         }
 
@@ -626,7 +641,6 @@ namespace EveIntelCheckerPages
         {
             MapNode[] mapNodes = new MapNode[IntelSystems.Count];
             List<MapLink> mapLinks = new List<MapLink>();
-            int linksCounter = 0;
 
             // Build nodes with Id starting by 1
             for (int i = 0; i < IntelSystems.Count; ++i)

@@ -17,7 +17,7 @@ let options = {
         enabled: true,
         solver: 'barnesHut',
         barnesHut: {
-            avoidOverlap: 0.2
+            avoidOverlap: 0.1
         },
         stabilization: {
             enabled: true,
@@ -30,7 +30,7 @@ let options = {
         margin: 5,
         chosen: false,
         color: {
-            border: '#E0E0E0',
+            border: '#FFFFFF',
             background: '#424242ff',
             highlight: {
                 border: '#E0E0E0',
@@ -51,7 +51,7 @@ let options = {
         randomSeed: 2
     },
     interaction: {
-        dragNodes: false,
+        dragNodes: true,
         dragView: true,
         hideEdgesOnDrag: false,
         hideEdgesOnZoom: false,
