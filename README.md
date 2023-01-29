@@ -122,8 +122,10 @@ You can reset the **triggers counters** by pressing **Reset icon**.
 
 <img align="left" height="300" src=".\Screenshots\Reset.png"><img align="center" height="300" src=".\Screenshots\Reseted.png">
 
-#### Starmap Mode (BETA)
-- On **Windows** you can **double click** on a system to access **Dotlan** system page
+#### Starmap Mode
+- Zoom In and Out with **mouse wheel**
+- Move the map around with **left click**
+- Reorganise nodes on the map with **left click**
 - You can manually center the map by clicking the **Align icon**
 <img align="center" height="400" src=".\Screenshots\StarMap.png">
 
