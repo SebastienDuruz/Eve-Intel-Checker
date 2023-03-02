@@ -19,7 +19,7 @@
             <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
             @if (ChatLogFile.LastLogFileMessage != "")
             {
-                <MudText Tag="LastReadMudText" Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="@LoadedClientName">@ChatLogFile.LastLogFileRead</MudText>
+                <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="@LoadedClientName">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
                 @if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)

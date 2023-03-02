@@ -99,11 +99,6 @@ namespace EveIntelCheckerPages
         private (MapNode[], MapLink[]) MapSystemsData { get; set; }
 
         /// <summary>
-        /// Contains the Top Label used to show last readed message timestamp
-        /// </summary>
-        private MudText LastReadMudText { get; set; }
-
-        /// <summary>
         /// Name of the client related to the loaded chatlog file
         /// </summary>
         private string LoadedClientName { get; set; } = "";
@@ -134,7 +129,7 @@ namespace EveIntelCheckerPages
         protected override void OnInitialized()
         {
             LogFileLoaded = false;
-            SetChatLogFile();
+            SetDefaultChatLogFile();
             LoadUserSettingsLastLog();
 
             SoundPlayer = new CustomSoundPlayer("notif.wav", "danger.wav");
@@ -198,7 +193,7 @@ namespace EveIntelCheckerPages
             {
                 FileIconColor = Color.Error;
                 LogFileLoaded = false;
-                SetChatLogFile();
+                SetDefaultChatLogFile();
             }
 
             StateHasChanged();
@@ -223,6 +218,9 @@ namespace EveIntelCheckerPages
                     ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
                     FileIconColor = Color.Success;
                     LogFileLoaded = true;
+
+                    // Wait for 1.5 sec before updating the client name
+                    Task.Run(() => Task.Delay(1500));
                     SetClientName();
                 }
                 else
@@ -358,7 +356,7 @@ namespace EveIntelCheckerPages
         }
 
         /// <summary>
-        /// Reset the triggers counter to 0
+        /// Resize the size and position of the starmap
         /// </summary>
         /// <returns>Result of the Task</returns>
         private async Task ResizeMap()
@@ -492,7 +490,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Reset the ChatLogFile to default with folder values
         /// </summary>
-        private void SetChatLogFile()
+        private void SetDefaultChatLogFile()
         {
             ChatLogFile = new ChatLogFile();
             if (OperatingSystemSelector.Instance.CurrentOS == OperatingSystemSelector.OperatingSystemType.Windows)
@@ -620,7 +618,7 @@ namespace EveIntelCheckerPages
                         {
                             characterName = line.Split(":")[1].Trim();
                             
-                            // Not required to read the remaining lines
+                            // Not required to read the rest of the lines
                             break;
                         }
                     }
