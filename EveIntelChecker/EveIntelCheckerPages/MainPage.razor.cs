@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 
 namespace EveIntelCheckerPages
 {
@@ -23,6 +24,9 @@ namespace EveIntelCheckerPages
     /// </summary>
     public partial class MainPage
     {
+        [Parameter] 
+        public string WindowSpecificSufix { get; set; } = "_1";
+        
         /// <summary>
         /// The selected system (root)
         /// </summary>
@@ -148,7 +152,7 @@ namespace EveIntelCheckerPages
         /// <returns>result of the task</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+            if (!SettingsReader.UserSettingsValues.CompactMode)
             {
                 if(firstRender || MapRebuildRequired)
                 {
@@ -184,8 +188,8 @@ namespace EveIntelCheckerPages
                 FileIconColor = Color.Success;
 
                 // Update the settings file
-                UserSettingsReader.Instance.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
-                UserSettingsReader.Instance.WriteUserSettings();
+                SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                SettingsReader.WriteUserSettings();
                 LogFileLoaded = true;
                 SetClientName();
             }
@@ -205,15 +209,15 @@ namespace EveIntelCheckerPages
         private void LoadUserSettingsLastLog()
         {
             // Start by reading the UserSettings
-            UserSettingsReader.Instance.ReadUserSettings();
+            SettingsReader.ReadUserSettings();
 
             // If a filename is found
-            if(!String.IsNullOrWhiteSpace(UserSettingsReader.Instance.UserSettingsValues.LastFileName))
+            if(!String.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastFileName))
             {
                 // Chatlog file exists
-                if(File.Exists(Path.Combine(ChatLogFile.LogFileFolder, UserSettingsReader.Instance.UserSettingsValues.LastFileName)))
+                if(File.Exists(Path.Combine(ChatLogFile.LogFileFolder, SettingsReader.UserSettingsValues.LastFileName)))
                 {
-                    ChatLogFile.LogFileFullName = UserSettingsReader.Instance.UserSettingsValues.LastFileName;
+                    ChatLogFile.LogFileFullName = SettingsReader.UserSettingsValues.LastFileName;
                     ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                     ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
                     FileIconColor = Color.Success;
@@ -231,11 +235,11 @@ namespace EveIntelCheckerPages
             }
 
             // Select the system if it exists in the DB
-            if(!String.IsNullOrWhiteSpace(UserSettingsReader.Instance.UserSettingsValues.LastSelectedSystem) 
-                && EveStaticDatabase.Instance.SolarSystems.Exists(x => x.SolarSystemName == UserSettingsReader.Instance.UserSettingsValues.LastSelectedSystem))
+            if(!String.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastSelectedSystem) 
+                && EveStaticDatabase.Instance.SolarSystems.Exists(x => x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
             {
-                SolarSystemSelector.Value = EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName == UserSettingsReader.Instance.UserSettingsValues.LastSelectedSystem).First();
-                SolarSystemSelector.Text = UserSettingsReader.Instance.UserSettingsValues.LastSelectedSystem;
+                SolarSystemSelector.Value = EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem).First();
+                SolarSystemSelector.Text = SettingsReader.UserSettingsValues.LastSelectedSystem;
                 SelectedSystem = SolarSystemSelector.Value;
             }
         }
@@ -258,15 +262,15 @@ namespace EveIntelCheckerPages
         private async void BuildSystems()
         {
             // Build the list of systems
-            IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, UserSettingsReader.Instance.UserSettingsValues.SystemsDepth);
+            IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, SettingsReader.UserSettingsValues.SystemsDepth);
 
             MapSystemsData = BuildMapNodes();
-            if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+            if(!SettingsReader.UserSettingsValues.CompactMode)
                 JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
             // Update the userSettings with new selected system
-            UserSettingsReader.Instance.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
-            UserSettingsReader.Instance.WriteUserSettings();
+            SettingsReader.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
+            SettingsReader.WriteUserSettings();
         }
 
         /// <summary>
@@ -313,9 +317,9 @@ namespace EveIntelCheckerPages
                 {
                     intelSystem.IsRed = true;
                     // Play specific sounds if needed by the user settings
-                    if (intelSystem.Jumps <= UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification && intelSystem.Jumps <= UserSettingsReader.Instance.UserSettingsValues.DangerNotification)
+                    if (intelSystem.Jumps <= SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
                         await PlayNotificationSound(true);
-                    else if (intelSystem.Jumps <= UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification && intelSystem.Jumps > UserSettingsReader.Instance.UserSettingsValues.DangerNotification)
+                    else if (intelSystem.Jumps <= SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
                         await PlayNotificationSound(false);
                     ++intelSystem.TriggerCounter;
                     newRedSystem = intelSystem.SystemName;
@@ -329,7 +333,7 @@ namespace EveIntelCheckerPages
                         intelSystem.IsRed = false;
 
                 // rebuild the systems data for StarMap
-                if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+                if(!SettingsReader.UserSettingsValues.CompactMode)
                 {
                     MapSystemsData = BuildMapNodes();
                     JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
@@ -351,7 +355,7 @@ namespace EveIntelCheckerPages
                 }
 
             MapSystemsData = BuildMapNodes();
-            if (!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+            if (!SettingsReader.UserSettingsValues.CompactMode)
                 JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
         }
 
@@ -417,8 +421,8 @@ namespace EveIntelCheckerPages
                         await InvokeAsync(() => StateHasChanged());
 
                         // Set the file to settings
-                        UserSettingsReader.Instance.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
-                        UserSettingsReader.Instance.WriteUserSettings();
+                        SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                        SettingsReader.WriteUserSettings();
                     }
                 }
             }
@@ -484,7 +488,7 @@ namespace EveIntelCheckerPages
         /// <returns>Copy filename</returns>
         private string BuildCopyFromFullName(string fileName)
         {
-            return $"Copy_{fileName}";
+            return $"Copy_{WindowSpecificSufix}{fileName}";
         }
 
         /// <summary>
@@ -517,7 +521,7 @@ namespace EveIntelCheckerPages
                 MapRebuildRequired = true;
 
                 // Apply changes
-                UserSettingsReader.Instance.WriteUserSettings();
+                SettingsReader.WriteUserSettings();
                 if (_selectedSystem != null && SettingsChanged)
                 {
                     BuildSystems();
@@ -532,8 +536,8 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void CompactModeChanged(bool newValue)
         {
-            UserSettingsReader.Instance.UserSettingsValues.CompactMode = newValue;
-            UserSettingsReader.Instance.WriteUserSettings();
+            SettingsReader.UserSettingsValues.CompactMode = newValue;
+            SettingsReader.WriteUserSettings();
         }
 
         /// <summary>
@@ -542,8 +546,8 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void TopMostChanged(bool newValue)
         {
-            UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost = newValue;
-            UserSettingsReader.Instance.WriteUserSettings();
+            SettingsReader.UserSettingsValues.WindowIsTopMost = newValue;
+            SettingsReader.WriteUserSettings();
         }
 
         /// <summary>
@@ -552,9 +556,9 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void SystemsDepthChanged(int newValue)
         {
-            UserSettingsReader.Instance.UserSettingsValues.SystemsDepth = newValue;
+            SettingsReader.UserSettingsValues.SystemsDepth = newValue;
             SettingsChanged = true;
-            UserSettingsReader.Instance.WriteUserSettings();
+            SettingsReader.WriteUserSettings();
         }
 
         /// <summary>
@@ -563,10 +567,10 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void DangerNotificationChanged(int newValue)
         {
-            UserSettingsReader.Instance.UserSettingsValues.DangerNotification = newValue;
-            if (UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification < newValue)
-                UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification = newValue;
-            UserSettingsReader.Instance.WriteUserSettings();
+            SettingsReader.UserSettingsValues.DangerNotification = newValue;
+            if (SettingsReader.UserSettingsValues.IgnoreNotification < newValue)
+                SettingsReader.UserSettingsValues.IgnoreNotification = newValue;
+            SettingsReader.WriteUserSettings();
         }
 
         /// <summary>
@@ -575,10 +579,10 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void IgnoreNotificationChanged(int newValue)
         {
-            UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification = newValue;
-            if (UserSettingsReader.Instance.UserSettingsValues.DangerNotification > newValue)
-                UserSettingsReader.Instance.UserSettingsValues.DangerNotification = newValue;
-            UserSettingsReader.Instance.WriteUserSettings();
+            SettingsReader.UserSettingsValues.IgnoreNotification = newValue;
+            if (SettingsReader.UserSettingsValues.DangerNotification > newValue)
+                SettingsReader.UserSettingsValues.DangerNotification = newValue;
+            SettingsReader.WriteUserSettings();
         }
 
         /// <summary>
@@ -587,9 +591,9 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void NotificationVolumeChanged(int newValue)
         {
-            UserSettingsReader.Instance.UserSettingsValues.NotificationVolume = newValue;
-            UserSettingsReader.Instance.WriteUserSettings();
-            SoundPlayer.PlaySound(true, UserSettingsReader.Instance.UserSettingsValues.NotificationVolume);
+            SettingsReader.UserSettingsValues.NotificationVolume = newValue;
+            SettingsReader.WriteUserSettings();
+            SoundPlayer.PlaySound(true, SettingsReader.UserSettingsValues.NotificationVolume);
         }
 
         /// <summary>

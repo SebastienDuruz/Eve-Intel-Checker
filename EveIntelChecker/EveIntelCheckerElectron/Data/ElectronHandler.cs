@@ -13,6 +13,16 @@ namespace EveIntelCheckerElectron.Data
     public static class ElectronHandler
     {
         /// <summary>
+        /// Reader for the Settings json file for MainWindow
+        /// </summary>
+        private static UserSettingsReader MainSettingsReader { get; set; }
+        
+        /// <summary>
+        /// Reader for the Settings json file for SecondaryWindow
+        /// </summary>
+        private static UserSettingsReader SecondarySettingsReader { get; set; }
+        
+        /// <summary>
         /// Main App Window
         /// </summary>
         private static BrowserWindow AppMainWindow { get; set; }
@@ -24,34 +34,27 @@ namespace EveIntelCheckerElectron.Data
         public async static Task CreateElectronWindow()
         {
             Electron.ReadAuth();
+            MainSettingsReader = new UserSettingsReader("_1");
+            SecondarySettingsReader = new UserSettingsReader("_2");
+
             AppMainWindow = await Electron.WindowManager.CreateWindowAsync(
                 new BrowserWindowOptions()
                 {
                     AutoHideMenuBar = true,
-                    AlwaysOnTop = UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost,
+                    AlwaysOnTop = MainSettingsReader.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
-                    Height = (int)UserSettingsReader.Instance.UserSettingsValues.WindowHeight,
+                    Height = (int)MainSettingsReader.UserSettingsValues.WindowHeight,
                     MinWidth = 180,
-                    Width = (int)UserSettingsReader.Instance.UserSettingsValues.WindowWidth,
+                    Width = (int)MainSettingsReader.UserSettingsValues.WindowWidth,
                     Title = "Eve Intel Checker",
                 });
-
+            
             // Add events to mainWindow
             AppMainWindow.OnReadyToShow += () => AppMainWindow.Show();
             AppMainWindow.OnClosed += () => CloseApplication();
         }
 
-        public async static void ReloadMainWindow()
-        {
-            if (AppMainWindow != null)
-            {
-                AppMainWindow.Reload();
-
-                // Resolve an issue where the focus is lost and user need to focus other window to be able to use inputs
-                AppMainWindow.Minimize();
-                AppMainWindow.Restore();
-            }
-        }
+        
 
         /// <summary>
         /// Save the application dimensions before closing the app
@@ -60,9 +63,9 @@ namespace EveIntelCheckerElectron.Data
         {
             int[] windowSize = AppMainWindow.GetSizeAsync().Result;
             int[] windowPosition = AppMainWindow.GetPositionAsync().Result;
-            UserSettingsReader.Instance.UserSettingsValues.WindowWidth = windowSize[0];
-            UserSettingsReader.Instance.UserSettingsValues.WindowHeight = windowSize[1];
-            UserSettingsReader.Instance.WriteUserSettings();
+            MainSettingsReader.UserSettingsValues.WindowWidth = windowSize[0];
+            MainSettingsReader.UserSettingsValues.WindowHeight = windowSize[1];
+            MainSettingsReader.WriteUserSettings();
             Electron.App.Quit();
         }
     }

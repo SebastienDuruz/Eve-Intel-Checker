@@ -14,19 +14,9 @@ namespace EveIntelCheckerLib.Data
     public class UserSettingsReader
     {
         /// <summary>
-        /// Padlock for thread safe Singleton operations
-        /// </summary>
-        private static readonly object _padLock = new object();
-
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        private static UserSettingsReader _instance = null;
-
-        /// <summary>
         /// File path of the userSettings file
         /// </summary>
-        private string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userSettings.json");
+        private string FilePath { get; set; }
 
         /// <summary>
         /// Objects that contains the settings values
@@ -34,27 +24,13 @@ namespace EveIntelCheckerLib.Data
         public UserSettings UserSettingsValues { get; set; }
 
         /// <summary>
-        /// Default Constructor
+        /// Custom Constructor
         /// </summary>
-        private UserSettingsReader()
+        /// <param name="identifier">The prefix to identify the setting file</param>
+        public UserSettingsReader(string identifier)
         {
+            FilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), $"userSettings{identifier}.json");
             ReadUserSettings();
-        }
-
-        /// <summary>
-        /// Get the singleton instance
-        /// </summary>
-        public static UserSettingsReader Instance
-        {
-            get
-            {
-                lock (_padLock)
-                {
-                    if (_instance == null)
-                        _instance = new UserSettingsReader();
-                    return _instance;
-                }
-            }
         }
 
         /// <summary>
@@ -63,11 +39,11 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public void ReadUserSettings()
         {
-            if(File.Exists(_filePath))
+            if(File.Exists(FilePath))
             {
                 try
                 {
-                    UserSettingsValues = JsonConvert.DeserializeObject<UserSettings>(File.ReadAllText(_filePath));
+                    UserSettingsValues = JsonConvert.DeserializeObject<UserSettings>(File.ReadAllText(FilePath));
                 }
                 catch (Exception)
                 {
@@ -90,9 +66,9 @@ namespace EveIntelCheckerLib.Data
         {
             try
             {
-                File.WriteAllText(_filePath, JsonConvert.SerializeObject(UserSettingsValues));
+                File.WriteAllText(FilePath, JsonConvert.SerializeObject(UserSettingsValues));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }

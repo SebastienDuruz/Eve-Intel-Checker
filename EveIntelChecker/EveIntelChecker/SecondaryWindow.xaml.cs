@@ -2,14 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 using System.Windows;
-using System.Windows.Input;
 
 namespace EveIntelChecker
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class SecondaryWindow : Window
     {
         /// <summary>
         /// Reader for the Settings json file
@@ -17,18 +16,13 @@ namespace EveIntelChecker
         private UserSettingsReader SettingsReader { get; set; }
         
         /// <summary>
-        /// SecondaryWindow object
-        /// </summary>
-        private SecondaryWindow SecondaryWindow { get; set; } = null;
-        
-        /// <summary>
         /// Default Constructor
         /// </summary>
-        public MainWindow()
+        public SecondaryWindow()
         {
             InitializeComponent();
 
-            SettingsReader = new UserSettingsReader("_1");
+            SettingsReader = new UserSettingsReader("_2");
 
             this.Width = SettingsReader.UserSettingsValues.WindowWidth;
             this.Height = SettingsReader.UserSettingsValues.WindowHeight;
@@ -51,32 +45,11 @@ namespace EveIntelChecker
         /// <param name="e">args collection</param>
         private void WindowOnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (SecondaryWindow != null)
-            {
-                SecondaryWindow.Close();    
-            }
-            
             SettingsReader.UserSettingsValues.WindowWidth = this.Width;
             SettingsReader.UserSettingsValues.WindowHeight = this.Height;
             SettingsReader.UserSettingsValues.WindowTop = this.Top;
             SettingsReader.UserSettingsValues.WindowLeft = this.Left;
             SettingsReader.WriteUserSettings();
-        }
-
-        private void MainWindowOnPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.T)
-            {
-                if (SecondaryWindow == null || !SecondaryWindow.IsVisible)
-                {
-                    // Create and show the new window
-                    SecondaryWindow = new SecondaryWindow();
-                    SecondaryWindow.Show();
-                }
-                
-                // Set e.Handled to true to indicate that the event has been handled
-                e.Handled = true;
-            }
         }
     }
 }

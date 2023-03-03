@@ -1,4 +1,4 @@
-﻿<MudThemeProvider IsDarkMode="UserSettingsReader.Instance.UserSettingsValues.DarkMode" Theme="CustomTheme" />
+﻿<MudThemeProvider IsDarkMode="SettingsReader.UserSettingsValues.DarkMode" Theme="CustomTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -11,6 +11,7 @@
 @using Microsoft.JSInterop
 
 @inject IJSRuntime JSRuntime
+@inject UserSettingsReader SettingsReader
 
 <div style="height:100vh;">
     <div Class="d-flex flex-column" style="height:71px;">
@@ -22,7 +23,7 @@
                 <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="@LoadedClientName">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
-                @if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+                @if(!SettingsReader.UserSettingsValues.CompactMode)
                 {
                     <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.AlignVerticalCenter" Size="Size.Small" OnClick="ResizeMap" Title="Resize the map to fit the window"></MudIconButton>
                 }
@@ -38,35 +39,35 @@
     @if (SettingsPageOpened)
     {
         <div class="d-flex flex-column mx-2 my-2">
-            <MudText Typo="Typo.body2">Jumps from root : @(UserSettingsReader.Instance.UserSettingsValues.SystemsDepth)</MudText>
+            <MudText Typo="Typo.body2">Jumps from root : @(SettingsReader.UserSettingsValues.SystemsDepth)</MudText>
                 <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
                 </div>
-                <MudText Typo="Typo.body2">Danger alerts : @(UserSettingsReader.Instance.UserSettingsValues.DangerNotification)</MudText>
+                <MudText Typo="Typo.body2">Danger alerts : @(SettingsReader.UserSettingsValues.DangerNotification)</MudText>
                 <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
                 </div>
-                <MudText Typo="Typo.body2">Mute alerts : @(UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification)</MudText>
+                <MudText Typo="Typo.body2">Mute alerts : @(SettingsReader.UserSettingsValues.IgnoreNotification)</MudText>
                 <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
                 </div>
-                <MudText Typo="Typo.body2">Volume : @(UserSettingsReader.Instance.UserSettingsValues.NotificationVolume)</MudText>
+                <MudText Typo="Typo.body2">Volume : @(SettingsReader.UserSettingsValues.NotificationVolume)</MudText>
                 <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
                 </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch Checked="UserSettingsReader.Instance.UserSettingsValues.CompactMode" CheckedChanged="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
+                <MudSwitch Checked="SettingsReader.UserSettingsValues.CompactMode" CheckedChanged="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Compact mode</MudText>
             </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch Checked="UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost" CheckedChanged="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
+                <MudSwitch Checked="SettingsReader.UserSettingsValues.WindowIsTopMost" CheckedChanged="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Always on top (restart required)</MudText>
             </div>
         </div>
     }
     else
     {
-        @if (UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+        @if (SettingsReader.UserSettingsValues.CompactMode)
         {
             @if (IntelSystems.Count() > 0)
             {
@@ -102,6 +103,6 @@
                 </MudStack>
             }
         }
-        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 71px; right: 0px; bottom: 0px; left: 0px;" hidden="@UserSettingsReader.Instance.UserSettingsValues.CompactMode"></div>
+        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 71px; right: 0px; bottom: 0px; left: 0px;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
     }
 </div>

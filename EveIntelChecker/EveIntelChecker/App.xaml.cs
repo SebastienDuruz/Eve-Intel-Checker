@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace EveIntelChecker
 {
@@ -13,5 +14,6 @@ namespace EveIntelChecker
     /// </summary>
     public partial class App : Application
     {
+        
     }
 }
