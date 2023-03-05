@@ -25,7 +25,12 @@ namespace EveIntelCheckerElectron.Data
         /// <summary>
         /// Main App Window
         /// </summary>
-        private static BrowserWindow AppMainWindow { get; set; }
+        private static BrowserWindow MainWindow { get; set; }
+        
+        /// <summary>
+        /// Secondary App Window
+        /// </summary>
+        private static BrowserWindow SecondaryWindow { get; set; }
 
         /// <summary>
         /// Create the Electron Window
@@ -34,10 +39,10 @@ namespace EveIntelCheckerElectron.Data
         public async static Task CreateElectronWindow()
         {
             Electron.ReadAuth();
-            MainSettingsReader = new UserSettingsReader("_1");
-            SecondarySettingsReader = new UserSettingsReader("_2");
+            MainSettingsReader = new UserSettingsReader("1_");
+            SecondarySettingsReader = new UserSettingsReader("2_");
 
-            AppMainWindow = await Electron.WindowManager.CreateWindowAsync(
+            MainWindow = await Electron.WindowManager.CreateWindowAsync(
                 new BrowserWindowOptions()
                 {
                     AutoHideMenuBar = true,
@@ -50,22 +55,47 @@ namespace EveIntelCheckerElectron.Data
                 });
             
             // Add events to mainWindow
-            AppMainWindow.OnReadyToShow += () => AppMainWindow.Show();
-            AppMainWindow.OnClosed += () => CloseApplication();
+            MainWindow.OnReadyToShow += () => MainWindow.Show();
+            MainWindow.OnClosed += () => CloseApplication();
+            
+            Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
+            {
+                if (SecondaryWindow == null)
+                {
+                    SecondaryWindow = await Electron.WindowManager.CreateWindowAsync(
+                        new BrowserWindowOptions()
+                        {
+                            AutoHideMenuBar = true,
+                            AlwaysOnTop = SecondarySettingsReader.UserSettingsValues.WindowIsTopMost,
+                            MinHeight = 100,
+                            Height = (int)SecondarySettingsReader.UserSettingsValues.WindowHeight,
+                            MinWidth = 180,
+                            Width = (int)SecondarySettingsReader.UserSettingsValues.WindowWidth,
+                            Title = "Eve Intel Checker - Secondary",
+                            Parent = MainWindow
+                        });
+                    SecondaryWindow.LoadURL("/secondary");
+                    SecondaryWindow.Show();
+                }
+            });
         }
-
-        
 
         /// <summary>
         /// Save the application dimensions before closing the app
         /// </summary>
         public static void CloseApplication()
         {
-            int[] windowSize = AppMainWindow.GetSizeAsync().Result;
-            int[] windowPosition = AppMainWindow.GetPositionAsync().Result;
-            MainSettingsReader.UserSettingsValues.WindowWidth = windowSize[0];
-            MainSettingsReader.UserSettingsValues.WindowHeight = windowSize[1];
+            int[] mainWindowSize = MainWindow.GetSizeAsync().Result;
+            int[] mainWindowPosition = MainWindow.GetPositionAsync().Result;
+            MainSettingsReader.UserSettingsValues.WindowWidth = mainWindowSize[0];
+            MainSettingsReader.UserSettingsValues.WindowHeight = mainWindowSize[1];
             MainSettingsReader.WriteUserSettings();
+            
+            int[] secondaryWindowSize = MainWindow.GetSizeAsync().Result;
+            int[] secondaryWindowPosition = MainWindow.GetPositionAsync().Result;
+            SecondarySettingsReader.UserSettingsValues.WindowWidth = secondaryWindowSize[0];
+            SecondarySettingsReader.UserSettingsValues.WindowHeight = secondaryWindowSize[1];
+            SecondarySettingsReader.WriteUserSettings();
             Electron.App.Quit();
         }
     }

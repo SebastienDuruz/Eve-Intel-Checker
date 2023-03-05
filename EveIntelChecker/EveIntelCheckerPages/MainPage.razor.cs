@@ -25,13 +25,13 @@ namespace EveIntelCheckerPages
     public partial class MainPage
     {
         [Parameter] 
-        public string WindowSpecificSufix { get; set; } = "_1";
+        public string WindowSpecificSufix { get; set; }
         
         /// <summary>
         /// The selected system (root)
         /// </summary>
         private MapSolarSystem _selectedSystem;
-
+        
         /// <summary>
         /// Property of the _selectedSytem attribute
         /// </summary>
