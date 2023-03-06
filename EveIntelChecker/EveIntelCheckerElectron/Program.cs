@@ -1,5 +1,6 @@
 using ElectronNET.API;
 using EveIntelCheckerElectron.Data;
+using EveIntelCheckerLib.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+builder.Services.AddSingleton(new CustomSoundPlayer("notif.wav", "danger.wav"));
 
 builder.WebHost.UseElectron(args);
 

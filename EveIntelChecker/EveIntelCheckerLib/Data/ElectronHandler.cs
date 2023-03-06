@@ -93,6 +93,8 @@ namespace EveIntelCheckerElectron.Data
             MainSettingsReader.UserSettingsValues.WindowTop = mainWindowPosition[1];
             MainSettingsReader.WriteUserSettings();
             
+            MainWindow.Destroy();
+            SecondaryWindow.Destroy();
             Electron.App.Quit();
         }
 
@@ -140,8 +142,7 @@ namespace EveIntelCheckerElectron.Data
                             Width = (int)SecondarySettingsReader.UserSettingsValues.WindowWidth,
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
-                            Title = "Eve Intel Checker - Secondary",
-                            Parent = MainWindow
+                            Title = "Eve Intel Checker - Secondary"
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();

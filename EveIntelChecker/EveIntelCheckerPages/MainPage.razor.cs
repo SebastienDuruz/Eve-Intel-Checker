@@ -62,11 +62,6 @@ namespace EveIntelCheckerPages
         private ChatLogFile ChatLogFile { get; set; }
 
         /// <summary>
-        /// SoundPlayer for alert trigger
-        /// </summary>
-        private EveIntelCheckerLib.Data.CustomSoundPlayer SoundPlayer { get; set; }
-
-        /// <summary>
         /// Mud componant for selecting the root system
         /// </summary>
         private MudAutocomplete<MapSolarSystem> SolarSystemSelector { get; set; } = new MudAutocomplete<MapSolarSystem>();
@@ -139,8 +134,6 @@ namespace EveIntelCheckerPages
             LogFileLoaded = false;
             SetDefaultChatLogFile();
             LoadUserSettingsLastLog();
-
-            SoundPlayer = new CustomSoundPlayer("notif.wav", "danger.wav");
 
             // Read chat log file each sec
             ReadFileTimer = new Timer(async (object? stateInfo) =>
