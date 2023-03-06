@@ -32,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="h5.ElectronNET.API" Version="21.2.0.33598" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="NetCoreAudio" Version="1.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />

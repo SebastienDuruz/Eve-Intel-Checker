@@ -5,7 +5,7 @@
   },
   "name": "EveIntelCheckerElectron",
   "author": "Sébastien Duruz",
-  "singleInstance": false,
+  "singleInstance": true,
   "environment": "Production",
   "build": {
     "appId": "com.EveIntelCheckerElectron.app",
@@ -13,6 +13,9 @@
     "copyright": "Copyright © 2023",
     "buildVersion": "1.0.8",
     "compression": "maximum",
+    "win": {
+      "icon": "Assets/appIcon.ico"
+    },
     "directories": {
       "output": "../../../bin/Desktop"
     },

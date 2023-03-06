@@ -2,9 +2,8 @@
   "profiles": {
     "Electron.NET App": {
       "commandName": "Executable",
-      "executablePath": "electronize",
-      "commandLineArgs": "start",
-      "workingDirectory": "."
+      "executablePath": "electronize-h5",
+      "commandLineArgs": "start"
     },
     "EveIntelCheckerElectron": {
       "commandName": "Project",

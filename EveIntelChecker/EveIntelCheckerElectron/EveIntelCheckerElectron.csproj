@@ -23,4 +23,7 @@
   <ItemGroup>
     <None Remove="NetCoreAudio" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets" />
+  </ItemGroup>
 </Project>

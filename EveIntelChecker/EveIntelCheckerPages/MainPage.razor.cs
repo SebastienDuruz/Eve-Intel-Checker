@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EveIntelCheckerElectron.Data;
 using Microsoft.AspNetCore.Components;
 
 namespace EveIntelCheckerPages
@@ -26,6 +27,9 @@ namespace EveIntelCheckerPages
     {
         [Parameter] 
         public string WindowSpecificSufix { get; set; }
+
+        [Parameter]
+        public UserSettingsReader SettingsReader { get; set; }
         
         /// <summary>
         /// The selected system (root)
@@ -488,7 +492,7 @@ namespace EveIntelCheckerPages
         /// <returns>Copy filename</returns>
         private string BuildCopyFromFullName(string fileName)
         {
-            return $"Copy_{WindowSpecificSufix}{fileName}";
+            return $"Copy{WindowSpecificSufix}{fileName}";
         }
 
         /// <summary>
@@ -695,6 +699,21 @@ namespace EveIntelCheckerPages
 
             return (mapNodes, mapLinks.ToArray());
         }
-
+        
+        /// <summary>
+        /// Task for closing the application
+        /// </summary>
+        private async Task CloseApplication()
+        {
+            ElectronHandler.CloseMainWindow();
+        }
+        
+        /// <summary>
+        /// Task for closing the application
+        /// </summary>
+        private async Task ShowHideSecondaryWindow()
+        {
+            ElectronHandler.HideAndShowSecondaryWindow();
+        }
     }
 }

@@ -8,12 +8,29 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
 @using System.Media
+@using EveIntelCheckerElectron.Data
 @using Microsoft.JSInterop
 
 @inject IJSRuntime JSRuntime
-@inject UserSettingsReader SettingsReader
 
 <div style="height:100vh;">
+    <div style="-webkit-app-region: drag; height: 25px; background-color: #1E1E2D;" Class="d-flex flex-column">
+        <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
+            @if (WindowSpecificSufix.Contains("1"))
+            {
+                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;"> Eve Intel Checker</div>
+                <div>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Rounded.OpenInNew" Size="Size.Small" Title="Close the application"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.CloseMainWindow()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
+                </div>
+            }
+            else
+            {
+                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker - Secondary</div>
+                <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
+            }    
+        </div>
+    </div>
     <div Class="d-flex flex-column" style="height:71px;">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
             <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
@@ -40,21 +57,21 @@
     {
         <div class="d-flex flex-column mx-2 my-2">
             <MudText Typo="Typo.body2">Jumps from root : @(SettingsReader.UserSettingsValues.SystemsDepth)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
-                <MudText Typo="Typo.body2">Danger alerts : @(SettingsReader.UserSettingsValues.DangerNotification)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
-                <MudText Typo="Typo.body2">Mute alerts : @(SettingsReader.UserSettingsValues.IgnoreNotification)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
-                <MudText Typo="Typo.body2">Volume : @(SettingsReader.UserSettingsValues.NotificationVolume)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
+            <MudText Typo="Typo.body2">Danger alerts : @(SettingsReader.UserSettingsValues.DangerNotification)</MudText>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
+            <MudText Typo="Typo.body2">Mute alerts : @(SettingsReader.UserSettingsValues.IgnoreNotification)</MudText>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
+            <MudText Typo="Typo.body2">Volume : @(SettingsReader.UserSettingsValues.NotificationVolume)</MudText>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
             <div class="d-flex justify-space-between align-center align-content-center">
                 <MudSwitch Checked="SettingsReader.UserSettingsValues.CompactMode" CheckedChanged="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Compact mode</MudText>
@@ -103,6 +120,6 @@
                 </MudStack>
             }
         }
-        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 71px; right: 0px; bottom: 0px; left: 0px;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
+        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 96px; right: 0px; bottom: 0px; left: 0px;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
     }
 </div>
