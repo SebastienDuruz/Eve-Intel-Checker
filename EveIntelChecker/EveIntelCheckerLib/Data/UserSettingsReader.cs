@@ -4,6 +4,7 @@
 using EveIntelCheckerLib.Models;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel.Design;
 using System.IO;
 
 namespace EveIntelCheckerLib.Data
@@ -29,7 +30,12 @@ namespace EveIntelCheckerLib.Data
         /// <param name="identifier">The prefix to identify the setting file</param>
         public UserSettingsReader(string identifier)
         {
-            FilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), $"userSettings{identifier}.json");
+            if(!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker")))
+            {
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"));
+            }
+            
+            FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"), $"userSettings{identifier}.json");
             ReadUserSettings();
         }
 
