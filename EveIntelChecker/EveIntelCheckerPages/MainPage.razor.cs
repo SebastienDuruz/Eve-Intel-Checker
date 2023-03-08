@@ -55,6 +55,11 @@ namespace EveIntelCheckerPages
         /// Timer for reading the chat log file
         /// </summary>
         private Timer? ReadFileTimer { get; set; }
+        
+        /// <summary>
+        /// Define if LogFile has to be readed ( set to false before disposing the timer)
+        /// </summary>
+        private bool ReadLogFileActivated { get; set; }
 
         /// <summary>
         /// The informations about current chat LogFile
@@ -110,6 +115,8 @@ namespace EveIntelCheckerPages
         /// Set to true if settings panel just closed
         /// </summary>
         private bool MapRebuildRequired { get; set; } = false;
+        
+        private Task ReadLogFileTask { get; set; }
 
         /// <summary>
         /// Custom theme for MudBlazor
@@ -134,12 +141,18 @@ namespace EveIntelCheckerPages
             LogFileLoaded = false;
             SetDefaultChatLogFile();
             LoadUserSettingsLastLog();
+            ReadLogFileActivated = true;
 
             // Read chat log file each sec
-            ReadFileTimer = new Timer(async (object? stateInfo) =>
+            ReadFileTimer = new Timer((object? stateInfo) =>
             {
-                await ReadLogFile();
-            }, new AutoResetEvent(false), 1000, 1000);
+                if (ReadLogFileActivated)
+                {
+                    ReadLogFileTask = new Task(() => ReadLogFile());
+                    ReadLogFileTask.Start();
+                    ReadLogFileTask.Wait();
+                }
+            }, new AutoResetEvent(false), (long)1000, 1000);
         }
 
         /// <summary>
@@ -274,7 +287,7 @@ namespace EveIntelCheckerPages
         /// Read the chat log file
         /// </summary>
         /// <returns>Result of the Task</returns>
-        private async Task ReadLogFile()
+        private async Task<bool> ReadLogFile()
         {
             // User has selected the required
             if (LogFileLoaded && IntelSystems.Count > 0)
@@ -282,22 +295,32 @@ namespace EveIntelCheckerPages
                 // File exists (Read the file)
                 if (File.Exists($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}"))
                 {
-                    File.Copy($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}", $"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}", true);
-
-                    // Execute the main process by reading last line of the logfile
-                    string[] lines = await File.ReadAllLinesAsync($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
-                    if (lines != null)
-                        if (lines[lines.Count() - 1] != ChatLogFile.LastLogFileMessage)
-                        {
-                            ChatLogFile.LastLogFileMessage = lines[lines.Count() - 1];
-                            await CheckSystemProximity();
-                            await ExtractTimeFromMessage(ChatLogFile.LastLogFileMessage);
-                        }
+                    try
+                    {
+                        File.Copy($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}",
+                            $"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}", true);
+                        
+                        // Execute the main process by reading last line of the logfile
+                        string[] lines = await File.ReadAllLinesAsync($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
+                        if (lines != null)
+                            if (lines[lines.Count() - 1] != ChatLogFile.LastLogFileMessage)
+                            {
+                                ChatLogFile.LastLogFileMessage = lines[lines.Count() - 1];
+                                await CheckSystemProximity();
+                                await ExtractTimeFromMessage(ChatLogFile.LastLogFileMessage);
+                            }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->");
+                    }
                 }
 
                 // Check for new chatlog file
                 await CheckNewLogFile();
             }
+
+            return true;
         }
 
         /// <summary>
@@ -450,7 +473,6 @@ namespace EveIntelCheckerPages
                     time = time.Split("]")[0];
                     ChatLogFile.LastLogFileRead = time.Split(" ")[2];
 
-                    // TODO : Find a solution to avoid this StateHasChanged, it cause issue with starmap
                     await InvokeAsync(() => StateHasChanged());
                 }
             }
@@ -546,6 +568,16 @@ namespace EveIntelCheckerPages
             SettingsReader.UserSettingsValues.WindowIsTopMost = newValue;
             SettingsReader.WriteUserSettings();
         }
+        
+        /// <summary>
+        /// Update the value of UseKeyboardShortcuts
+        /// </summary>
+        /// <param name="newValue">The new value to be applied</param>
+        private void UseKeyboardShortcutsChanged(bool newValue)
+        {
+            SettingsReader.UserSettingsValues.UseKeyboardShortcuts = newValue;
+            SettingsReader.WriteUserSettings();
+        }
 
         /// <summary>
         /// Update the value of SystemsDepth
@@ -596,14 +628,14 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Set the ClientName from loaded chatlog file
         /// </summary>
-        private void SetClientName()
+        private async Task SetClientName()
         {
             if(File.Exists($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}"))
             {
                 try
                 {
                     // Fetch the content of the chatlog file
-                    string[] fileContent = File.ReadAllLines($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
+                    string[] fileContent = await File.ReadAllLinesAsync($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
                     string channelName = String.Empty;
                     string characterName = String.Empty;
 
@@ -698,15 +730,22 @@ namespace EveIntelCheckerPages
         /// </summary>
         private async Task CloseApplication()
         {
+            ReadLogFileActivated = false;
+            ReadLogFileTask.Dispose();
+            await ReadFileTimer.DisposeAsync();
             ElectronHandler.CloseMainWindow();
         }
         
         /// <summary>
         /// Task for closing the application
         /// </summary>
-        private async Task ShowHideSecondaryWindow()
+        private async Task CloseSecondaryWindow()
         {
-            ElectronHandler.HideAndShowSecondaryWindow();
+            ReadLogFileActivated = false;
+            if(ReadLogFileTask != null)
+                ReadLogFileTask.Dispose();
+            await ReadFileTimer.DisposeAsync();
+            ElectronHandler.CloseSecondaryWindow();
         }
     }
 }

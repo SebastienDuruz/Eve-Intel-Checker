@@ -1,0 +1,12 @@
+﻿body::-webkit-scrollbar {
+    display: none;
+}
+
+.windowBar {
+    -webkit-app-region: drag;
+    height: 25px;
+    background-color: #1E1E2D;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}

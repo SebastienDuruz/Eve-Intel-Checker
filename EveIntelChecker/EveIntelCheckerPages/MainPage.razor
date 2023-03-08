@@ -15,24 +15,27 @@
 @inject CustomSoundPlayer SoundPlayer
 
 <div style="height:100vh;">
-    <div style="-webkit-app-region: drag; height: 25px; background-color: #1E1E2D;" Class="d-flex flex-column">
+    <div class="d-flex flex-column windowBar">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
             @if (WindowSpecificSufix.Contains("1"))
             {
-                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;"> Eve Intel Checker</div>
+                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker</div>
                 <div>
-                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Rounded.OpenInNew" Size="Size.Small" Title="Close the application"></MudIconButton>
-                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.CloseMainWindow()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Rounded.OpenInNew" Size="Size.Small" Title="Show the secondary window"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => CloseApplication()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
                 </div>
             }
             else
             {
-                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker - Secondary</div>
-                <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
+                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker [2]</div>
+                <div>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Material.Rounded.OpenInNewOff" Size="Size.Small" Title="Hide the secondary window"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => CloseSecondaryWindow()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the secondary window"></MudIconButton>
+                </div>
             }    
         </div>
     </div>
-    <div Class="d-flex flex-column" style="height:71px;">
+    <div Class="d-flex flex-column" style="height:71px; margin-top: 25px;">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
             <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
             <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
@@ -81,6 +84,13 @@
                 <MudSwitch Checked="SettingsReader.UserSettingsValues.WindowIsTopMost" CheckedChanged="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Always on top (restart required)</MudText>
             </div>
+            @if (WindowSpecificSufix.Contains("1"))
+            {
+                <div class="d-flex justify-space-between align-center align-content-center">
+                    <MudSwitch Checked="SettingsReader.UserSettingsValues.UseKeyboardShortcuts" CheckedChanged="(bool x) => UseKeyboardShortcutsChanged(x)" Color="Color.Primary" />
+                    <MudText Align="Align.Center" Typo="Typo.body2">Keyboard shortcuts (restart required)</MudText>
+                </div>
+            }
         </div>
     }
     else

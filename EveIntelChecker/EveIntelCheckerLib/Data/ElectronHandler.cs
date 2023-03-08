@@ -47,7 +47,7 @@ namespace EveIntelCheckerElectron.Data
         /// Create the Electron Window
         /// </summary>
         /// <returns>Results of the task</returns>
-        public async static Task CreateElectronWindow()
+        public static async Task CreateElectronWindow()
         {
             Electron.ReadAuth();
             MainSettingsReader = new UserSettingsReader("_1");
@@ -60,10 +60,11 @@ namespace EveIntelCheckerElectron.Data
                 {
                     AutoHideMenuBar = true,
                     Frame = false,
+                    UseContentSize = true,
                     AlwaysOnTop = MainSettingsReader.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
                     Height = (int)MainSettingsReader.UserSettingsValues.WindowHeight,
-                    MinWidth = 180,
+                    MinWidth = 210,
                     Width = (int)MainSettingsReader.UserSettingsValues.WindowWidth,
                     X = (int)MainSettingsReader.UserSettingsValues.WindowLeft,
                     Y = (int)MainSettingsReader.UserSettingsValues.WindowTop,
@@ -72,12 +73,12 @@ namespace EveIntelCheckerElectron.Data
             
             // Add events to mainWindow
             MainWindow.OnReadyToShow += () => MainWindow.Show();
-            MainWindow.OnClose += () => CloseMainWindow();
-            
-            Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
-            {
-                HideAndShowSecondaryWindow();
-            });
+
+            if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
+                Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
+                {
+                    HideAndShowSecondaryWindow();
+                });
         }
 
         /// <summary>
@@ -85,38 +86,45 @@ namespace EveIntelCheckerElectron.Data
         /// </summary>
         public static async void CloseMainWindow()
         {
+            // Save the current state of the mainWindow
             int[] mainWindowSize = await MainWindow.GetSizeAsync();
             int[] mainWindowPosition = await MainWindow.GetPositionAsync();
-            MainSettingsReader.UserSettingsValues.WindowWidth = mainWindowSize[0];
-            MainSettingsReader.UserSettingsValues.WindowHeight = mainWindowSize[1];
-            MainSettingsReader.UserSettingsValues.WindowLeft = mainWindowPosition[0];
+            MainSettingsReader.UserSettingsValues.WindowWidth = mainWindowSize[0] - 14;
+            MainSettingsReader.UserSettingsValues.WindowHeight = mainWindowSize[1] - 8;
+            MainSettingsReader.UserSettingsValues.WindowLeft = mainWindowPosition[0] + 7;
             MainSettingsReader.UserSettingsValues.WindowTop = mainWindowPosition[1];
             MainSettingsReader.WriteUserSettings();
             
-            MainWindow.Destroy();
-            SecondaryWindow.Destroy();
-            Electron.App.Quit();
+            // Close the windows before exiting the app
+            MainWindow.Close();
+            if(SecondaryWindowInstanced)
+                SecondaryWindow.Close();
         }
 
         /// <summary>
         /// Save the secondary window dimensions and positions before closing the window
         /// </summary>
-        private static async void CloseSecondaryWindow()
+        public static async void CloseSecondaryWindow()
         {
-            int[] secondaryWindowSize = await SecondaryWindow.GetSizeAsync();
+            // Save the current state of the secondaryWindow
+            int[] secondaryContentSize = await SecondaryWindow.GetSizeAsync();
             int[] secondaryWindowPosition = await SecondaryWindow.GetPositionAsync();
-            SecondarySettingsReader.UserSettingsValues.WindowWidth = secondaryWindowSize[0];
-            SecondarySettingsReader.UserSettingsValues.WindowHeight = secondaryWindowSize[1];
-            SecondarySettingsReader.UserSettingsValues.WindowLeft = secondaryWindowPosition[0];
+            SecondarySettingsReader.UserSettingsValues.WindowWidth = secondaryContentSize[0] - 14;
+            SecondarySettingsReader.UserSettingsValues.WindowHeight = secondaryContentSize[1] - 8;
+            SecondarySettingsReader.UserSettingsValues.WindowLeft = secondaryWindowPosition[0] + 7;
             SecondarySettingsReader.UserSettingsValues.WindowTop = secondaryWindowPosition[1];
             SecondarySettingsReader.WriteUserSettings();
+
+            // Reset the states values before closing the secondaryWindow
+            SecondaryWindowInstanced = false;
+            SecondaryWindowOpened = false;
+            SecondaryWindow.Close();
         }
 
         public static async void HideAndShowSecondaryWindow()
         {
             if (SecondaryWindowOpened)
             {
-                CloseSecondaryWindow();
                 SecondaryWindow.Hide();
                 SecondaryWindowOpened = false;
             }
@@ -133,20 +141,18 @@ namespace EveIntelCheckerElectron.Data
                         new BrowserWindowOptions()
                         {
                             AutoHideMenuBar = true,
-                            Closable = false,
                             Frame = false,
+                            UseContentSize = true,
                             AlwaysOnTop = SecondarySettingsReader.UserSettingsValues.WindowIsTopMost,
                             MinHeight = 100,
                             Height = (int)SecondarySettingsReader.UserSettingsValues.WindowHeight,
-                            MinWidth = 180,
+                            MinWidth = 210,
                             Width = (int)SecondarySettingsReader.UserSettingsValues.WindowWidth,
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
-                            Title = "Eve Intel Checker - Secondary"
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
-                    SecondaryWindow.OnClose += () => CloseSecondaryWindow();
                     SecondaryWindowInstanced = true;
                     SecondaryWindowOpened = true;
                 }

@@ -3,13 +3,13 @@
   "splashscreen": {
     "imageFile": ""
   },
-  "name": "EveIntelCheckerElectron",
+  "name": "EveIntelChecker",
   "author": "Sébastien Duruz",
   "singleInstance": true,
   "environment": "Production",
   "build": {
     "appId": "com.EveIntelCheckerElectron.app",
-    "productName": "EveIntelCheckerElectron",
+    "productName": "EveIntelChecker",
     "copyright": "Copyright © 2023",
     "buildVersion": "1.0.8",
     "compression": "maximum",

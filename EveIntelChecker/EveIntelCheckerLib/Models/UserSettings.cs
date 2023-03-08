@@ -48,17 +48,22 @@
         /// <summary>
         /// Default TOP position of the main Window
         /// </summary>
-        public double WindowTop { get; set; } = 0;
+        public double WindowTop { get; set; } = 100;
 
         /// <summary>
         /// Default LEFT position of the main Window
         /// </summary>
-        public double WindowLeft { get; set; } = 0;
+        public double WindowLeft { get; set; } = 100;
 
         /// <summary>
         /// Window is TopMost ? (default -> true)
         /// </summary>
         public bool WindowIsTopMost { get; set; } = true;
+        
+        /// <summary>
+        /// Use the keyboard shortcuts ? (default -> true)
+        /// </summary>
+        public bool UseKeyboardShortcuts { get; set; } = true;
 
         /// <summary>
         /// Compact mode is the default display mode, if set to false display a Node graph
