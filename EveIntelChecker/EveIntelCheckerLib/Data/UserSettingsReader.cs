@@ -1,10 +1,6 @@
-﻿/// Author : Sébastien Duruz
-/// Date : 13.10.2022
-
-using EveIntelCheckerLib.Models;
+﻿using EveIntelCheckerLib.Models;
 using Newtonsoft.Json;
 using System;
-using System.ComponentModel.Design;
 using System.IO;
 
 namespace EveIntelCheckerLib.Data
@@ -17,7 +13,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// File path of the userSettings file
         /// </summary>
-        private string FilePath { get; set; }
+        private string FilePath { get; }
 
         /// <summary>
         /// Objects that contains the settings values

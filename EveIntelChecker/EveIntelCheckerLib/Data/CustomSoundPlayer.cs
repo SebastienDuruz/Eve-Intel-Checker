@@ -1,8 +1,4 @@
-﻿/// Author : Sébastien Duruz
-/// Date : 25.09.2022
-
-using NetCoreAudio;
-using System.IO;
+﻿using NetCoreAudio;
 using System.Threading.Tasks;
 
 namespace EveIntelCheckerLib.Data
@@ -28,10 +24,10 @@ namespace EveIntelCheckerLib.Data
         private string NormalAudioFilePath { get; set; }
         
         /// <summary>
-        /// Check if a sound is currently playing
+        /// Last Window that played sound
         /// </summary>
-        private bool IsPlaying { get; set; }
-
+        private string LastPlayed { get; set; }
+        
         /// <summary>
         /// Custom Constructor
         /// </summary>
@@ -41,32 +37,27 @@ namespace EveIntelCheckerLib.Data
             DangerAudioFilePath = dangerSoundPath;
             NormalAudioFilePath = normalSoundPath;
             SoundPlayer = new Player();
-            IsPlaying = false;
+            LastPlayed = "NONE";
         }
 
         /// <summary>
         /// Play the sound selected with corresponding player
         /// </summary>
         /// <param name="isDanger">Play Danger notification or normal notification</param>
+        /// <param name="sender">_1 or _2 (Primary or Secondary window ?)</param>
         /// <param name="volume">Volume applied to the notification</param>
-        public async Task<bool> PlaySound(bool isDanger, int volume = -1)
+        public async Task PlaySound(bool isDanger, string sender = "FORCE", int volume = -1)
         {
             if(volume != -1)
                 SoundPlayer.SetVolume((byte)volume);
             
-            // Sound is already playing
-            if (IsPlaying) 
-                return false;
+            // Sound is already playing by the same window
+            if (SoundPlayer.Playing && sender == LastPlayed && sender != "FORCE") return;
+
+            LastPlayed = sender;
             
             // All good, play the sound
-            IsPlaying = true;
-            if (isDanger)
-                await SoundPlayer.Play(DangerAudioFilePath);
-            else
-                await SoundPlayer.Play(NormalAudioFilePath);
-            IsPlaying = false;
-
-            return true;
+            SoundPlayer.Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
         }
     }
 }

@@ -1,13 +1,8 @@
-﻿/// Author : Sébastien Duruz
-/// Date : 04.10.2022
-
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
-using EveIntelCheckerLib.Data;
 
-namespace EveIntelCheckerElectron.Data
+namespace EveIntelCheckerLib.Data
 {
     /// <summary>
     /// Class ElectronHandler
@@ -37,7 +32,7 @@ namespace EveIntelCheckerElectron.Data
         /// <summary>
         /// State of the Secondary Window
         /// </summary>
-        private static bool SecondaryWindowOpened { get; set; }
+        public static bool SecondaryWindowOpened { get; set; }
         
         /// <summary>
         /// State of the instance of Secondary Window
@@ -100,16 +95,17 @@ namespace EveIntelCheckerElectron.Data
             MainSettingsReader.UserSettingsValues.WindowTop = mainWindowPosition[1];
             MainSettingsReader.WriteUserSettings();
             
+            if(SecondaryWindowInstanced)
+                await SaveSecondaryWindowSettings();
+            
             // Close the windows before exiting the app
             MainWindow.Close();
-            if(SecondaryWindowInstanced)
-                SecondaryWindow.Close();
         }
 
         /// <summary>
-        /// Save the secondary window dimensions and positions before closing the window
+        /// Save the secondary window dimensions and positions
         /// </summary>
-        public static async void CloseSecondaryWindow()
+        private static async Task SaveSecondaryWindowSettings()
         {
             // Save the current state of the secondaryWindow
             int[] secondaryContentSize = await SecondaryWindow.GetSizeAsync();
@@ -119,18 +115,13 @@ namespace EveIntelCheckerElectron.Data
             SecondarySettingsReader.UserSettingsValues.WindowLeft = secondaryWindowPosition[0] + 7;
             SecondarySettingsReader.UserSettingsValues.WindowTop = secondaryWindowPosition[1];
             SecondarySettingsReader.WriteUserSettings();
-
-            // Reset the states values before closing the secondaryWindow
-            SecondaryWindowInstanced = false;
-            SecondaryWindowOpened = false;
-            SecondaryWindow.Close();
-            
         }
 
-        public static async void HideAndShowSecondaryWindow()
+        public static async Task HideAndShowSecondaryWindow()
         {
             if (SecondaryWindowOpened)
             {
+                SaveSecondaryWindowSettings();
                 SecondaryWindow.Hide();
                 SecondaryWindowOpened = false;
             }
@@ -161,8 +152,7 @@ namespace EveIntelCheckerElectron.Data
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
-                    SecondaryWindow.OnFocus += () =>
-                        SecondaryWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+                    SecondaryWindow.OnFocus += () => SecondaryWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
                     SecondaryWindowInstanced = true;
                     SecondaryWindowOpened = true;
                     SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);

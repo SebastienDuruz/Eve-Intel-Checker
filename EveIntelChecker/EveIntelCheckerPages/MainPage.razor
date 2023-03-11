@@ -8,14 +8,13 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
 @using System.Media
-@using EveIntelCheckerElectron.Data
 @using Microsoft.JSInterop
 
 @inject IJSRuntime JSRuntime
 @inject CustomSoundPlayer SoundPlayer
 
-<div style="height:100vh;">
-    <div class="d-flex flex-column windowBar">
+<div style="height:100vh; z-index: 3;">
+    <div class="d-flex flex-column windowBar" style="z-index: 5;">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
             @if (WindowSpecificSufix.Contains("1"))
             {
@@ -30,7 +29,6 @@
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker [2]</div>
                 <div>
                     <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Material.Rounded.OpenInNewOff" Size="Size.Small" Title="Hide the secondary window"></MudIconButton>
-                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => CloseSecondaryWindow()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the secondary window"></MudIconButton>
                 </div>
             }    
         </div>
@@ -41,7 +39,7 @@
             <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
             @if (ChatLogFile.LastLogFileMessage != "")
             {
-                <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="@LoadedClientName">@ChatLogFile.LastLogFileRead</MudText>
+                <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="Last message readed">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
                 @if(!SettingsReader.UserSettingsValues.CompactMode)
@@ -97,7 +95,7 @@
     {
         @if (SettingsReader.UserSettingsValues.CompactMode)
         {
-            @if (IntelSystems.Count() > 0)
+            @if (IntelSystems.Any())
             {
                 <MudStack Spacing="0" Class="mx-2">
                     <div class="d-flex justify-space-around align-center flex-grow-1 gap-8" style="width: 100%;">
