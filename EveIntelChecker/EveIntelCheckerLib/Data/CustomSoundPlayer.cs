@@ -3,6 +3,7 @@
 
 using NetCoreAudio;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -25,6 +26,11 @@ namespace EveIntelCheckerLib.Data
         /// FilePath of the normal audio file
         /// </summary>
         private string NormalAudioFilePath { get; set; }
+        
+        /// <summary>
+        /// Check if a sound is currently playing
+        /// </summary>
+        private bool IsPlaying { get; set; }
 
         /// <summary>
         /// Custom Constructor
@@ -35,6 +41,7 @@ namespace EveIntelCheckerLib.Data
             DangerAudioFilePath = dangerSoundPath;
             NormalAudioFilePath = normalSoundPath;
             SoundPlayer = new Player();
+            IsPlaying = false;
         }
 
         /// <summary>
@@ -42,15 +49,24 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         /// <param name="isDanger">Play Danger notification or normal notification</param>
         /// <param name="volume">Volume applied to the notification</param>
-        public async void PlaySound(bool isDanger, int volume = -1)
+        public async Task<bool> PlaySound(bool isDanger, int volume = -1)
         {
             if(volume != -1)
                 SoundPlayer.SetVolume((byte)volume);
-
+            
+            // Sound is already playing
+            if (IsPlaying) 
+                return false;
+            
+            // All good, play the sound
+            IsPlaying = true;
             if (isDanger)
-                SoundPlayer.Play(DangerAudioFilePath);
+                await SoundPlayer.Play(DangerAudioFilePath);
             else
-                SoundPlayer.Play(NormalAudioFilePath);
+                await SoundPlayer.Play(NormalAudioFilePath);
+            IsPlaying = false;
+
+            return true;
         }
     }
 }

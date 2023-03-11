@@ -1,6 +1,7 @@
 ﻿/// Author : Sébastien Duruz
 /// Date : 04.10.2022
 
+using System;
 using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
@@ -61,6 +62,7 @@ namespace EveIntelCheckerElectron.Data
                     AutoHideMenuBar = true,
                     Frame = false,
                     UseContentSize = true,
+                    Focusable = true,
                     AlwaysOnTop = MainSettingsReader.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
                     Height = (int)MainSettingsReader.UserSettingsValues.WindowHeight,
@@ -73,6 +75,9 @@ namespace EveIntelCheckerElectron.Data
             
             // Add events to mainWindow
             MainWindow.OnReadyToShow += () => MainWindow.Show();
+            MainWindow.OnFocus += () =>
+                MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+            MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
 
             if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
                 Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
@@ -119,6 +124,7 @@ namespace EveIntelCheckerElectron.Data
             SecondaryWindowInstanced = false;
             SecondaryWindowOpened = false;
             SecondaryWindow.Close();
+            
         }
 
         public static async void HideAndShowSecondaryWindow()
@@ -143,6 +149,7 @@ namespace EveIntelCheckerElectron.Data
                             AutoHideMenuBar = true,
                             Frame = false,
                             UseContentSize = true,
+                            Focusable = true,
                             AlwaysOnTop = SecondarySettingsReader.UserSettingsValues.WindowIsTopMost,
                             MinHeight = 100,
                             Height = (int)SecondarySettingsReader.UserSettingsValues.WindowHeight,
@@ -150,11 +157,15 @@ namespace EveIntelCheckerElectron.Data
                             Width = (int)SecondarySettingsReader.UserSettingsValues.WindowWidth,
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
+                            Parent = MainWindow
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
+                    SecondaryWindow.OnFocus += () =>
+                        SecondaryWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
                     SecondaryWindowInstanced = true;
                     SecondaryWindowOpened = true;
+                    SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
                 }
             }
         }

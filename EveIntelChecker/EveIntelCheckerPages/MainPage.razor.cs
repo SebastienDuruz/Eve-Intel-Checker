@@ -1,8 +1,4 @@
-﻿/// Autor : Sébastien Duruz
-/// Date : 17.09.2022
-/// Description : Backend of the main page
-
-using EveIntelCheckerLib.Data;
+﻿using EveIntelCheckerLib.Data;
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using EveIntelCheckerLib.Models.Map;
@@ -13,10 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using EveIntelCheckerElectron.Data;
 using Microsoft.AspNetCore.Components;
+using Nito.Disposables;
 
 namespace EveIntelCheckerPages
 {
@@ -26,7 +23,7 @@ namespace EveIntelCheckerPages
     public partial class MainPage
     {
         [Parameter] 
-        public string WindowSpecificSufix { get; set; }
+        public string?  WindowSpecificSufix { get; set; }
 
         [Parameter]
         public UserSettingsReader SettingsReader { get; set; }
@@ -34,12 +31,12 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// The selected system (root)
         /// </summary>
-        private MapSolarSystem _selectedSystem;
+        private MapSolarSystem? _selectedSystem;
         
         /// <summary>
         /// Property of the _selectedSytem attribute
         /// </summary>
-        private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { if (value != null) { _selectedSystem = value; } BuildSystems(); } }
+        private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { _selectedSystem = value; BuildSystems(); } }
 
         /// <summary>
         /// List of System to check
@@ -54,12 +51,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Timer for reading the chat log file
         /// </summary>
-        private Timer? ReadFileTimer { get; set; }
-        
-        /// <summary>
-        /// Define if LogFile has to be readed ( set to false before disposing the timer)
-        /// </summary>
-        private bool ReadLogFileActivated { get; set; }
+        private static Timer? ReadFileTimer { get; set; }
 
         /// <summary>
         /// The informations about current chat LogFile
@@ -116,12 +108,10 @@ namespace EveIntelCheckerPages
         /// </summary>
         private bool MapRebuildRequired { get; set; } = false;
         
-        private Task ReadLogFileTask { get; set; }
-
         /// <summary>
         /// Custom theme for MudBlazor
         /// </summary>
-        MudTheme CustomTheme = new MudTheme()
+        MudTheme _customTheme = new MudTheme()
         {
             Typography = new Typography()
             {
@@ -141,18 +131,18 @@ namespace EveIntelCheckerPages
             LogFileLoaded = false;
             SetDefaultChatLogFile();
             LoadUserSettingsLastLog();
-            ReadLogFileActivated = true;
 
             // Read chat log file each sec
-            ReadFileTimer = new Timer((object? stateInfo) =>
-            {
-                if (ReadLogFileActivated)
-                {
-                    ReadLogFileTask = new Task(() => ReadLogFile());
-                    ReadLogFileTask.Start();
-                    ReadLogFileTask.Wait();
-                }
-            }, new AutoResetEvent(false), (long)1000, 1000);
+            ReadFileTimer = new Timer(1000);
+
+            ReadFileTimer.Elapsed += ReadLogHandler;
+            ReadFileTimer.AutoReset = true;
+            ReadFileTimer.Enabled = true;
+        }
+
+        private void ReadLogHandler(object source, ElapsedEventArgs e)
+        {
+            ReadLogFile();
         }
 
         /// <summary>
@@ -162,7 +152,7 @@ namespace EveIntelCheckerPages
         /// <returns>result of the task</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!SettingsReader.UserSettingsValues.CompactMode)
+            if (SettingsReader is { UserSettingsValues.CompactMode: false })
             {
                 if(firstRender || MapRebuildRequired)
                 {
@@ -198,8 +188,12 @@ namespace EveIntelCheckerPages
                 FileIconColor = Color.Success;
 
                 // Update the settings file
-                SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
-                SettingsReader.WriteUserSettings();
+                if (SettingsReader != null)
+                {
+                    SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                    SettingsReader.WriteUserSettings();
+                }
+
                 LogFileLoaded = true;
                 SetClientName();
             }
@@ -287,7 +281,7 @@ namespace EveIntelCheckerPages
         /// Read the chat log file
         /// </summary>
         /// <returns>Result of the Task</returns>
-        private async Task<bool> ReadLogFile()
+        private async void ReadLogFile()
         {
             // User has selected the required
             if (LogFileLoaded && IntelSystems.Count > 0)
@@ -312,15 +306,13 @@ namespace EveIntelCheckerPages
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->");
+                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}");
                     }
                 }
 
                 // Check for new chatlog file
                 await CheckNewLogFile();
             }
-
-            return true;
         }
 
         /// <summary>
@@ -454,7 +446,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task PlayNotificationSound(bool isDanger)
         {
-            SoundPlayer.PlaySound(isDanger);
+            await SoundPlayer.PlaySound(isDanger);
         }
 
         /// <summary>
@@ -618,11 +610,11 @@ namespace EveIntelCheckerPages
         /// Update the value of NotificationVolume
         /// </summary>
         /// <param name="newValue">The new value to be applied</param>
-        private void NotificationVolumeChanged(int newValue)
+        private async void NotificationVolumeChanged(int newValue)
         {
             SettingsReader.UserSettingsValues.NotificationVolume = newValue;
             SettingsReader.WriteUserSettings();
-            SoundPlayer.PlaySound(true, SettingsReader.UserSettingsValues.NotificationVolume);
+            await SoundPlayer.PlaySound(true, SettingsReader.UserSettingsValues.NotificationVolume);
         }
 
         /// <summary>
@@ -728,23 +720,22 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Task for closing the application
         /// </summary>
-        private async Task CloseApplication()
+        private static async Task CloseApplication()
         {
-            ReadLogFileActivated = false;
-            ReadLogFileTask.Dispose();
-            await ReadFileTimer.DisposeAsync();
+            ReadFileTimer.Stop();
+            ReadFileTimer.Close();
+            ReadFileTimer.Dispose();
             ElectronHandler.CloseMainWindow();
         }
         
         /// <summary>
         /// Task for closing the application
         /// </summary>
-        private async Task CloseSecondaryWindow()
+        private static async Task CloseSecondaryWindow()
         {
-            ReadLogFileActivated = false;
-            if(ReadLogFileTask != null)
-                ReadLogFileTask.Dispose();
-            await ReadFileTimer.DisposeAsync();
+            ReadFileTimer.Stop();
+            ReadFileTimer.Close();
+            ReadFileTimer.Dispose();
             ElectronHandler.CloseSecondaryWindow();
         }
     }
