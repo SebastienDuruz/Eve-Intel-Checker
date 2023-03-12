@@ -7,6 +7,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -327,9 +328,9 @@ namespace EveIntelCheckerPages
                 {
                     intelSystem.IsRed = true;
                     // Play specific sounds if needed by the user settings
-                    if (intelSystem.Jumps <= SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
+                    if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
                         await PlayNotificationSound(true);
-                    else if (intelSystem.Jumps <= SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
+                    else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
                         await PlayNotificationSound(false);
                     ++intelSystem.TriggerCounter;
                     newRedSystem = intelSystem.SystemName;
@@ -385,7 +386,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private void UpdateRootSystem(IntelSystem system)
         {
-            SelectedSystem = EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName == system.SystemName).FirstOrDefault();
+            SelectedSystem = EveStaticDatabase.Instance.SolarSystems.FirstOrDefault(x => x.SolarSystemName == system.SystemName);
             SolarSystemSelector.Text = SelectedSystem.SolarSystemName;
         }
 
@@ -686,6 +687,19 @@ namespace EveIntelCheckerPages
             ReadFileTimer.Stop();
             ReadFileTimer.Close();
             ElectronHandler.CloseMainWindow();
+        }
+
+        /// <summary>
+        /// Open an URL into the default browser
+        /// </summary>
+        /// <param name="url">URL to open</param>
+        private async Task OpenURL(string url)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? true : false
+            });
         }
     }
 }

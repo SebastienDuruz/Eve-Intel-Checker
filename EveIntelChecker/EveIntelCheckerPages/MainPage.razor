@@ -32,7 +32,7 @@
                 </div>
             }    
         </div>
-    </div>
+    </div> 
     <div Class="d-flex flex-column" style="height:71px; margin-top: 25px;">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
             <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
@@ -111,6 +111,9 @@
                         else if (system.TriggerCounter > 0)
                             classes += OrangeClasses;
 
+                        string zKillboardURL = $"https://zkillboard.com/system/{system.SystemId}";
+                        string dotlanURL = $"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}";
+
                         <div class="@classes" style="width: 100%;">
                             <MudText Typo="Typo.body2">@system.Jumps</MudText>
                             <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
@@ -118,8 +121,8 @@
                                     <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
                                 </ActivatorContent>
                                 <ChildContent>
-                                    <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
-                                    <MudMenuItem Href="@($"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}")">Dotlan</MudMenuItem>
+                                    <MudMenuItem OnClick="() => OpenURL(zKillboardURL)">ZKillboard</MudMenuItem>
+                                    <MudMenuItem OnClick="() => OpenURL(dotlanURL)">Dotlan</MudMenuItem>
                                     <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
                                 </ChildContent>
                             </MudMenu>

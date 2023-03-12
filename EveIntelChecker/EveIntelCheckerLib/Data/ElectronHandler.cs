@@ -54,6 +54,7 @@ namespace EveIntelCheckerLib.Data
             MainWindow = await Electron.WindowManager.CreateWindowAsync(
                 new BrowserWindowOptions()
                 {
+                    Icon = "appIcon.ico",
                     AutoHideMenuBar = true,
                     Frame = false,
                     UseContentSize = true,
@@ -70,8 +71,8 @@ namespace EveIntelCheckerLib.Data
             
             // Add events to mainWindow
             MainWindow.OnReadyToShow += () => MainWindow.Show();
-            MainWindow.OnFocus += () =>
-                MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+            MainWindow.OnFocus += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+            MainWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
 
             if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
@@ -152,7 +153,8 @@ namespace EveIntelCheckerLib.Data
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
-                    SecondaryWindow.OnFocus += () => SecondaryWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+                    SecondaryWindow.OnFocus += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
+                    SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
                     SecondaryWindowInstanced = true;
                     SecondaryWindowOpened = true;
                     SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
