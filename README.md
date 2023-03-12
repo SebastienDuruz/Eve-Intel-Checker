@@ -1,6 +1,8 @@
 # EveIntelChecker
 A compact desktop tool that filters relevant messages across Intel chat channels.
 
+**The screenshots on this page need to be updated and are therefore no longer contractual.**
+
 ## Working on
 
 - Windows 10 / 11
@@ -94,6 +96,7 @@ Each time irrelevant message is sent :
 <img align="center" height="300" src=".\Screenshots\Undetected.png">
 
 ### Other functionalities
+
 #### Settings Menu
 You can open/close application settings by clicking on the **settings icon**.
 
@@ -107,9 +110,11 @@ Max jumps before muting sound alerts (only visual modifications will continue to
 ##### Volume
 Volume of the sound alerts
 ##### Compact mode
-Default mode is compact. An alternative but **still in BETA** mode is available. This mode display a network map instead of a list
+Default mode is compact. An alternative mode is available. This mode display a network map instead of a list
 ##### Always on top
 By default the application stay **Top most** you can disable this behaviour. An application restart is **required** to apply this settings
+##### Keyboard Shortcuts
+**Activate/Desactivate** the keyboard shortcuts, by default this settings is activated
 
 #### Compact Mode
 You can **left click** on a system to access more functionalities :
@@ -129,10 +134,15 @@ You can reset the **triggers counters** by pressing **Reset icon**.
 - You can manually center the map by clicking the **Align icon**
 <img align="center" height="400" src=".\Screenshots\StarMap.png">
 
+#### Secondary Window
+It's possible to have a secondary window that works as an independant Intel.
+
+To *open/close* the secondary window press **CTRL+T** (if keyboards shortcuts are activated on the settings) or simply click the **open icon** on the top bar.
+
 ### Custom alert sounds
 Both alert sounds can be found in the root of the installation folder, next to the executable.
 
-You can replace *danger.wav* and *notif.wav* by any other ***.wav*** sound file, but file names have to still **be identical**.
+You can replace *danger_[1 or 2].wav* and *notif_[1 or 2].wav* by any other ***.wav*** sound file, but file names have to still **be identical**.
 
 ## License
 
