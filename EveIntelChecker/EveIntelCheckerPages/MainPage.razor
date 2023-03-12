@@ -1,4 +1,4 @@
-﻿<MudThemeProvider IsDarkMode="UserSettingsReader.Instance.UserSettingsValues.DarkMode" Theme="CustomTheme" />
+﻿<MudThemeProvider IsDarkMode="SettingsReader.UserSettingsValues.DarkMode" Theme="_customTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -11,18 +11,38 @@
 @using Microsoft.JSInterop
 
 @inject IJSRuntime JSRuntime
+@inject CustomSoundPlayer SoundPlayer
 
-<div style="height:100vh;">
-    <div Class="d-flex flex-column" style="height:71px;">
+<div style="height:100vh; z-index: 3;">
+    <div class="d-flex flex-column windowBar" style="z-index: 5;">
+        <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
+            @if (WindowSpecificSufix.Contains("1"))
+            {
+                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker</div>
+                <div>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Rounded.OpenInNew" Size="Size.Small" Title="Show the secondary window"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => CloseApplication()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
+                </div>
+            }
+            else
+            {
+                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker [2]</div>
+                <div>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Material.Rounded.OpenInNewOff" Size="Size.Small" Title="Hide the secondary window"></MudIconButton>
+                </div>
+            }    
+        </div>
+    </div> 
+    <div Class="d-flex flex-column" style="height:71px; margin-top: 25px;">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
             <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
             <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
             @if (ChatLogFile.LastLogFileMessage != "")
             {
-                <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="@LoadedClientName">@ChatLogFile.LastLogFileRead</MudText>
+                <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="Last message readed">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
-                @if(!UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+                @if(!SettingsReader.UserSettingsValues.CompactMode)
                 {
                     <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.AlignVerticalCenter" Size="Size.Small" OnClick="ResizeMap" Title="Resize the map to fit the window"></MudIconButton>
                 }
@@ -38,37 +58,44 @@
     @if (SettingsPageOpened)
     {
         <div class="d-flex flex-column mx-2 my-2">
-            <MudText Typo="Typo.body2">Jumps from root : @(UserSettingsReader.Instance.UserSettingsValues.SystemsDepth)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
-                <MudText Typo="Typo.body2">Danger alerts : @(UserSettingsReader.Instance.UserSettingsValues.DangerNotification)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
-                <MudText Typo="Typo.body2">Mute alerts : @(UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
-                <MudText Typo="Typo.body2">Volume : @(UserSettingsReader.Instance.UserSettingsValues.NotificationVolume)</MudText>
-                <div class="mx-3">
-                    <MudSlider Size="Size.Small" Value="UserSettingsReader.Instance.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
-                </div>
+            <MudText Typo="Typo.body2">Jumps from root : @(SettingsReader.UserSettingsValues.SystemsDepth)</MudText>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
+            <MudText Typo="Typo.body2">Danger alerts : @(SettingsReader.UserSettingsValues.DangerNotification)</MudText>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.DangerNotification" ValueChanged="(int x) => DangerNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
+            <MudText Typo="Typo.body2">Mute alerts : @(SettingsReader.UserSettingsValues.IgnoreNotification)</MudText>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.IgnoreNotification" ValueChanged="(int x) => IgnoreNotificationChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
+            <MudText Typo="Typo.body2">Volume : @(SettingsReader.UserSettingsValues.NotificationVolume)</MudText>
+            <div class="mx-3">
+                <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
+            </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch Checked="UserSettingsReader.Instance.UserSettingsValues.CompactMode" CheckedChanged="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
+                <MudSwitch Checked="SettingsReader.UserSettingsValues.CompactMode" CheckedChanged="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Compact mode</MudText>
             </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch Checked="UserSettingsReader.Instance.UserSettingsValues.WindowIsTopMost" CheckedChanged="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
+                <MudSwitch Checked="SettingsReader.UserSettingsValues.WindowIsTopMost" CheckedChanged="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Always on top (restart required)</MudText>
             </div>
+            @if (WindowSpecificSufix.Contains("1"))
+            {
+                <div class="d-flex justify-space-between align-center align-content-center">
+                    <MudSwitch Checked="SettingsReader.UserSettingsValues.UseKeyboardShortcuts" CheckedChanged="(bool x) => UseKeyboardShortcutsChanged(x)" Color="Color.Primary" />
+                    <MudText Align="Align.Center" Typo="Typo.body2">Keyboard shortcuts (restart required)</MudText>
+                </div>
+            }
         </div>
     }
     else
     {
-        @if (UserSettingsReader.Instance.UserSettingsValues.CompactMode)
+        @if (SettingsReader.UserSettingsValues.CompactMode)
         {
-            @if (IntelSystems.Count() > 0)
+            @if (IntelSystems.Any())
             {
                 <MudStack Spacing="0" Class="mx-2">
                     <div class="d-flex justify-space-around align-center flex-grow-1 gap-8" style="width: 100%;">
@@ -84,6 +111,9 @@
                         else if (system.TriggerCounter > 0)
                             classes += OrangeClasses;
 
+                        string zKillboardURL = $"https://zkillboard.com/system/{system.SystemId}";
+                        string dotlanURL = $"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}";
+
                         <div class="@classes" style="width: 100%;">
                             <MudText Typo="Typo.body2">@system.Jumps</MudText>
                             <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
@@ -91,8 +121,8 @@
                                     <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
                                 </ActivatorContent>
                                 <ChildContent>
-                                    <MudMenuItem Href="@($"https://zkillboard.com/system/{system.SystemId}")">ZKillboard</MudMenuItem>
-                                    <MudMenuItem Href="@($"https://evemaps.dotlan.net/map/{system.SystemDomainName.Replace(" ", "_")}/{system.SystemName}")">Dotlan</MudMenuItem>
+                                    <MudMenuItem OnClick="() => OpenURL(zKillboardURL)">ZKillboard</MudMenuItem>
+                                    <MudMenuItem OnClick="() => OpenURL(dotlanURL)">Dotlan</MudMenuItem>
                                     <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
                                 </ChildContent>
                             </MudMenu>
@@ -102,6 +132,6 @@
                 </MudStack>
             }
         }
-        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 71px; right: 0px; bottom: 0px; left: 0px;" hidden="@UserSettingsReader.Instance.UserSettingsValues.CompactMode"></div>
+        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 96px; right: 0px; bottom: 0px; left: 0px;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
     }
 </div>

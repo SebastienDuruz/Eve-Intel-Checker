@@ -1,9 +1,33 @@
 {
   "profiles": {
-    "EveIntelChecker": {
+    "Electron.NET App": {
+      "commandName": "Executable",
+      "executablePath": "electronize-h5",
+      "commandLineArgs": "start"
+    },
+    "EveIntelCheckerElectron": {
       "commandName": "Project",
-      "nativeDebugging": true,
-      "jsWebView2Debugging": true
+      "commandLineArgs": "electronize-h5 start",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:7295;http://localhost:5295"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:64594",
+      "sslPort": 44397
     }
   }
 }

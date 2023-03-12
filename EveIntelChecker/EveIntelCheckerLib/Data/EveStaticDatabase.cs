@@ -1,16 +1,10 @@
-﻿/// Author : Sébastien Duruz
-/// Date : 23.08.2022
-
-using EveIntelCheckerLib.Models;
+﻿using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace EveIntelCheckerLib.Data
 {

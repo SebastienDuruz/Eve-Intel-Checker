@@ -1,5 +1,4 @@
 using ElectronNET.API;
-using EveIntelCheckerElectron.Data;
 using EveIntelCheckerLib.Data;
 using MudBlazor.Services;
 
@@ -9,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+builder.Services.AddSingleton(new CustomSoundPlayer("notif_1.wav", "danger_1.wav", "notif_2.wav", "danger_2.wav"));
 
 builder.WebHost.UseElectron(args);
 
@@ -33,6 +33,8 @@ app.MapFallbackToPage("/_Host");
 
 // Support Electron
 if (HybridSupport.IsElectronActive)
+{
     await ElectronHandler.CreateElectronWindow();
+}
 
 app.Run();
