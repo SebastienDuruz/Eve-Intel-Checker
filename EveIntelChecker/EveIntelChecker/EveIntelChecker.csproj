@@ -3,6 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>EveIntelCheckerElectron</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="h5.ElectronNET.API" Version="21.2.0.33598" />

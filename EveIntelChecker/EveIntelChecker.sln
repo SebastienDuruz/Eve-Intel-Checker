@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveIntelCheckerLib", "EveIn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveIntelCheckerPages", "EveIntelCheckerPages\EveIntelCheckerPages.csproj", "{6D8A34B3-F0C1-4D5D-8C5E-036BF8E1241C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EveIntelCheckerElectron", "EveIntelCheckerElectron\EveIntelCheckerElectron.csproj", "{F7A1713B-47F9-41B4-9D36-96DEBB492DC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EveIntelChecker", "EveIntelChecker\EveIntelChecker.csproj", "{F7A1713B-47F9-41B4-9D36-96DEBB492DC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

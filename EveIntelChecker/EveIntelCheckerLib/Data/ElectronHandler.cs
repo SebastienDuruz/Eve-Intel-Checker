@@ -72,7 +72,7 @@ namespace EveIntelCheckerLib.Data
             // Add events to mainWindow
             MainWindow.OnReadyToShow += () => MainWindow.Show();
             MainWindow.OnFocus += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
-            MainWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+            MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
 
             if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)

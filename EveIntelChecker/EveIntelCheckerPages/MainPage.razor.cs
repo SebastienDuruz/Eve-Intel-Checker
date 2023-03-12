@@ -126,16 +126,8 @@ namespace EveIntelCheckerPages
         protected override void OnInitialized()
         {
             LogFileLoaded = false;
-            SetDefaultChatLogFile();
+            SetDefaultChatLogFileFolders();
             LoadUserSettingsLastLog();
-
-            // Read chat log file each sec
-            ReadFileTimer = new Timer(1000);
-
-            ReadFileTimer.Elapsed += ReadLogHandler;
-            ReadFileTimer.AutoReset = true;
-            ReadFileTimer.Enabled = true;
-            ReadFileTimer.Start();
         }
 
         /// <summary>
@@ -156,6 +148,17 @@ namespace EveIntelCheckerPages
         /// <returns>result of the task</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            if (firstRender)
+            {
+                // Read chat log file each sec
+                ReadFileTimer = new Timer(1000);
+
+                ReadFileTimer.Elapsed += ReadLogHandler;
+                ReadFileTimer.AutoReset = true;
+                ReadFileTimer.Enabled = true;
+                ReadFileTimer.Start();
+            }
+            
             if (SettingsReader is { UserSettingsValues.CompactMode: false })
             {
                 if(firstRender || MapRebuildRequired)
@@ -176,7 +179,7 @@ namespace EveIntelCheckerPages
         private void SelectFile(InputFileChangeEventArgs e)
         {
             IBrowserFile logFile = null;
-
+            
             // Only the last selected file will be used
             foreach (var file in e.GetMultipleFiles())
             {
@@ -192,22 +195,17 @@ namespace EveIntelCheckerPages
                 FileIconColor = Color.Success;
 
                 // Update the settings file
-                if (SettingsReader != null)
-                {
-                    SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
-                    SettingsReader.WriteUserSettings();
-                }
-
+                SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                SettingsReader.WriteUserSettings();
+                
                 LogFileLoaded = true;
             }
             else
             {
                 FileIconColor = Color.Error;
                 LogFileLoaded = false;
-                SetDefaultChatLogFile();
+                SetDefaultChatLogFileFolders();
             }
-
-            StateHasChanged();
         }
 
         /// <summary>
@@ -219,7 +217,7 @@ namespace EveIntelCheckerPages
             SettingsReader.ReadUserSettings();
 
             // If a filename is found
-            if(!String.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastFileName))
+            if(!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastFileName))
             {
                 // Chat-log file exists
                 if(File.Exists(Path.Combine(ChatLogFile.LogFileFolder, SettingsReader.UserSettingsValues.LastFileName)))
@@ -238,7 +236,7 @@ namespace EveIntelCheckerPages
             }
 
             // Select the system if it exists in the DB
-            if(!String.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastSelectedSystem) 
+            if(!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastSelectedSystem) 
                 && EveStaticDatabase.Instance.SolarSystems.Exists(x => x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
             {
                 SolarSystemSelector.Value = EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem).First();
@@ -292,7 +290,14 @@ namespace EveIntelCheckerPages
                     {
                         File.Copy($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}",
                             $"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}", true);
-                        
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
+                    }
+
+                    try
+                    {
                         // Execute the main process by reading last line of the logfile
                         IEnumerable<string> lines = File.ReadLines($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
                         if (lines != null)
@@ -305,7 +310,7 @@ namespace EveIntelCheckerPages
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}");
+                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
                     }
                 }
 
@@ -328,10 +333,18 @@ namespace EveIntelCheckerPages
                 {
                     intelSystem.IsRed = true;
                     // Play specific sounds if needed by the user settings
-                    if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
+                    if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
+                        intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
+                    {
                         await PlayNotificationSound(true);
-                    else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification && intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
+                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSufix}");
+                    }
+                    else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
+                             intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
+                    {
                         await PlayNotificationSound(false);
+                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSufix}");
+                    }
                     ++intelSystem.TriggerCounter;
                     newRedSystem = intelSystem.SystemName;
                 }
@@ -465,7 +478,7 @@ namespace EveIntelCheckerPages
                     time = time.Split("]")[0];
                     ChatLogFile.LastLogFileRead = time.Split(" ")[2];
 
-                    await InvokeAsync(() => StateHasChanged());
+                    await InvokeAsync(StateHasChanged);
                 }
             }
             catch (Exception)
@@ -505,7 +518,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Reset the ChatLogFile to default with folder values
         /// </summary>
-        private void SetDefaultChatLogFile()
+        private void SetDefaultChatLogFileFolders()
         {
             ChatLogFile = new ChatLogFile();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -614,7 +627,7 @@ namespace EveIntelCheckerPages
         {
             SettingsReader.UserSettingsValues.NotificationVolume = newValue;
             SettingsReader.WriteUserSettings();
-            await SoundPlayer.PlaySound(true, volume: SettingsReader.UserSettingsValues.NotificationVolume);
+            await SoundPlayer.PlaySound(true, WindowSpecificSufix, SettingsReader.UserSettingsValues.NotificationVolume);
         }
 
         /// <summary>
@@ -658,8 +671,8 @@ namespace EveIntelCheckerPages
 
                     try
                     {
-                        systemLink.From = mapNodes.Where(x => x.Label.Contains(system.SystemName)).FirstOrDefault().Id;
-                        IntelSystem systemToConnect = IntelSystems.Where(x => x.SystemId == link).FirstOrDefault();
+                        systemLink.From = mapNodes.FirstOrDefault(x => x.Label.Contains(system.SystemName)).Id;
+                        IntelSystem systemToConnect = IntelSystems.FirstOrDefault(x => x.SystemId == link);
 
                         // Only if system is still on the generation
                         if (systemToConnect != null)
