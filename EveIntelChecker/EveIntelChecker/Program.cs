@@ -1,5 +1,8 @@
 using ElectronNET.API;
 using EveIntelCheckerLib.Data;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
