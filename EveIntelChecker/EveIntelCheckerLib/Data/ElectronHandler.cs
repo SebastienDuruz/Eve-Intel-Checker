@@ -45,7 +45,6 @@ namespace EveIntelCheckerLib.Data
         /// <returns>Results of the task</returns>
         public static async Task CreateElectronWindow()
         {
-            Electron.ReadAuth();
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
             SecondaryWindowOpened = false;
@@ -149,7 +148,6 @@ namespace EveIntelCheckerLib.Data
                             Width = (int)SecondarySettingsReader.UserSettingsValues.WindowWidth,
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
-                            Parent = MainWindow
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();

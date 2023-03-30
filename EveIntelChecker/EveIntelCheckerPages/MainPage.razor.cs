@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.AspNetCore.Components;
-using Nito.Disposables;
 using static System.GC;
 
 namespace EveIntelCheckerPages
