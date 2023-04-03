@@ -71,7 +71,7 @@
         public bool CompactMode { get; set; } = true;
 
         /// <summary>
-        /// Using an alternate color sheme for accessibility usage
+        /// Using an alternate color scheme for accessibility usage
         /// </summary>
         public bool AccessibleTheme { get; set; } = false;
 
