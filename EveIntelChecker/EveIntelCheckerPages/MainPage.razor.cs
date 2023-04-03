@@ -261,6 +261,9 @@ namespace EveIntelCheckerPages
         /// </summary>
         private async void BuildSystems()
         {
+            // Check the value before doing anything
+            if (SelectedSystem == null) return;
+            
             // Build the list of systems
             IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, SettingsReader.UserSettingsValues.SystemsDepth);
 
