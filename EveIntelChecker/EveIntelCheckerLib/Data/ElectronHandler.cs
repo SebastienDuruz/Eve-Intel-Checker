@@ -70,7 +70,6 @@ namespace EveIntelCheckerLib.Data
             
             // Add events to mainWindow
             MainWindow.OnReadyToShow += () => MainWindow.Show();
-            MainWindow.OnFocus += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
 
@@ -94,9 +93,13 @@ namespace EveIntelCheckerLib.Data
             MainSettingsReader.UserSettingsValues.WindowLeft = mainWindowPosition[0] + 7;
             MainSettingsReader.UserSettingsValues.WindowTop = mainWindowPosition[1];
             MainSettingsReader.WriteUserSettings();
-            
-            if(SecondaryWindowInstanced)
+
+            // Save and close the secondary window if has been opened
+            if (SecondaryWindowInstanced)
+            {
                 await SaveSecondaryWindowSettings();
+                SecondaryWindow.Close();                
+            }
             
             // Close the windows before exiting the app
             MainWindow.Close();
@@ -151,7 +154,6 @@ namespace EveIntelCheckerLib.Data
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
-                    SecondaryWindow.OnFocus += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
                     SecondaryWindowInstanced = true;
                     SecondaryWindowOpened = true;
