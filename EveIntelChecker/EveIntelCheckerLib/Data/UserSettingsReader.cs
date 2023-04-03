@@ -32,6 +32,7 @@ namespace EveIntelCheckerLib.Data
             }
             
             FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"), $"userSettings{identifier}.json");
+            
             ReadUserSettings();
         }
 
@@ -47,7 +48,7 @@ namespace EveIntelCheckerLib.Data
                 {
                     UserSettingsValues = JsonConvert.DeserializeObject<UserSettings>(File.ReadAllText(FilePath));
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // Reset the settings by recreating a file
                     WriteUserSettings();

@@ -51,7 +51,7 @@
             </div>
         </div>
         <div class="d-flex mx-1">
-            <MudAutocomplete T="MapSolarSystem" @ref="SolarSystemSelector" Label="Actual position" Immediate="true" @bind-value="SelectedSystem" SelectValueOnTab="true" SelectOnClick="true" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null?null : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" CoerceText="true" Variant="Variant.Outlined" />
+            <MudAutocomplete T="MapSolarSystem" @ref="SolarSystemSelector" Label="Actual position" Immediate="true" @bind-value="SelectedSystem" SelectValueOnTab="true" SelectOnClick="true" SearchFunc="@SearchSystem" ResetValueOnEmptyText="true" ToStringFunc="@(e=> e==null? "" : $"{e.SolarSystemName}")" Dense="true" Margin="Margin.Dense" CoerceText="true" Variant="Variant.Outlined" />
         </div>
     </div>
 

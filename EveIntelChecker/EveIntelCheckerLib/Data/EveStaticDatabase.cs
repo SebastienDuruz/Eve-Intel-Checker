@@ -51,7 +51,6 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// Custom Constructor
         /// </summary>
-        /// <param name="isElectron">True if built with Electron, False if not</param>
         private EveStaticDatabase()
         {
             FolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Data");
