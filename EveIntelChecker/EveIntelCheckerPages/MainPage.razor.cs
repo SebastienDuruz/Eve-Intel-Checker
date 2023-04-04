@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.AspNetCore.Components;
 using static System.GC;
+using Colors = MudBlazor.Colors;
 
 namespace EveIntelCheckerPages
 {
@@ -105,10 +106,41 @@ namespace EveIntelCheckerPages
         private bool MapRebuildRequired { get; set; } = false;
         
         /// <summary>
-        /// Custom theme for MudBlazor
+        /// Default theme for MudBlazor
         /// </summary>
-        MudTheme _customTheme = new MudTheme()
+        private MudTheme _defaultTheme = new MudTheme()
         {
+            Palette = new Palette()
+            {
+                Primary = Colors.Blue.Default,
+                Secondary = Colors.Green.Accent4,
+                AppbarBackground = Colors.Red.Default,
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Blue.Lighten1,
+            },
+            Typography = new Typography()
+            {
+                Default = new Default()
+                {
+                    FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }
+                }
+            }
+        };
+        
+        /// <summary>
+        /// Main theme for MudBlazor
+        /// </summary>
+        private MudTheme _mainTheme = new MudTheme()
+        {
+            PaletteDark = new PaletteDark()
+            {
+                Primary = "#fdd54f",
+                Secondary = "#f8049c",
+                Background = "#000000",
+                AppbarBackground = "#000000",
+            },
             Typography = new Typography()
             {
                 Default = new Default()
@@ -162,7 +194,7 @@ namespace EveIntelCheckerPages
             {
                 if(firstRender || MapRebuildRequired)
                 {
-                    await JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+                    JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
                     // Reset the value, avoiding rebuild at every rendering
                     MapRebuildRequired = false;
