@@ -22,8 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="NetCoreAudio" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets" />
+    <None Include="wwwroot\img\EveIntelChecker_logo.png" />
+    <None Include="wwwroot\img\EveIntelChecker_logo_small.png" />
   </ItemGroup>
 </Project>

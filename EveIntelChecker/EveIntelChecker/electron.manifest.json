@@ -1,7 +1,7 @@
 {
   "executable": "EveIntelChecker",
   "splashscreen": {
-    "imageFile": ""
+    "imageFile": "/wwwroot/img/EveIntelChecker_logo_small.png"
   },
   "name": "EveIntelChecker",
   "description": "Compact desktop tool for checking intel channels on Eve Online",
@@ -12,10 +12,17 @@
     "appId": "com.EveIntelChecker.app",
     "productName": "EveIntelChecker",
     "copyright": "Copyright © 2023",
-    "buildVersion": "1.0.8",
+    "buildVersion": "1.0.9",
     "compression": "maximum",
     "win": {
-      "icon": "appIcon.ico"
+      "icon": "../../../bin/Desktop/win-unpacked/resources/bin/EveIntelChecker_logo.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "runAfterFinish": false,
+      "artifactName": "${productName}_${version}.${ext}"
     },
     "directories": {
       "output": "../../../bin/Desktop"
