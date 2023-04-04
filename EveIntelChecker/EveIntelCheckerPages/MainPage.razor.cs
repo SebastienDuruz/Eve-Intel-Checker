@@ -162,7 +162,7 @@ namespace EveIntelCheckerPages
             {
                 if(firstRender || MapRebuildRequired)
                 {
-                    JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+                    await JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
                     // Reset the value, avoiding rebuild at every rendering
                     MapRebuildRequired = false;
