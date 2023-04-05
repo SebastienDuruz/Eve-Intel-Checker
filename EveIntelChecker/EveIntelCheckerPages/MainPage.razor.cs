@@ -136,10 +136,22 @@ namespace EveIntelCheckerPages
         {
             PaletteDark = new PaletteDark()
             {
-                Primary = "#fdd54f",
-                Secondary = "#f8049c",
-                Background = "#000000",
-                AppbarBackground = "#000000",
+                Primary = "#007ea7",
+                Background = "#1c1c1c",
+                AppbarBackground = "#1c1c1c",
+                DrawerBackground = "#1c1c1c",
+                Divider = "#FFFFFF",
+                AppbarText = "#FFFFFF",
+                DrawerText = "#FFFFFF",
+                White = "#FFFFFF",
+                Dark = "#1c1c1c",
+                DarkDarken = "#1c1c1c",
+                DarkLighten = "#1c1c1c",
+                OverlayDark = "#1c1c1c",
+                GrayDark = "#1c1c1c",
+                GrayDarker = "#1c1c1c",
+                BackgroundGrey = "#1c1c1c",
+                Surface = "#1c1c1c",
             },
             Typography = new Typography()
             {
@@ -678,11 +690,11 @@ namespace EveIntelCheckerPages
             {
                 mapNodes[i] = new MapNode();
 
-                mapNodes[i].Color.Background = "#424242ff";
+                mapNodes[i].Color.Background = "#1c1c1cff";
                 if (IntelSystems[i].IsRed)
-                    mapNodes[i].Color.Background = "#f64e62ff";
+                    mapNodes[i].Color.Background = "#ff3f5fff";
                 else if (IntelSystems[i].TriggerCounter > 0)
-                    mapNodes[i].Color.Background = "#d68000";
+                    mapNodes[i].Color.Background = "#ffb545";
 
                 if (IntelSystems[i].Jumps == 0)
                 {

@@ -31,10 +31,10 @@ let options = {
         chosen: false,
         color: {
             border: '#FFFFFF',
-            background: '#424242ff',
+            background: '#1c1c1c',
             highlight: {
-                border: '#E0E0E0',
-                background: '#424242ff'
+                border: '#FFFFFF',
+                background: '#1c1c1c'
             },
         },
         font: {

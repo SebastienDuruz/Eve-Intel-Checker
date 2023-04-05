@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -49,7 +50,7 @@ namespace EveIntelCheckerLib.Data
             SecondarySettingsReader = new UserSettingsReader("_2");
             SecondaryWindowOpened = false;
             SecondaryWindowInstanced = false;
-
+            
             MainWindow = await Electron.WindowManager.CreateWindowAsync(
                 new BrowserWindowOptions()
                 {
@@ -153,6 +154,7 @@ namespace EveIntelCheckerLib.Data
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
                     SecondaryWindow.LoadURL("http://localhost:8001/secondary");
+
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
                     SecondaryWindowInstanced = true;
