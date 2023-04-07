@@ -1,4 +1,9 @@
+<p align="center">
+  <img align="middle" src=".\EveIntelChecker\EveIntelChecker\wwwroot\img\EveIntelChecker_logo.png">
+</p>
+
 # EveIntelChecker
+
 A compact desktop tool for filtering relevant messages across Intel chat channels.
 
 **Please note: The screenshots on this page are outdated and should be updated. As a result, they are no longer considered contractual.**
@@ -54,13 +59,18 @@ cd bin/Desktop/TARGETED_ARCHITECTURE
 
 Ensure that **the Log Chat to File** option is activated. If it is not, activate the option and restart the Eve client.
 
-<img align="center" height="250" src=".\Screenshots\ChatLogOption.png">
+<p align="center">
+  <img align="middle" height="250" src=".\Screenshots\ChatLogOption.png">
+</p>
 
 ### Select your current system
 
 Use the autocomplete form to select the system you're currently in. Press Enter to validate your selection.
 
-<img align="center" height="300" src=".\Screenshots\SelectSystem.png"><img align="left" height="300" src=".\Screenshots\SelectedSystem.png">
+<p align="center">
+  <img align="middle" height="300" src=".\Screenshots\SelectSystem.png">
+  <img align="middle" height="300" src=".\Screenshots\SelectedSystem.png">
+</p>
 
 ### Open chat log file
 
@@ -68,7 +78,11 @@ Click the red **OpenFile** icon and select the desired text file.
 
 Chatlogs are stored in ***Document/EVE/logs/Chatlogs***
 
-<img align="left" height="300" src=".\Screenshots\OpenLogFile.png"><img align="left" height="120" src=".\Screenshots\SelectLogFile.png"><img align="center" height="300" src=".\Screenshots\SelectedLogFile.png">
+<p align="center">
+  <img align="center" height="300" src=".\Screenshots\OpenLogFile.png">
+  <img align="center" height="120" src=".\Screenshots\SelectLogFile.png">
+  <img align="center" height="300" src=".\Screenshots\SelectedLogFile.png">
+</p>
 
 Once selected, **OpenFile** icon turns green.
 
@@ -85,20 +99,28 @@ Each time a message contains system near your position is sent :
 - The system turns **red** until new relevant message is triggered
 - the Triggered column is incremented
 
-<img align="center" height="300" src=".\Screenshots\Detected.png">
+<p align="center">
+  <img align="middle" height="300" src=".\Screenshots\Detected.png">
+</p>
 
 Each time irrelevant message is sent :
 
 - The **Last message** label is updated
 
-<img align="center" height="300" src=".\Screenshots\Undetected.png">
+<p align="center">
+  <img align="middle" height="300" src=".\Screenshots\Undetected.png">
+</p>
 
 ### Other functionalities
 
 #### Settings Menu
 You can open/close the application settings by clicking on the **settings icon**.
 
-<img align="left" height="300" src=".\Screenshots\OpenSettings.png"><img align="center" height="375" src=".\Screenshots\OpenedSettings.png">
+<p align="center">
+  <img align="middle" height="300" src=".\Screenshots\OpenSettings.png">
+  <img align="middle" height="300" src=".\Screenshots\OpenedSettings.png">
+</p>
+
 ##### Jumps from root
 Max jumps to check from the root system (your current position)
 ##### Danger notifications
@@ -123,14 +145,20 @@ You can **left click** on a system to access more functionalities :
 
 You can reset the **triggers counters** by pressing the **Reset icon**.
 
-<img align="left" height="300" src=".\Screenshots\Reset.png"><img align="center" height="300" src=".\Screenshots\Reseted.png">
+<p align="center">
+  <img align="middle" height="300" src=".\Screenshots\Reset.png">
+  <img align="middle" height="300" src=".\Screenshots\Reseted.png">
+</p>
 
 #### Starmap Mode
 - Zoom In and Out with the **mouse wheel**
 - Move the map around with the **left click**
 - Reorganise nodes on the map with the **left click**
 - Manually center the map by clicking the **Align icon**
-<img align="center" height="400" src=".\Screenshots\StarMap.png">
+
+<p align="center">
+  <img align="middle" height="400" src=".\Screenshots\StarMap.png">
+</p>
 
 #### Secondary Window
 It's possible to have a secondary window that works as an independant Intel.
