@@ -1,4 +1,4 @@
-﻿<MudThemeProvider IsDarkMode="SettingsReader.UserSettingsValues.DarkMode" Theme="_customTheme" />
+﻿<MudThemeProvider IsDarkMode="SettingsReader.UserSettingsValues.DarkMode" Theme="_mainTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -20,15 +20,15 @@
             {
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker</div>
                 <div>
-                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Rounded.OpenInNew" Size="Size.Small" Title="Show the secondary window"></MudIconButton>
-                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => CloseApplication()" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="ElectronHandler.HideAndShowSecondaryWindow" Color="@Color.Default" Icon="@Icons.Rounded.OpenInNew" Size="Size.Small" Title="Show the secondary window"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="CloseApplication" Color="@Color.Error" Icon="@Icons.Rounded.Close" Size="Size.Small" Title="Close the application"></MudIconButton>
                 </div>
             }
             else
             {
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 5px;">Eve Intel Checker [2]</div>
                 <div>
-                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="() => ElectronHandler.HideAndShowSecondaryWindow()" Color="@Color.Default" Icon="@Icons.Material.Rounded.OpenInNewOff" Size="Size.Small" Title="Hide the secondary window"></MudIconButton>
+                    <MudIconButton Style="-webkit-app-region: no-drag;" HtmlTag="label" OnClick="ElectronHandler.HideAndShowSecondaryWindow" Color="@Color.Default" Icon="@Icons.Material.Rounded.OpenInNewOff" Size="Size.Small" Title="Hide the secondary window"></MudIconButton>
                 </div>
             }    
         </div>
@@ -39,7 +39,7 @@
             <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
             @if (ChatLogFile.LastLogFileMessage != "")
             {
-                <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="Last message readed">@ChatLogFile.LastLogFileRead</MudText>
+                <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="Last message read">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
                 @if(!SettingsReader.UserSettingsValues.CompactMode)
@@ -47,7 +47,7 @@
                     <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.AlignVerticalCenter" Size="Size.Small" OnClick="ResizeMap" Title="Resize the map to fit the window"></MudIconButton>
                 }
                 <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Refresh" Size="Size.Small" OnClick="ResetTriggers" Title="Reset the triggers counter"></MudIconButton>
-                <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Settings" Size="Size.Small" Title="Open/Close Settings panel" OnClick="() => OpenCloseSettingsPanel()"></MudIconButton>
+                <MudIconButton HtmlTag="label" Icon="@Icons.Rounded.Settings" Size="Size.Small" Title="Open/Close Settings panel" OnClick="OpenCloseSettingsPanel"></MudIconButton>
             </div>
         </div>
         <div class="d-flex mx-1">

@@ -5,7 +5,7 @@
 .windowBar {
     -webkit-app-region: drag;
     height: 25px;
-    background-color: #1E1E2D;
+    background-color: #0F0F0F;
     position: fixed;
     top: 0;
     width: 100%;

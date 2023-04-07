@@ -6,23 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="NetCoreAudio" />
-    <None Remove="Assets\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    
     <EmbeddedResource Include="Data\mapConstellations.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\mapRegions.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\mapSolarSystemJumps.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\mapSolarSystems.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="danger_1.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -36,8 +30,8 @@
     <EmbeddedResource Include="notif_2.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="appIcon.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <EmbeddedResource Include="EveIntelChecker_logo.ico">
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </EmbeddedResource>
   </ItemGroup>
 
