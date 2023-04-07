@@ -688,13 +688,18 @@ namespace EveIntelCheckerPages
             // Build nodes with Id starting by 1
             for (int i = 0; i < IntelSystems.Count; ++i)
             {
-                mapNodes[i] = new MapNode();
+                mapNodes[i] = new MapNode
+                {
+                    Color =
+                    {
+                        Background = "#1c1c1cff"
+                    }
+                };
 
-                mapNodes[i].Color.Background = "#1c1c1cff";
                 if (IntelSystems[i].IsRed)
                     mapNodes[i].Color.Background = "#ff3f5fff";
                 else if (IntelSystems[i].TriggerCounter > 0)
-                    mapNodes[i].Color.Background = "#ffb545";
+                    mapNodes[i].Color.Background = "#ff9800ff";
 
                 if (IntelSystems[i].Jumps == 0)
                 {

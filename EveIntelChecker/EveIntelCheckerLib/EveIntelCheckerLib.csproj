@@ -30,8 +30,8 @@
     <EmbeddedResource Include="notif_2.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="appIcon.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <EmbeddedResource Include="EveIntelChecker_logo.ico">
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </EmbeddedResource>
   </ItemGroup>
 
@@ -41,12 +41,5 @@
     <PackageReference Include="NetCoreAudio" Version="1.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Windows.Extensions" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="EveIntelChecker_logo.ico">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 </Project>
