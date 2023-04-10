@@ -6,8 +6,6 @@
 
 A compact desktop tool for filtering relevant messages across Intel chat channels.
 
-**Please note: The screenshots on this page are outdated and should be updated. As a result, they are no longer considered contractual.**
-
 ## Supported Platforms
 - Windows 10 / 11
 - MacOS Intel / ARM (Manual building required)
