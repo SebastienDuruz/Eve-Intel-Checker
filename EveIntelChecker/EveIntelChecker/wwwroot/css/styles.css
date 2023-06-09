@@ -10,3 +10,20 @@
     top: 0;
     width: 100%;
 }
+
+.topBar {
+    height:71px; 
+    margin-top: 25px;
+    position: fixed;
+    width: 100%;
+    background-color: #1c1c1c;
+}
+
+.content {
+    padding-top: 106px;
+    position: relative;
+}
+
+.noDragContainer {
+    -webkit-app-region: no-drag;
+}

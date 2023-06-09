@@ -24,9 +24,15 @@ namespace EveIntelCheckerPages
     /// </summary>
     public partial class MainPage
     {
+        /// <summary>
+        /// Window Suffix parameter
+        /// </summary>
         [Parameter] 
-        public string?  WindowSpecificSufix { get; set; }
+        public string?  WindowSpecificSuffix { get; set; }
 
+        /// <summary>
+        /// SettingsReader object
+        /// </summary>
         [Parameter]
         public UserSettingsReader SettingsReader { get; set; }
         
@@ -104,31 +110,7 @@ namespace EveIntelCheckerPages
         /// Set to true if settings panel just closed
         /// </summary>
         private bool MapRebuildRequired { get; set; } = false;
-        
-        /// <summary>
-        /// Default theme for MudBlazor
-        /// </summary>
-        private MudTheme _defaultTheme = new MudTheme()
-        {
-            Palette = new Palette()
-            {
-                Primary = Colors.Blue.Default,
-                Secondary = Colors.Green.Accent4,
-                AppbarBackground = Colors.Red.Default,
-            },
-            PaletteDark = new PaletteDark()
-            {
-                Primary = Colors.Blue.Lighten1,
-            },
-            Typography = new Typography()
-            {
-                Default = new Default()
-                {
-                    FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }
-                }
-            }
-        };
-        
+
         /// <summary>
         /// Main theme for MudBlazor
         /// </summary>
@@ -176,8 +158,8 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Handler for logfile reading process
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
+        /// <param name="source">Source object</param>
+        /// <param name="e">Event Args</param>
         private void ReadLogHandler(object source, ElapsedEventArgs e)
         {
             ReadLogFile();
@@ -206,7 +188,7 @@ namespace EveIntelCheckerPages
             {
                 if(firstRender || MapRebuildRequired)
                 {
-                    JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+                    JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
                     // Reset the value, avoiding rebuild at every rendering
                     MapRebuildRequired = false;
@@ -313,7 +295,7 @@ namespace EveIntelCheckerPages
 
             MapSystemsData = BuildMapNodes();
             if(!SettingsReader.UserSettingsValues.CompactMode)
-                JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+                JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
             // Update the userSettings with new selected system
             SettingsReader.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
@@ -339,7 +321,7 @@ namespace EveIntelCheckerPages
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
+                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSuffix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
                     }
 
                     try
@@ -356,7 +338,7 @@ namespace EveIntelCheckerPages
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSufix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
+                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSuffix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
                     }
                 }
 
@@ -383,13 +365,13 @@ namespace EveIntelCheckerPages
                         intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
                     {
                         await PlayNotificationSound(true);
-                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSufix}");
+                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSuffix}");
                     }
                     else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
                              intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
                     {
                         await PlayNotificationSound(false);
-                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSufix}");
+                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSuffix}");
                     }
                     ++intelSystem.TriggerCounter;
                     newRedSystem = intelSystem.SystemName;
@@ -406,7 +388,7 @@ namespace EveIntelCheckerPages
                 if(!SettingsReader.UserSettingsValues.CompactMode)
                 {
                     MapSystemsData = BuildMapNodes();
-                    JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                    JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
                 }
             }
         }
@@ -426,7 +408,7 @@ namespace EveIntelCheckerPages
 
             MapSystemsData = BuildMapNodes();
             if (!SettingsReader.UserSettingsValues.CompactMode)
-                JSRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
         }
 
         /// <summary>
@@ -435,7 +417,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task ResizeMap()
         {
-            JSRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+            JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
         }
 
         /// <summary>
@@ -504,8 +486,8 @@ namespace EveIntelCheckerPages
         private async Task PlayNotificationSound(bool isDanger)
         {
             // Secondary Window, play sound only if Window is opened at the moment of the sound trigger
-            if((WindowSpecificSufix.Equals("_2") && ElectronHandler.SecondaryWindowOpened) || WindowSpecificSufix.Equals("_1"))
-                await SoundPlayer.PlaySound(isDanger, WindowSpecificSufix, SettingsReader.UserSettingsValues.NotificationVolume);
+            if((WindowSpecificSuffix.Equals("_2") && ElectronHandler.SecondaryWindowOpened) || WindowSpecificSuffix.Equals("_1"))
+                await SoundPlayer.PlaySound(isDanger, WindowSpecificSuffix, SettingsReader.UserSettingsValues.NotificationVolume);
         }
 
         /// <summary>
@@ -558,7 +540,7 @@ namespace EveIntelCheckerPages
         /// <returns>Copy filename</returns>
         private string BuildCopyFromFullName(string fileName)
         {
-            return $"Copy{WindowSpecificSufix}{fileName}";
+            return $"Copy{WindowSpecificSuffix}{fileName}";
         }
 
         /// <summary>
@@ -673,7 +655,7 @@ namespace EveIntelCheckerPages
         {
             SettingsReader.UserSettingsValues.NotificationVolume = newValue;
             SettingsReader.WriteUserSettings();
-            await SoundPlayer.PlaySound(true, WindowSpecificSufix, SettingsReader.UserSettingsValues.NotificationVolume);
+            await SoundPlayer.PlaySound(true, WindowSpecificSuffix, SettingsReader.UserSettingsValues.NotificationVolume);
         }
 
         /// <summary>

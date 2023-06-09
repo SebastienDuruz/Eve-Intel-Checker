@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using System.Windows;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -48,6 +50,8 @@ namespace EveIntelCheckerLib.Data
         {
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
+            
+            await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
             SecondaryWindowInstanced = false;
             
@@ -77,7 +81,7 @@ namespace EveIntelCheckerLib.Data
             if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
                 Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
                 {
-                    HideAndShowSecondaryWindow();
+                    await HideAndShowSecondaryWindow();
                 });
         }
 
@@ -104,6 +108,7 @@ namespace EveIntelCheckerLib.Data
             
             // Close the windows before exiting the app
             MainWindow.Close();
+            Electron.App.Exit();
         }
 
         /// <summary>
@@ -121,11 +126,14 @@ namespace EveIntelCheckerLib.Data
             SecondarySettingsReader.WriteUserSettings();
         }
 
+        /// <summary>
+        /// Hide or Show the secondary window, automaticaly create the window if it does not exists yet
+        /// </summary>
         public static async Task HideAndShowSecondaryWindow()
         {
             if (SecondaryWindowOpened)
             {
-                SaveSecondaryWindowSettings();
+                await SaveSecondaryWindowSettings();
                 SecondaryWindow.Hide();
                 SecondaryWindowOpened = false;
             }
@@ -161,6 +169,48 @@ namespace EveIntelCheckerLib.Data
                     SecondaryWindowOpened = true;
                     SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Validate that the application is on the bounds of the displays
+        /// </summary>
+        private static async Task ValidateApplicationPosition()
+        {
+            bool mainWindowPositionIsValid = false;
+            bool secondaryWindowPositionIsValid = false;
+            Display[] displays = await Electron.Screen.GetAllDisplaysAsync();
+            
+            // check Windows positions
+            foreach (Display display in displays)
+            {
+                if (display.Bounds.X <= MainSettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.X + display.Bounds.Width >= MainSettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.Y <= MainSettingsReader.UserSettingsValues.WindowHeight
+                    && display.Bounds.Y + display.Bounds.Height >= MainSettingsReader.UserSettingsValues.WindowTop)
+                    mainWindowPositionIsValid = true;
+                
+                if (display.Bounds.X <= SecondarySettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.X + display.Bounds.Width >= SecondarySettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.Y <= SecondarySettingsReader.UserSettingsValues.WindowHeight
+                    && display.Bounds.Y + display.Bounds.Height >= SecondarySettingsReader.UserSettingsValues.WindowTop)
+                    secondaryWindowPositionIsValid = true;
+            }
+
+            // Reset the position values for MainWindow
+            if (!mainWindowPositionIsValid)
+            {
+                MainSettingsReader.UserSettingsValues.WindowLeft = 100;
+                MainSettingsReader.UserSettingsValues.WindowTop = 100;
+                MainSettingsReader.WriteUserSettings();
+            }
+
+            // Reset the position values for SecondaryWindow
+            if (!secondaryWindowPositionIsValid)
+            {
+                SecondarySettingsReader.UserSettingsValues.WindowLeft = 100;
+                SecondarySettingsReader.UserSettingsValues.WindowTop = 100;
+                SecondarySettingsReader.WriteUserSettings();
             }
         }
     }
