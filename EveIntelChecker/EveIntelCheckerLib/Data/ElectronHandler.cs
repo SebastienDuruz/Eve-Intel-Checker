@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
@@ -65,11 +67,11 @@ namespace EveIntelCheckerLib.Data
                     Focusable = true,
                     AlwaysOnTop = MainSettingsReader.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
-                    Height = (int)MainSettingsReader.UserSettingsValues.WindowHeight,
+                    Height = MainSettingsReader.UserSettingsValues.WindowHeight,
                     MinWidth = 210,
-                    Width = (int)MainSettingsReader.UserSettingsValues.WindowWidth,
-                    X = (int)MainSettingsReader.UserSettingsValues.WindowLeft,
-                    Y = (int)MainSettingsReader.UserSettingsValues.WindowTop,
+                    Width = MainSettingsReader.UserSettingsValues.WindowWidth,
+                    X = MainSettingsReader.UserSettingsValues.WindowLeft,
+                    Y = MainSettingsReader.UserSettingsValues.WindowTop,
                     Title = "Eve Intel Checker",
                 });
             
@@ -77,7 +79,8 @@ namespace EveIntelCheckerLib.Data
             MainWindow.OnReadyToShow += () => MainWindow.Show();
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
-
+            
+            // Check if shortcuts are required
             if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
                 Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
                 {
@@ -174,8 +177,9 @@ namespace EveIntelCheckerLib.Data
 
         /// <summary>
         /// Validate that the application is on the bounds of the displays
+        /// <returns>True if valid position, false if not</returns>
         /// </summary>
-        private static async Task ValidateApplicationPosition()
+        private static async Task<bool> ValidateApplicationPosition()
         {
             bool mainWindowPositionIsValid = false;
             bool secondaryWindowPositionIsValid = false;
@@ -212,6 +216,9 @@ namespace EveIntelCheckerLib.Data
                 SecondarySettingsReader.UserSettingsValues.WindowTop = 100;
                 SecondarySettingsReader.WriteUserSettings();
             }
+
+            // Return the result
+            return mainWindowPositionIsValid && secondaryWindowPositionIsValid ? true : false;
         }
     }
 }
