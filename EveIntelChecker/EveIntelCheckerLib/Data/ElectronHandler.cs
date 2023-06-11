@@ -1,11 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.Extensions.Caching.Memory;
 using System.Windows;
+using EveIntelCheckerLib.Models;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -50,6 +54,14 @@ namespace EveIntelCheckerLib.Data
         /// <returns>Results of the task</returns>
         public static async Task CreateElectronWindow()
         {
+            // Check the Eve Chatlogs folder, if it does not exists, close the application
+            if (!CheckEveFolder())
+            {
+                await Electron.Dialog.ShowMessageBoxAsync("It looks like the Eve chatlogs folder does not exist. Make sure log to file is activated on Eve Online settings !");
+                Electron.App.Exit();
+                return;
+            }
+            
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
             
@@ -219,6 +231,26 @@ namespace EveIntelCheckerLib.Data
 
             // Return the result
             return mainWindowPositionIsValid && secondaryWindowPositionIsValid ? true : false;
+        }
+
+        /// <summary>
+        /// Check if Eve folder exists
+        /// </summary>
+        /// <returns>True if exists, false if not</returns>
+        private static bool CheckEveFolder()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return Directory.Exists(
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\")
+                    ? true
+                    : false;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return Directory.Exists(
+                $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/") 
+                    ? true : false;
+
+            return false;
         }
     }
 }
