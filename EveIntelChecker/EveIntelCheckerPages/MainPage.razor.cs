@@ -151,6 +151,10 @@ namespace EveIntelCheckerPages
         protected override void OnInitialized()
         {
             LogFileLoaded = false;
+
+            if (SettingsReader == null)
+                SettingsReader = new UserSettingsReader("web");
+            
             SetDefaultChatLogFileFolders();
             LoadUserSettingsLastLog();
         }

@@ -54,14 +54,6 @@ namespace EveIntelCheckerLib.Data
         /// <returns>Results of the task</returns>
         public static async Task CreateElectronWindow()
         {
-            // Check the Eve Chatlogs folder, if it does not exists, close the application
-            if (!CheckEveFolder())
-            {
-                await Electron.Dialog.ShowMessageBoxAsync("It looks like the Eve chatlogs folder does not exist. Make sure log to file is activated on Eve Online settings !");
-                Electron.App.Exit();
-                return;
-            }
-            
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
             
@@ -91,6 +83,16 @@ namespace EveIntelCheckerLib.Data
             MainWindow.OnReadyToShow += () => MainWindow.Show();
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+            
+            // Check the Eve Chatlogs folder, if it does not exists, close the application
+            if (!CheckEveFolder())
+            {
+                Electron.Dialog.ShowErrorBox(
+                    "Required folder does not exists", 
+                    "It looks like the Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.");
+                Electron.App.Exit();
+                return;
+            }
             
             // Check if shortcuts are required
             if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
@@ -176,7 +178,7 @@ namespace EveIntelCheckerLib.Data
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
-                    SecondaryWindow.LoadURL("http://localhost:8001/secondary");
+                    SecondaryWindow.LoadURL("http://localhost:31696/secondary");
 
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
