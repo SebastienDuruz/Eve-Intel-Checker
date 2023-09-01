@@ -364,19 +364,15 @@ namespace EveIntelCheckerPages
                 if (ChatLogFile.LastLogFileMessage.Contains(intelSystem.SystemName))
                 {
                     intelSystem.IsRed = true;
+                    
                     // Play specific sounds if needed by the user settings
                     if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
                         intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
-                    {
                         await PlayNotificationSound(true);
-                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSuffix}");
-                    }
                     else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
                              intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
-                    {
                         await PlayNotificationSound(false);
-                        Console.WriteLine($"{DateTime.Now} Playing Sound for {WindowSpecificSuffix}");
-                    }
+                    
                     ++intelSystem.TriggerCounter;
                     newRedSystem = intelSystem.SystemName;
                 }
@@ -444,41 +440,52 @@ namespace EveIntelCheckerPages
         {
             if(ChatLogFile.LogFileFolder != "" && ChatLogFile.LogFileShortName != "" && LogFileLoaded)
             {
-                // Get the logfiles corresponding to the selected chat file
-                List<string> chatLogFiles = Directory.GetFiles(ChatLogFile.LogFileFolder, $"{ChatLogFile.LogFileShortName}*.txt").ToList();
-                string[] splitedCurrent = ChatLogFile.LogFileFullName.Split("_");
-
-                // Replace the logfile by the most recent if it's not the current that is used
-                foreach (string chatLogFile in chatLogFiles)
+                try
                 {
-                    // Only check different files
-                    if($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}" != chatLogFile)
+                    // Get the logfiles corresponding to the selected chat file
+                    List<string> chatLogFiles = Directory
+                        .GetFiles(ChatLogFile.LogFileFolder, $"{ChatLogFile.LogFileShortName}*.txt").ToList();
+                    string[] splitedCurrent = ChatLogFile.LogFileFullName.Split("_");
+
+                    // Replace the logfile by the most recent if it's not the current that is used
+                    foreach (string chatLogFile in chatLogFiles)
                     {
-                        string[] splitedToCheck = chatLogFile.Split("_");
-
-                        // Must be same client ID
-                        if (splitedCurrent[3] != splitedToCheck[3])
-                            continue;
-
-                        // Creation date is too low
-                        if (long.Parse(splitedToCheck[1]) < long.Parse(splitedCurrent[1]))
-                            continue;
-
-                        // same creation date but hour is too low
-                        if (splitedToCheck[1] == splitedCurrent[1] && long.Parse(splitedToCheck[2]) < long.Parse(splitedCurrent[2]))
+                        // Only check different files
+                        if ($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}" != chatLogFile)
+                        {
+                            string[] splitedToCheck = chatLogFile.Split("_");
+                            
+                            // FileName is not valid
+                            if (splitedToCheck.Length < 4)
                                 continue;
 
-                        // NEW FILE DETECTED do the necessary changes
-                        ChatLogFile.LogFileFullName = chatLogFile.Split("\\").Last();
-                        ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
-                        ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+                            // Must be same client ID
+                            if (splitedCurrent[3] != splitedToCheck[3])
+                                continue;
 
-                        //await InvokeAsync(() => StateHasChanged());
+                            // Creation date is too low
+                            if (long.Parse(splitedToCheck[1]) < long.Parse(splitedCurrent[1]))
+                                continue;
 
-                        // Set the file to settings
-                        SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
-                        SettingsReader.WriteUserSettings();
+                            // same creation date but hour is too low
+                            if (splitedToCheck[1] == splitedCurrent[1] &&
+                                long.Parse(splitedToCheck[2]) < long.Parse(splitedCurrent[2]))
+                                continue;
+
+                            // NEW FILE DETECTED do the necessary changes
+                            ChatLogFile.LogFileFullName = chatLogFile.Split("\\").Last();
+                            ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
+                            ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+
+                            // Set the file to settings
+                            SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                            SettingsReader.WriteUserSettings();
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    // TODO : Do something with exception
                 }
             }
         }
@@ -515,7 +522,7 @@ namespace EveIntelCheckerPages
             }
             catch (Exception)
             {
-
+                // Nothing to do
             }
         }
 

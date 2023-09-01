@@ -1,17 +1,9 @@
-﻿<MudThemeProvider IsDarkMode="SettingsReader.UserSettingsValues.DarkMode" Theme="_mainTheme" />
+﻿@inject IJSRuntime JsRuntime
+@inject CustomSoundPlayer SoundPlayer
+
+<MudThemeProvider IsDarkMode="SettingsReader.UserSettingsValues.DarkMode" Theme="_mainTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
-
-@using EveIntelCheckerLib.Data
-@using EveIntelCheckerLib.Models
-@using EveIntelCheckerLib.Models.Database
-@using Microsoft.AspNetCore.Components.Forms
-@using System.IO
-@using System.Media
-@using Microsoft.JSInterop
-
-@inject IJSRuntime JsRuntime
-@inject CustomSoundPlayer SoundPlayer
 
 <div style="height:100vh; z-index: 3;">
     <div class="d-flex flex-column windowBar" style="z-index: 5;">
