@@ -19,7 +19,7 @@
       "icon": "../../../bin/Desktop/win-unpacked/resources/bin/EveIntelChecker_logo.ico"
     },
     "nsis": {
-      "oneClick": false,
+      "oneClick": true,
       "perMachine": false,
       "allowToChangeInstallationDirectory": false,
       "runAfterFinish": false,
