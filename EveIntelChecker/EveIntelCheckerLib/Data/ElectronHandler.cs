@@ -1,7 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using System.Windows;
+using EveIntelCheckerLib.Models;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -48,6 +56,8 @@ namespace EveIntelCheckerLib.Data
         {
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
+            
+            await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
             SecondaryWindowInstanced = false;
             
@@ -61,11 +71,11 @@ namespace EveIntelCheckerLib.Data
                     Focusable = true,
                     AlwaysOnTop = MainSettingsReader.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
-                    Height = (int)MainSettingsReader.UserSettingsValues.WindowHeight,
+                    Height = MainSettingsReader.UserSettingsValues.WindowHeight,
                     MinWidth = 210,
-                    Width = (int)MainSettingsReader.UserSettingsValues.WindowWidth,
-                    X = (int)MainSettingsReader.UserSettingsValues.WindowLeft,
-                    Y = (int)MainSettingsReader.UserSettingsValues.WindowTop,
+                    Width = MainSettingsReader.UserSettingsValues.WindowWidth,
+                    X = MainSettingsReader.UserSettingsValues.WindowLeft,
+                    Y = MainSettingsReader.UserSettingsValues.WindowTop,
                     Title = "Eve Intel Checker",
                 });
             
@@ -73,11 +83,22 @@ namespace EveIntelCheckerLib.Data
             MainWindow.OnReadyToShow += () => MainWindow.Show();
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
-
+            
+            // Check the Eve Chatlogs folder, if it does not exists, close the application
+            if (!CheckEveFolder())
+            {
+                Electron.Dialog.ShowErrorBox(
+                    "Required folder does not exists", 
+                    "It looks like the Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.");
+                Electron.App.Exit();
+                return;
+            }
+            
+            // Check if shortcuts are required
             if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
                 Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
                 {
-                    HideAndShowSecondaryWindow();
+                    await HideAndShowSecondaryWindow();
                 });
         }
 
@@ -104,6 +125,7 @@ namespace EveIntelCheckerLib.Data
             
             // Close the windows before exiting the app
             MainWindow.Close();
+            Electron.App.Exit();
         }
 
         /// <summary>
@@ -121,11 +143,14 @@ namespace EveIntelCheckerLib.Data
             SecondarySettingsReader.WriteUserSettings();
         }
 
+        /// <summary>
+        /// Hide or Show the secondary window, automaticaly create the window if it does not exists yet
+        /// </summary>
         public static async Task HideAndShowSecondaryWindow()
         {
             if (SecondaryWindowOpened)
             {
-                SaveSecondaryWindowSettings();
+                await SaveSecondaryWindowSettings();
                 SecondaryWindow.Hide();
                 SecondaryWindowOpened = false;
             }
@@ -153,7 +178,7 @@ namespace EveIntelCheckerLib.Data
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
-                    SecondaryWindow.LoadURL("http://localhost:8001/secondary");
+                    SecondaryWindow.LoadURL("http://localhost:31696/secondary");
 
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
@@ -162,6 +187,72 @@ namespace EveIntelCheckerLib.Data
                     SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
                 }
             }
+        }
+
+        /// <summary>
+        /// Validate that the application is on the bounds of the displays
+        /// <returns>True if valid position, false if not</returns>
+        /// </summary>
+        private static async Task<bool> ValidateApplicationPosition()
+        {
+            bool mainWindowPositionIsValid = false;
+            bool secondaryWindowPositionIsValid = false;
+            Display[] displays = await Electron.Screen.GetAllDisplaysAsync();
+            
+            // check Windows positions
+            foreach (Display display in displays)
+            {
+                if (display.Bounds.X <= MainSettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.X + display.Bounds.Width >= MainSettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.Y <= MainSettingsReader.UserSettingsValues.WindowHeight
+                    && display.Bounds.Y + display.Bounds.Height >= MainSettingsReader.UserSettingsValues.WindowTop)
+                    mainWindowPositionIsValid = true;
+                
+                if (display.Bounds.X <= SecondarySettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.X + display.Bounds.Width >= SecondarySettingsReader.UserSettingsValues.WindowLeft
+                    && display.Bounds.Y <= SecondarySettingsReader.UserSettingsValues.WindowHeight
+                    && display.Bounds.Y + display.Bounds.Height >= SecondarySettingsReader.UserSettingsValues.WindowTop)
+                    secondaryWindowPositionIsValid = true;
+            }
+
+            // Reset the position values for MainWindow
+            if (!mainWindowPositionIsValid)
+            {
+                MainSettingsReader.UserSettingsValues.WindowLeft = 100;
+                MainSettingsReader.UserSettingsValues.WindowTop = 100;
+                MainSettingsReader.WriteUserSettings();
+            }
+
+            // Reset the position values for SecondaryWindow
+            if (!secondaryWindowPositionIsValid)
+            {
+                SecondarySettingsReader.UserSettingsValues.WindowLeft = 100;
+                SecondarySettingsReader.UserSettingsValues.WindowTop = 100;
+                SecondarySettingsReader.WriteUserSettings();
+            }
+
+            // Return the result
+            return mainWindowPositionIsValid && secondaryWindowPositionIsValid ? true : false;
+        }
+
+        /// <summary>
+        /// Check if Eve folder exists
+        /// </summary>
+        /// <returns>True if exists, false if not</returns>
+        private static bool CheckEveFolder()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return Directory.Exists(
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\")
+                    ? true
+                    : false;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return Directory.Exists(
+                $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/") 
+                    ? true : false;
+
+            return false;
         }
     }
 }

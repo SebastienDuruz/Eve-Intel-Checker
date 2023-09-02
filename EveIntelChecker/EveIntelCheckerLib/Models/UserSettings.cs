@@ -38,22 +38,22 @@
         /// <summary>
         /// Width of the main Window
         /// </summary>
-        public double WindowWidth { get; set; } = 170;
+        public int WindowWidth { get; set; } = 170;
 
         /// <summary>
         /// Height of the main Window
         /// </summary>
-        public double WindowHeight { get; set; } = 300;
+        public int WindowHeight { get; set; } = 300;
 
         /// <summary>
         /// Default TOP position of the main Window
         /// </summary>
-        public double WindowTop { get; set; } = 100;
+        public int WindowTop { get; set; } = 100;
 
         /// <summary>
         /// Default LEFT position of the main Window
         /// </summary>
-        public double WindowLeft { get; set; } = 100;
+        public int WindowLeft { get; set; } = 100;
 
         /// <summary>
         /// Window is TopMost ? (default -> true)
