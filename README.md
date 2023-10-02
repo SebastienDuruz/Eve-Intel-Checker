@@ -19,7 +19,7 @@ Ensure that you have **all the required** dependencies for this library
 
 1) Install Electron.NET Dotnet tool :
 ```
-dotnet tool install --global h5.ElectronNET.CLI
+dotnet tool install --global ElectronNET.CLI
 ```
 
 2) Add Dotnet tools to your PATH (this command may vary depending on your system) :
