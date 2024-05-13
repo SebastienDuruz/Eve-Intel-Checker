@@ -23,6 +23,11 @@ namespace EveIntelCheckerLib.Data
         public static UserSettingsReader SecondarySettingsReader { get; set; }
         
         /// <summary>
+        /// Only for linux users -> contains specific settings for Wine Path
+        /// </summary>
+        public static LinuxSettingsReader LinuxSettingsReader { get; set; }
+        
+        /// <summary>
         /// Main App Window
         /// </summary>
         private static BrowserWindow MainWindow { get; set; }
@@ -50,6 +55,9 @@ namespace EveIntelCheckerLib.Data
         {
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                LinuxSettingsReader = new LinuxSettingsReader();
             
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
@@ -83,7 +91,7 @@ namespace EveIntelCheckerLib.Data
             {
                 Electron.Dialog.ShowErrorBox(
                     "Required folder does not exists", 
-                    "It looks like the Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.");
+                    "It looks like the Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.\n");
                 Electron.App.Exit();
                 return;
             }
@@ -237,14 +245,14 @@ namespace EveIntelCheckerLib.Data
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return Directory.Exists(
-                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\")
-                    ? true
-                    : false;
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return Directory.Exists(
-                $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/") 
-                    ? true : false;
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return Directory.Exists(LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder);
 
             return false;
         }

@@ -27,9 +27,7 @@ namespace EveIntelCheckerLib.Data
         public UserSettingsReader(string identifier)
         {
             if(!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker")))
-            {
                 Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"));
-            }
             
             FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"), $"userSettings{identifier}.json");
             
@@ -69,7 +67,7 @@ namespace EveIntelCheckerLib.Data
         {
             try
             {
-                File.WriteAllText(FilePath, JsonConvert.SerializeObject(UserSettingsValues));
+                File.WriteAllText(FilePath, JsonConvert.SerializeObject(UserSettingsValues, Formatting.Indented));
             }
             catch (Exception ex)
             {

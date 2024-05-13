@@ -560,15 +560,18 @@ namespace EveIntelCheckerPages
         private void SetDefaultChatLogFileFolders()
         {
             ChatLogFile = new ChatLogFile();
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
-                ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            
+            ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+            ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
                 ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                ChatLogFile.LogFileFolder = $"{ElectronHandler.LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder}";
             }
         }
 
