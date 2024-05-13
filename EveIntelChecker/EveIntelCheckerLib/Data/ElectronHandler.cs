@@ -1,15 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
-using Microsoft.Extensions.Caching.Memory;
-using System.Windows;
-using EveIntelCheckerLib.Models;
 
 namespace EveIntelCheckerLib.Data
 {
