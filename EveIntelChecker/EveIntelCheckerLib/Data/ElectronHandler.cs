@@ -56,8 +56,7 @@ namespace EveIntelCheckerLib.Data
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                LinuxSettingsReader = new LinuxSettingsReader();
+            LinuxSettingsReader = new LinuxSettingsReader();
             
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
@@ -234,7 +233,7 @@ namespace EveIntelCheckerLib.Data
             }
 
             // Return the result
-            return mainWindowPositionIsValid && secondaryWindowPositionIsValid ? true : false;
+            return mainWindowPositionIsValid && secondaryWindowPositionIsValid;
         }
 
         /// <summary>

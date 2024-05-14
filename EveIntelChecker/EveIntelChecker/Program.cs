@@ -11,22 +11,18 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 builder.Services.AddSingleton(new CustomSoundPlayer("notif_1.wav", "danger_1.wav", "notif_2.wav", "danger_2.wav"));
 
-if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-    builder.Services.AddSingleton(new LinuxSettingsReader());
-
 builder.WebHost.UseElectron(args);
 builder.WebHost.UseUrls("http://localhost:3169");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+ // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.MapBlazorHub();

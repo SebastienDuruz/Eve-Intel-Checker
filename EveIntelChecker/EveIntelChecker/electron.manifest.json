@@ -6,9 +6,9 @@
   "name": "EveIntelChecker",
   "description": "Compact desktop tool for checking intel channels on Eve Online",
   "author": "Sébastien Duruz",
-  "singleInstance": false,
+  "singleInstance": true,
   "aspCoreBackendPort": 3169,
-  "environment": "Development",
+  "environment": "Production",
   "build": {
     "appId": "com.EveIntelChecker.app",
     "productName": "EveIntelChecker",

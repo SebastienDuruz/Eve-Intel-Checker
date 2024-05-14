@@ -758,7 +758,7 @@ namespace EveIntelCheckerPages
             Process.Start(new ProcessStartInfo
             {
                 FileName = url,
-                UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? true : false
+                UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             });
         }
     }
