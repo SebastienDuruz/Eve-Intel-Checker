@@ -332,7 +332,7 @@ namespace EveIntelCheckerPages
                     {
                         // Execute the main process by reading last line of the logfile
                         IEnumerable<string> lines = File.ReadLines($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
-                        if (lines != null)
+                        if (lines != null && lines.Count() > 0)
                             if (lines.Last() != ChatLogFile.LastLogFileMessage)
                             {
                                 ChatLogFile.LastLogFileMessage = lines.Last();
