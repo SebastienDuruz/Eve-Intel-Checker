@@ -90,7 +90,7 @@ namespace EveIntelCheckerLib.Data
             {
                 Electron.Dialog.ShowErrorBox(
                     "Required folder does not exists", 
-                    "It looks like the Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.\n");
+                    "The Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.\n");
                 Electron.App.Exit();
                 return;
             }

@@ -755,11 +755,14 @@ namespace EveIntelCheckerPages
         /// <param name="url">URL to open</param>
         private async Task OpenURL(string url)
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = url,
-                UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            });
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            else
+                Process.Start(url);
         }
     }
 }
