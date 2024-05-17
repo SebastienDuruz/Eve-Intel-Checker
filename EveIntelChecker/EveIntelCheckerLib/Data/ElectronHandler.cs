@@ -79,6 +79,9 @@ namespace EveIntelCheckerLib.Data
                     Y = MainSettingsReader.UserSettingsValues.WindowTop,
                     Title = "Eve Intel Checker",
                 });
+
+            // Clear cache to prevent old JS file to not update
+            await MainWindow.WebContents.Session.ClearCacheAsync();
             
             // Add events to mainWindow
             MainWindow.OnReadyToShow += () => MainWindow.Show();
@@ -90,7 +93,7 @@ namespace EveIntelCheckerLib.Data
             {
                 Electron.Dialog.ShowErrorBox(
                     "Required folder does not exists", 
-                    "The Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.\n");
+                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\n");
                 Electron.App.Exit();
                 return;
             }
@@ -179,7 +182,7 @@ namespace EveIntelCheckerLib.Data
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
-                    SecondaryWindow.LoadURL("http://localhost:31696/secondary");
+                    SecondaryWindow.LoadURL($"http://localhost:{3969}/secondary");
 
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);

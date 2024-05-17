@@ -48,6 +48,8 @@ namespace EveIntelCheckerLib.Data
                 }
                 catch (Exception ex)
                 {
+                    StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+
                     // Reset the settings by recreating a file
                     WriteUserSettings();
                     UserSettingsValues = new UserSettings();
@@ -71,7 +73,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
             }
         }
     }

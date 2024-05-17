@@ -31,7 +31,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// List of SolarSystems
         /// </summary>
-        public List<MapSolarSystem> SolarSystems { get; set; }
+        public List<MapSolarSystem?> SolarSystems { get; set; }
 
         /// <summary>
         /// List of JumpGates
@@ -85,7 +85,7 @@ namespace EveIntelCheckerLib.Data
         /// Read the solar systems export file
         /// </summary>
         /// <returns>List of solar systems</returns>
-        public List<MapSolarSystem> ReadSolarSystems()
+        public List<MapSolarSystem?> ReadSolarSystems()
         {
             try
             {
@@ -93,8 +93,8 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return new List<MapSolarSystem>();
+                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                return new List<MapSolarSystem?>();
             }
         }
 
@@ -110,7 +110,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
                 return new List<MapSolarSystemJump>();
             }
         }
@@ -127,7 +127,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
                 return new List<MapRegion>();
             }
         }
@@ -144,7 +144,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
                 return new List<MapConstellation>();
             }
         }
@@ -155,7 +155,7 @@ namespace EveIntelCheckerLib.Data
         /// <param name="root">The root system</param>
         /// <param name="systemDepth">The jumps to take before stopping the generation</param>
         /// <returns>The list with systems to check</returns>
-        public List<IntelSystem> BuildSystemsList(MapSolarSystem root, int systemDepth)
+        public List<IntelSystem> BuildSystemsList(MapSolarSystem? root, int systemDepth)
         {
             List<IntelSystem> intelSystems = new List<IntelSystem>();
             intelSystems.Add(ConvertMapSytemToIntelSystem(root));
@@ -178,7 +178,7 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         /// <param name="system">The DB object</param>
         /// <returns>The converted frontend object</returns>
-        private IntelSystem ConvertMapSytemToIntelSystem(MapSolarSystem system)
+        private IntelSystem ConvertMapSytemToIntelSystem(MapSolarSystem? system)
         {
             IntelSystem intelSystem = new IntelSystem();
             intelSystem.SystemId = system.SolarSystemID;
@@ -189,9 +189,7 @@ namespace EveIntelCheckerLib.Data
             intelSystem.SystemConstellationName = Constellations.Where(x => x.ConstellationID == system.ConstellationID).First().ConstallationName;
 
             foreach (MapSolarSystemJump connection in SolarSystemJumps.Where(x => x.FromSolarSystemID == intelSystem.SystemId))
-            {
                 intelSystem.ConnectedSytemsId.Add(connection.ToSolarSystemID);
-            }
 
             return intelSystem;
         }

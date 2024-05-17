@@ -47,6 +47,8 @@ public class LinuxSettingsReader
             }
             catch (Exception ex)
             {
+                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                
                 // Reset the settings by recreating a file
                 WriteLinuxSettings();
                 LinuxSettingsValues = new LinuxSettings();
@@ -70,7 +72,7 @@ public class LinuxSettingsReader
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
         }
     }
 }

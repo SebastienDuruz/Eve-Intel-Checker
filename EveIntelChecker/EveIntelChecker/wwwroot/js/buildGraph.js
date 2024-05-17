@@ -81,17 +81,18 @@ function buildMap(nodesToBuild, edgesToBuild) {
 
     nodes = new vis.DataSet(nodesToBuild)
     edges = new vis.DataSet(edgesToBuild)
-    var data = {
+    const data = {
         nodes: nodes,
         edges: edges
     };
 
     container = document.getElementById('canvasMap');
-    map = new vis.Network(container, data, options);
+
+    if (container !== null)
+        map = new vis.Network(container, data, options);
 }
 function setData(nodesToUpdate) {
-    console.log(nodes)
-    for (let i = 1; i < nodesToUpdate.length + 1; i++) {
+    for (let i = 1; i < nodesToUpdate.length + 1; ++i) {
         nodes.update([{ id: i, color: { background: nodesToUpdate[i - 1].color.background } }]);
         nodes.update([{ id: i, label: nodesToUpdate[i - 1].label }]);
     }
