@@ -481,7 +481,10 @@ namespace EveIntelCheckerPages
                                 continue;
 
                             // NEW FILE DETECTED do the necessary changes
-                            ChatLogFile.LogFileFullName = chatLogFile.Split("\\").Last();
+                            string separator = "/";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                separator = "\\";
+                            ChatLogFile.LogFileFullName = chatLogFile.Split(separator).Last();
                             ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                             ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
 
