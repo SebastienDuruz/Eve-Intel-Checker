@@ -58,7 +58,8 @@ namespace EveIntelCheckerLib.Data
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
 
-            LinuxSettingsReader = new LinuxSettingsReader();
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                LinuxSettingsReader = new LinuxSettingsReader();
             
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
