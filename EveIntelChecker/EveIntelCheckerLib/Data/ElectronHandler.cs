@@ -47,6 +47,8 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         private static bool SecondaryWindowInstanced { get; set; }
 
+        private static bool IsFirstShow { get; set; } = true;
+
         /// <summary>
         /// Create the Electron Window
         /// </summary>
@@ -84,7 +86,7 @@ namespace EveIntelCheckerLib.Data
             await MainWindow.WebContents.Session.ClearCacheAsync();
             
             // Add events to mainWindow
-            MainWindow.OnReadyToShow += () => MainWindow.Show();
+            MainWindow.OnReadyToShow += MainWindowOnOnReadyToShow;
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             
@@ -104,6 +106,16 @@ namespace EveIntelCheckerLib.Data
                 {
                     await HideAndShowSecondaryWindow();
                 });
+        }
+
+        private static void MainWindowOnOnReadyToShow()
+        {
+            MainWindow.Show();
+            if (IsFirstShow)
+            {
+                MainWindow.Reload();
+                IsFirstShow = false;
+            }
         }
 
         /// <summary>
