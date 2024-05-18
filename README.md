@@ -61,7 +61,7 @@ Finally, access the built application :
 cd bin/Desktop/TARGETED_ARCHITECTURE
 ```
 
-## Dependancies
+## Dependencies
 
 ### Linux
 
