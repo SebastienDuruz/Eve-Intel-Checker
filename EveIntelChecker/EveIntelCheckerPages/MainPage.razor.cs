@@ -179,7 +179,7 @@ namespace EveIntelCheckerPages
             if (firstRender)
             {
                 // Read chat log file each sec
-                ReadFileTimer = new Timer(1000);
+                ReadFileTimer = new Timer(StaticData.ReadLogInterval);
 
                 ReadFileTimer.Elapsed += ReadLogHandler;
                 ReadFileTimer.AutoReset = true;
@@ -627,16 +627,6 @@ namespace EveIntelCheckerPages
         }
         
         /// <summary>
-        /// Update the value of UseKeyboardShortcuts
-        /// </summary>
-        /// <param name="newValue">The new value to be applied</param>
-        private void UseKeyboardShortcutsChanged(bool newValue)
-        {
-            SettingsReader.UserSettingsValues.UseKeyboardShortcuts = newValue;
-            SettingsReader.WriteUserSettings();
-        }
-
-        /// <summary>
         /// Update the value of SystemsDepth
         /// </summary>
         /// <param name="newValue">The new value to be applied</param>
@@ -716,7 +706,6 @@ namespace EveIntelCheckerPages
                 mapNodes[i].Font.Multi = true;
                 mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n<code>J:{IntelSystems[i].Jumps} T:{IntelSystems[i].TriggerCounter}</code>";
                 mapNodes[i].Id = i + 1;
-                mapNodes[i].Region = IntelSystems[i].SystemDomainName;
                 mapNodes[i].System = IntelSystems[i].SystemName;
             }
 

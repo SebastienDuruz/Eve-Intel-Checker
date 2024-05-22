@@ -95,15 +95,7 @@ namespace EveIntelCheckerLib.Data
                     "Required folder does not exists", 
                     "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\n");
                 Electron.App.Exit();
-                return;
             }
-            
-            // Check if shortcuts are required
-            if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
-                Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
-                {
-                    await HideAndShowSecondaryWindow();
-                });
         }
 
         /// <summary>

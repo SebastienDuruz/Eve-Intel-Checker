@@ -39,16 +39,6 @@ namespace EveIntelCheckerLib.Data
         public List<MapSolarSystemJump> SolarSystemJumps { get; set; }
 
         /// <summary>
-        /// List of Regions
-        /// </summary>
-        public List<MapRegion> Regions { get; set; }
-
-        /// <summary>
-        /// List of Constellations
-        /// </summary>
-        public List<MapConstellation> Constellations { get; set; }
-
-        /// <summary>
         /// Custom Constructor
         /// </summary>
         private EveStaticDatabase()
@@ -61,8 +51,6 @@ namespace EveIntelCheckerLib.Data
 
             SolarSystems = ReadSolarSystems();
             SolarSystemJumps = ReadSolarSystemJumps();
-            Regions = ReadRegions();
-            Constellations = ReadConstellations();
         }
 
         /// <summary>
@@ -116,40 +104,6 @@ namespace EveIntelCheckerLib.Data
         }
 
         /// <summary>
-        /// Read the region export file
-        /// </summary>
-        /// <returns>List of solar systems</returns>
-        public List<MapRegion> ReadRegions()
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<List<MapRegion>>(File.ReadAllText(Path.Combine(FolderPath, "mapRegions.json")));
-            }
-            catch (Exception ex)
-            {
-                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
-                return new List<MapRegion>();
-            }
-        }
-
-        /// <summary>
-        /// Read the constellations export file
-        /// </summary>
-        /// <returns>List of solar systems</returns>
-        public List<MapConstellation> ReadConstellations()
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<List<MapConstellation>>(File.ReadAllText(Path.Combine(FolderPath, "mapConstellations.json")));
-            }
-            catch (Exception ex)
-            {
-                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
-                return new List<MapConstellation>();
-            }
-        }
-
-        /// <summary>
         /// Build the list of System to check
         /// </summary>
         /// <param name="root">The root system</param>
@@ -169,7 +123,7 @@ namespace EveIntelCheckerLib.Data
                             current.Jumps = i + 1;
                             intelSystems.Add(current);
                         }
-
+            
             return intelSystems;
         }
 
@@ -183,10 +137,6 @@ namespace EveIntelCheckerLib.Data
             IntelSystem intelSystem = new IntelSystem();
             intelSystem.SystemId = system.SolarSystemID;
             intelSystem.SystemName = system.SolarSystemName;
-            intelSystem.SystemDomainId = system.RegionID;
-            intelSystem.SystemConstellationId = system.ConstellationID;
-            intelSystem.SystemDomainName = Regions.Where(x => x.RegionID == system.RegionID).First().RegionName;
-            intelSystem.SystemConstellationName = Constellations.Where(x => x.ConstellationID == system.ConstellationID).First().ConstallationName;
 
             foreach (MapSolarSystemJump connection in SolarSystemJumps.Where(x => x.FromSolarSystemID == intelSystem.SystemId))
                 intelSystem.ConnectedSytemsId.Add(connection.ToSolarSystemID);

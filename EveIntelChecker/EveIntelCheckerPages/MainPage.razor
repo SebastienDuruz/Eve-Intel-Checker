@@ -74,13 +74,6 @@
                 <MudSwitch Checked="SettingsReader.UserSettingsValues.WindowIsTopMost" CheckedChanged="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Always on top (restart required)</MudText>
             </div>
-            @if (WindowSpecificSuffix.Contains("1"))
-            {
-                <div class="d-flex justify-space-between align-center align-content-center">
-                    <MudSwitch Checked="SettingsReader.UserSettingsValues.UseKeyboardShortcuts" CheckedChanged="(bool x) => UseKeyboardShortcutsChanged(x)" Color="Color.Primary" />
-                    <MudText Align="Align.Center" Typo="Typo.body2">Keyboard shortcuts (restart required)</MudText>
-                </div>
-            }
         </div>
     }
     else
@@ -104,7 +97,7 @@
                             classes += OrangeClasses;
 
                         string zKillboardUrl = $"https://zkillboard.com/system/{system.SystemId}";
-                        string dotlanUrl = $"https://evemaps.dotlan.net/map/{system.SystemDomainName?.Replace(" ", "_")}/{system.SystemName}";
+                        string dotlanUrl = $"https://evemaps.dotlan.net/system/{system.SystemName}";
 
                         <div class="@classes" style="width: 100%;">
                             <MudText Typo="Typo.body2">@system.Jumps</MudText>

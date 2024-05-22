@@ -28,29 +28,9 @@ namespace EveIntelCheckerLib.Models
         public long SystemId { get; set; }
 
         /// <summary>
-        /// Id of the system domain
-        /// </summary>
-        public long SystemDomainId { get; set; }
-
-        /// <summary>
-        /// Id of the system constellation
-        /// </summary>
-        public long SystemConstellationId { get; set; }
-
-        /// <summary>
         /// Name of the system
         /// </summary>
         public string? SystemName { get; set; }
-
-        /// <summary>
-        /// Name of the system domain
-        /// </summary>
-        public string? SystemDomainName { get; set; }
-
-        /// <summary>
-        /// Name of the system constellation
-        /// </summary>
-        public string? SystemConstellationName { get; set; }
 
         /// <summary>
         /// List of system ID directly connected with this system

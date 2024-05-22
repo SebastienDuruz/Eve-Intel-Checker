@@ -17,7 +17,7 @@ builder.WebHost.UseUrls($"http://localhost:{StaticData.ApplicationPort}");
 var app = builder.Build();
 
  // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
@@ -27,6 +27,9 @@ app.UseStaticFiles();
 app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+// Set a limit to MALLOC_TRIM (reduce RAM usage on Linux)
+Environment.SetEnvironmentVariable("MALLOC_TRIM_THRESHOLD_", "100000");
 
 // Support Electron
 if (HybridSupport.IsElectronActive)

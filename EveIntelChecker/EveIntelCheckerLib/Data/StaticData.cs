@@ -6,6 +6,8 @@ public static class StaticData
 {
     public static int ApplicationPort { get; set; } = 3969;
 
+    public static int ReadLogInterval { get; set; } = 1000;
+
     public enum LogLevel
     {
         Critical,
