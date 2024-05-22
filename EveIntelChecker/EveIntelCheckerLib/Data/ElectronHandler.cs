@@ -47,6 +47,8 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         private static bool SecondaryWindowInstanced { get; set; }
 
+        private static bool IsFirstShow { get; set; } = true;
+
         /// <summary>
         /// Create the Electron Window
         /// </summary>
@@ -56,7 +58,8 @@ namespace EveIntelCheckerLib.Data
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
 
-            LinuxSettingsReader = new LinuxSettingsReader();
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                LinuxSettingsReader = new LinuxSettingsReader();
             
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
@@ -84,7 +87,7 @@ namespace EveIntelCheckerLib.Data
             await MainWindow.WebContents.Session.ClearCacheAsync();
             
             // Add events to mainWindow
-            MainWindow.OnReadyToShow += () => MainWindow.Show();
+            MainWindow.OnReadyToShow += MainWindowOnOnReadyToShow;
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             
@@ -95,6 +98,16 @@ namespace EveIntelCheckerLib.Data
                     "Required folder does not exists", 
                     "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\n");
                 Electron.App.Exit();
+            }
+        }
+
+        private static void MainWindowOnOnReadyToShow()
+        {
+            MainWindow.Show();
+            if (IsFirstShow)
+            {
+                MainWindow.Reload();
+                IsFirstShow = false;
             }
         }
 

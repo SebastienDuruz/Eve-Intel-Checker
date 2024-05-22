@@ -8,13 +8,15 @@ A compact desktop tool for filtering relevant messages across Intel chat channel
 
 ## Supported Platforms
 - Windows 10 / 11
+- Linux x64 (Wayland might not working properly)
 - MacOS Intel / ARM (Manual building required)
+
 
 ## Installation
 
 Download the latest release [here](https://github.com/SebastienDuruz/Eve-Intel-Checker/releases)
 
-### Build for MacOS / Linux
+### Build it yourself
 Ensure that you have **all the required** dependencies for this library
 
 1) Install Electron.NET Dotnet tool :
@@ -22,7 +24,7 @@ Ensure that you have **all the required** dependencies for this library
 dotnet tool install --global ElectronNET.CLI
 ```
 
-2) Add Dotnet tools to your PATH (this command may vary depending on your system) :
+2) (MacOS & Linux) Add Dotnet tools to your PATH (this command may vary depending on your system) :
 ```
 export PATH="$PATH:/Users/YOUR_USERNAME/.dotnet/tools"
 or
@@ -37,6 +39,10 @@ cd Eve-Intel-Checker/EveIntelChecker/EveIntelCheckerElectron
 
 4) Build the project for the targeted architecture :
 
+*Windows*
+```
+electronize build /target win
+```
 *MacOS Intel*
 ```
 electronize build /target osx
@@ -55,6 +61,14 @@ Finally, access the built application :
 cd bin/Desktop/TARGETED_ARCHITECTURE
 ```
 
+## Dependencies
+
+### Linux
+
+Eve Intel Checker use [NetCoreAudio library](https://github.com/mobiletechtracker/NetCoreAudio) for playing sounds.
+
+You have to have **ALSA** architecture on your system and having access to **aplay** and **amixer** commands.
+
 ## Usage
 
 ### Eve Online Options
@@ -64,6 +78,24 @@ Ensure that **the Log Chat to File** option is activated. If it is not, activate
 <p align="center">
   <img align="middle" height="250" src=".\Screenshots\ChatLogOption.png">
 </p>
+
+### Linux specific settings
+
+After first launch an error message will be shown.
+
+You have to **manually** set the folder that contains the **Eve Online chat logs**.
+
+For doing so edit the **linuxSettings.json** file presents in the **EveIntelChecker Data** folder :
+```
+/home/YOUR_USERNAME/.local/share/EveIntelChecker/
+```
+
+I use the steam Eve Online client so in my case, the file content is :
+```
+{
+  "LinuxEveLogFolder": "/home/YOUR_USERNAME/.steam/steam/steamapps/compatdata/8500/pfx/drive_c/users/steamuser/Documents/EVE/logs/Chatlogs/"
+}
+```
 
 ### Select your current system
 
@@ -170,7 +202,7 @@ To *open/close* the secondary window press **CTRL+T** (if keyboards shortcuts ar
 ### Custom alert sounds
 Both alert sounds can be found in the root of the installation folder, next to the executable.
 
-You can replace *danger_[1 or 2].wav* and *notif_[1 or 2].wav* by any other ***.wav*** sound file, but the file names must **remain identical**.
+You can replace *danger_[1 or 2].wav* and *notif_[1 or 2].wav* by any other ***.wav*** sound file, but the file names have to **remain identical**.
 
 ## License
 
