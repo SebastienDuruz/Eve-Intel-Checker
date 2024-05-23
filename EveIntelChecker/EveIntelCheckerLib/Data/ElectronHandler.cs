@@ -47,6 +47,9 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         private static bool SecondaryWindowInstanced { get; set; }
 
+        /// <summary>
+        /// Set to true if this is the first render
+        /// </summary>
         private static bool IsFirstShow { get; set; } = true;
 
         /// <summary>
@@ -101,6 +104,9 @@ namespace EveIntelCheckerLib.Data
             }
         }
 
+        /// <summary>
+        /// OnReadyToShow Event
+        /// </summary>
         private static void MainWindowOnOnReadyToShow()
         {
             MainWindow.Show();

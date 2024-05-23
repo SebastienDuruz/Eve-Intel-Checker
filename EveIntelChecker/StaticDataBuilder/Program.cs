@@ -14,7 +14,6 @@ using (ChoCSVReader<dynamic> p = ChoCSVReader.LoadText(solarSystemJumpsCSV).With
     using (ChoJSONWriter w = new ChoJSONWriter(solarSystemJumpsSB))
         w.Write(p);
 
-
 File.WriteAllText("mapSolarSystems.json", solarSystemsSB.ToString());
 File.WriteAllText("mapSolarSystemJumps.json", solarSystemJumpsSB.ToString());
 
