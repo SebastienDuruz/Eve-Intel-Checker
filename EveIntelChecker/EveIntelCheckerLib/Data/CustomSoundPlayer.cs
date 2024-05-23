@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Media;
+﻿using System.Collections.Generic;
 using NetCoreAudio;
 using System.Threading.Tasks;
 

@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.AspNetCore.Components;
 using static System.GC;
-using Colors = MudBlazor.Colors;
 
 namespace EveIntelCheckerPages
 {
@@ -34,7 +33,7 @@ namespace EveIntelCheckerPages
         /// SettingsReader object
         /// </summary>
         [Parameter]
-        public UserSettingsReader SettingsReader { get; set; }
+        public UserSettingsReader? SettingsReader { get; set; }
         
         /// <summary>
         /// The selected system (root)
@@ -44,7 +43,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Property of the _selectedSytem attribute
         /// </summary>
-        private MapSolarSystem SelectedSystem { get { return _selectedSystem; } set { _selectedSystem = value; BuildSystems(); } }
+        private MapSolarSystem? SelectedSystem { get { return _selectedSystem; } set { _selectedSystem = value; BuildSystems(); } }
 
         /// <summary>
         /// List of System to check
@@ -64,7 +63,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// The informations about current chat LogFile
         /// </summary>
-        private ChatLogFile ChatLogFile { get; set; }
+        private ChatLogFile ChatLogFile { get; set; } = new ChatLogFile();
 
         /// <summary>
         /// Mud componant for selecting the root system
@@ -180,7 +179,7 @@ namespace EveIntelCheckerPages
             if (firstRender)
             {
                 // Read chat log file each sec
-                ReadFileTimer = new Timer(1000);
+                ReadFileTimer = new Timer(StaticData.ReadLogInterval);
 
                 ReadFileTimer.Elapsed += ReadLogHandler;
                 ReadFileTimer.AutoReset = true;
@@ -192,7 +191,7 @@ namespace EveIntelCheckerPages
             {
                 if(firstRender || MapRebuildRequired)
                 {
-                    JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+                    await JsRuntime.InvokeVoidAsync("buildMap", [MapSystemsData.Item1, MapSystemsData.Item2]);
 
                     // Reset the value, avoiding rebuild at every rendering
                     MapRebuildRequired = false;
@@ -207,7 +206,7 @@ namespace EveIntelCheckerPages
         /// <param name="e">args of the event caller</param>
         private void SelectFile(InputFileChangeEventArgs e)
         {
-            IBrowserFile logFile = null;
+            IBrowserFile? logFile = null;
             
             // Only the last selected file will be used
             foreach (var file in e.GetMultipleFiles())
@@ -224,9 +223,12 @@ namespace EveIntelCheckerPages
                 FileIconColor = Color.Success;
 
                 // Update the settings file
-                SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
-                SettingsReader.WriteUserSettings();
-                
+                if (SettingsReader != null)
+                {
+                    SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                    SettingsReader.WriteUserSettings();
+                }
+
                 LogFileLoaded = true;
             }
             else
@@ -243,34 +245,40 @@ namespace EveIntelCheckerPages
         private void LoadUserSettingsLastLog()
         {
             // Start by reading the UserSettings
-            SettingsReader.ReadUserSettings();
-
-            // If a filename is found
-            if(!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastFileName))
+            if (SettingsReader != null)
             {
-                // Chat-log file exists
-                if(File.Exists(Path.Combine(ChatLogFile.LogFileFolder, SettingsReader.UserSettingsValues.LastFileName)))
-                {
-                    ChatLogFile.LogFileFullName = SettingsReader.UserSettingsValues.LastFileName;
-                    ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
-                    ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
-                    FileIconColor = Color.Success;
-                    LogFileLoaded = true;
-                }
-                else
-                {
-                    LogFileLoaded = false;
-                    FileIconColor = Color.Error;
-                }
-            }
+                SettingsReader.ReadUserSettings();
 
-            // Select the system if it exists in the DB
-            if(!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastSelectedSystem) 
-                && EveStaticDatabase.Instance.SolarSystems.Exists(x => x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
-            {
-                SolarSystemSelector.Value = EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem).First();
-                SolarSystemSelector.Text = SettingsReader.UserSettingsValues.LastSelectedSystem;
-                SelectedSystem = SolarSystemSelector.Value;
+                // If a filename is found
+                if (!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastFileName))
+                {
+                    // Chat-log file exists
+                    if (File.Exists(Path.Combine(ChatLogFile.LogFileFolder,
+                            SettingsReader.UserSettingsValues.LastFileName)))
+                    {
+                        ChatLogFile.LogFileFullName = SettingsReader.UserSettingsValues.LastFileName;
+                        ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
+                        ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+                        FileIconColor = Color.Success;
+                        LogFileLoaded = true;
+                    }
+                    else
+                    {
+                        LogFileLoaded = false;
+                        FileIconColor = Color.Error;
+                    }
+                }
+
+                // Select the system if it exists in the DB
+                if (!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastSelectedSystem)
+                    && EveStaticDatabase.Instance.SolarSystems.Exists(x =>
+                        x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
+                {
+                    SolarSystemSelector.Value = EveStaticDatabase.Instance.SolarSystems.Where(x =>
+                        x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem).First();
+                    SolarSystemSelector.Text = SettingsReader.UserSettingsValues.LastSelectedSystem;
+                    SelectedSystem = SolarSystemSelector.Value;
+                }
             }
         }
 
@@ -279,10 +287,10 @@ namespace EveIntelCheckerPages
         /// </summary>
         /// <param name="value">System name to search</param>
         /// <returns>DB object with sytem informations</returns>
-        private async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value)
+        private async Task<IEnumerable<MapSolarSystem?>> SearchSystem(string value)
         {
             if (string.IsNullOrEmpty(value))
-                return new List<MapSolarSystem>();
+                return new List<MapSolarSystem?>();
             return EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName.Contains(value, StringComparison.InvariantCultureIgnoreCase) || x.SolarSystemID.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
 
@@ -298,8 +306,8 @@ namespace EveIntelCheckerPages
             IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, SettingsReader.UserSettingsValues.SystemsDepth);
 
             MapSystemsData = BuildMapNodes();
-            if(!SettingsReader.UserSettingsValues.CompactMode)
-                JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+            if(!SettingsReader.UserSettingsValues.CompactMode && !SettingsPageOpened)
+                await JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
             // Update the userSettings with new selected system
             SettingsReader.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
@@ -325,14 +333,14 @@ namespace EveIntelCheckerPages
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSuffix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
+                        StaticData.Log(StaticData.LogLevel.Error, $"[[{WindowSpecificSuffix}]] {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
                     }
 
                     try
                     {
                         // Execute the main process by reading last line of the logfile
                         IEnumerable<string> lines = File.ReadLines($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
-                        if (lines != null)
+                        if (lines.Any())
                             if (lines.Last() != ChatLogFile.LastLogFileMessage)
                             {
                                 ChatLogFile.LastLogFileMessage = lines.Last();
@@ -342,7 +350,7 @@ namespace EveIntelCheckerPages
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[{DateTime.Now}] [[{WindowSpecificSuffix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
+                        StaticData.Log(StaticData.LogLevel.Error, $"[[{WindowSpecificSuffix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
                     }
                 }
 
@@ -377,7 +385,7 @@ namespace EveIntelCheckerPages
                     newRedSystem = intelSystem.SystemName;
                 }
 
-            // If needed reset the last system set to RED
+            // If needed a reset to the last system set to RED
             if (newRedSystem != "")
             {
                 foreach (IntelSystem intelSystem in IntelSystems)
@@ -388,7 +396,7 @@ namespace EveIntelCheckerPages
                 if(!SettingsReader.UserSettingsValues.CompactMode)
                 {
                     MapSystemsData = BuildMapNodes();
-                    JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                    await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
                 }
             }
         }
@@ -408,7 +416,7 @@ namespace EveIntelCheckerPages
 
             MapSystemsData = BuildMapNodes();
             if (!SettingsReader.UserSettingsValues.CompactMode)
-                JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
         }
 
         /// <summary>
@@ -417,7 +425,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task ResizeMap()
         {
-            JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+            await JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
         }
 
         /// <summary>
@@ -473,7 +481,10 @@ namespace EveIntelCheckerPages
                                 continue;
 
                             // NEW FILE DETECTED do the necessary changes
-                            ChatLogFile.LogFileFullName = chatLogFile.Split("\\").Last();
+                            string separator = "/";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                separator = "\\";
+                            ChatLogFile.LogFileFullName = chatLogFile.Split(separator).Last();
                             ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                             ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
 
@@ -560,14 +571,19 @@ namespace EveIntelCheckerPages
         private void SetDefaultChatLogFileFolders()
         {
             ChatLogFile = new ChatLogFile();
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
-                ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            
+            // Default case --> Windows
+            ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+            ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
+                ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                ChatLogFile.LogFileFolder = ElectronHandler.LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder;
                 ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
             }
         }
@@ -613,16 +629,6 @@ namespace EveIntelCheckerPages
             SettingsReader.WriteUserSettings();
         }
         
-        /// <summary>
-        /// Update the value of UseKeyboardShortcuts
-        /// </summary>
-        /// <param name="newValue">The new value to be applied</param>
-        private void UseKeyboardShortcutsChanged(bool newValue)
-        {
-            SettingsReader.UserSettingsValues.UseKeyboardShortcuts = newValue;
-            SettingsReader.WriteUserSettings();
-        }
-
         /// <summary>
         /// Update the value of SystemsDepth
         /// </summary>
@@ -703,7 +709,6 @@ namespace EveIntelCheckerPages
                 mapNodes[i].Font.Multi = true;
                 mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n<code>J:{IntelSystems[i].Jumps} T:{IntelSystems[i].TriggerCounter}</code>";
                 mapNodes[i].Id = i + 1;
-                mapNodes[i].Region = IntelSystems[i].SystemDomainName;
                 mapNodes[i].System = IntelSystems[i].SystemName;
             }
 
@@ -752,11 +757,14 @@ namespace EveIntelCheckerPages
         /// <param name="url">URL to open</param>
         private async Task OpenURL(string url)
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = url,
-                UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? true : false
-            });
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            else
+                Process.Start(url);
         }
     }
 }

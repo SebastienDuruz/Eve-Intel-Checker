@@ -61,11 +61,6 @@
         public bool WindowIsTopMost { get; set; } = true;
         
         /// <summary>
-        /// Use the keyboard shortcuts ? (default -> true)
-        /// </summary>
-        public bool UseKeyboardShortcuts { get; set; } = true;
-
-        /// <summary>
         /// Compact mode is the default display mode, if set to false display a Node graph
         /// </summary>
         public bool CompactMode { get; set; } = true;

@@ -23,6 +23,11 @@ namespace EveIntelCheckerLib.Data
         public static UserSettingsReader SecondarySettingsReader { get; set; }
         
         /// <summary>
+        /// Only for linux users -> contains specific settings for Wine Path
+        /// </summary>
+        public static LinuxSettingsReader LinuxSettingsReader { get; set; }
+        
+        /// <summary>
         /// Main App Window
         /// </summary>
         private static BrowserWindow MainWindow { get; set; }
@@ -43,6 +48,11 @@ namespace EveIntelCheckerLib.Data
         private static bool SecondaryWindowInstanced { get; set; }
 
         /// <summary>
+        /// Set to true if this is the first render
+        /// </summary>
+        private static bool IsFirstShow { get; set; } = true;
+
+        /// <summary>
         /// Create the Electron Window
         /// </summary>
         /// <returns>Results of the task</returns>
@@ -50,6 +60,9 @@ namespace EveIntelCheckerLib.Data
         {
             MainSettingsReader = new UserSettingsReader("_1");
             SecondarySettingsReader = new UserSettingsReader("_2");
+
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                LinuxSettingsReader = new LinuxSettingsReader();
             
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
@@ -72,9 +85,12 @@ namespace EveIntelCheckerLib.Data
                     Y = MainSettingsReader.UserSettingsValues.WindowTop,
                     Title = "Eve Intel Checker",
                 });
+
+            // Clear cache to prevent old JS file to not update
+            await MainWindow.WebContents.Session.ClearCacheAsync();
             
             // Add events to mainWindow
-            MainWindow.OnReadyToShow += () => MainWindow.Show();
+            MainWindow.OnReadyToShow += MainWindowOnOnReadyToShow;
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             
@@ -83,17 +99,22 @@ namespace EveIntelCheckerLib.Data
             {
                 Electron.Dialog.ShowErrorBox(
                     "Required folder does not exists", 
-                    "It looks like the Eve chatlogs folder does not exist.\nMake sure log to file is activated on Eve Online settings !\nFor more informations check the Github documentation.");
+                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\n");
                 Electron.App.Exit();
-                return;
             }
-            
-            // Check if shortcuts are required
-            if (MainSettingsReader.UserSettingsValues.UseKeyboardShortcuts)
-                Electron.GlobalShortcut.Register("CommandOrControl+T", async () =>
-                {
-                    await HideAndShowSecondaryWindow();
-                });
+        }
+
+        /// <summary>
+        /// OnReadyToShow Event
+        /// </summary>
+        private static void MainWindowOnOnReadyToShow()
+        {
+            MainWindow.Show();
+            if (IsFirstShow)
+            {
+                MainWindow.Reload();
+                IsFirstShow = false;
+            }
         }
 
         /// <summary>
@@ -172,7 +193,7 @@ namespace EveIntelCheckerLib.Data
                             X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
-                    SecondaryWindow.LoadURL("http://localhost:31696/secondary");
+                    SecondaryWindow.LoadURL($"http://localhost:{3969}/secondary");
 
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
@@ -226,7 +247,7 @@ namespace EveIntelCheckerLib.Data
             }
 
             // Return the result
-            return mainWindowPositionIsValid && secondaryWindowPositionIsValid ? true : false;
+            return mainWindowPositionIsValid && secondaryWindowPositionIsValid;
         }
 
         /// <summary>
@@ -237,14 +258,14 @@ namespace EveIntelCheckerLib.Data
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return Directory.Exists(
-                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\")
-                    ? true
-                    : false;
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return Directory.Exists(
-                $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/") 
-                    ? true : false;
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return Directory.Exists(LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder);
 
             return false;
         }

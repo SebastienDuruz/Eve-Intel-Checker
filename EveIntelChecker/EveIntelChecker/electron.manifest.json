@@ -7,13 +7,13 @@
   "description": "Compact desktop tool for checking intel channels on Eve Online",
   "author": "Sébastien Duruz",
   "singleInstance": true,
-  "aspCoreBackendPort": 31696,
+  "aspCoreBackendPort": 3969,
   "environment": "Production",
   "build": {
     "appId": "com.EveIntelChecker.app",
     "productName": "EveIntelChecker",
-    "copyright": "Copyright © 2023",
-    "buildVersion": "1.0.10",
+    "copyright": "Copyright © 2024",
+    "buildVersion": "1.0.11",
     "compression": "maximum",
     "win": {
       "icon": "../../../bin/Desktop/win-unpacked/resources/bin/EveIntelChecker_logo.ico"
@@ -24,6 +24,9 @@
       "allowToChangeInstallationDirectory": false,
       "runAfterFinish": false,
       "artifactName": "${productName}_${version}.${ext}"
+    },
+    "linux": {
+      "category": "Game"
     },
     "directories": {
       "output": "../../../bin/Desktop"
