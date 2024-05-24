@@ -167,8 +167,6 @@ Volume of the sound alerts
 Default mode is **compact**. An alternative mode is available. This mode display a **network map** instead of a list
 ##### Always on top
 By default the application stay **Top most** you can disable this behaviour. An application restart is **required** to apply this settings
-##### Keyboard Shortcuts
-**Activate/Desactivate** the keyboard shortcuts, by default this settings is activated
 
 #### Compact Mode
 You can **left click** on a system to access more functionalities :
