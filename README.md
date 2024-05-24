@@ -34,7 +34,7 @@ export PATH="$HOME/.dotnet/tools:$PATH"
 3) Download the source code and move into the correct folder :
 ```
 git clone https://github.com/SebastienDuruz/Eve-Intel-Checker.git
-cd Eve-Intel-Checker/EveIntelChecker/EveIntelCheckerElectron
+cd Eve-Intel-Checker/EveIntelChecker/EveIntelChecker
 ```
 
 4) Build the project for the targeted architecture :
