@@ -185,8 +185,10 @@ namespace EveIntelCheckerPages
                 ReadFileTimer.AutoReset = true;
                 ReadFileTimer.Enabled = true;
                 ReadFileTimer.Start();
+
+                await SoundPlayer.SetPlayersVolume(SettingsReader.UserSettingsValues.NotificationVolume);
             }
-            
+
             if (SettingsReader is { UserSettingsValues.CompactMode: false })
             {
                 if(firstRender || MapRebuildRequired)
@@ -209,7 +211,7 @@ namespace EveIntelCheckerPages
             IBrowserFile? logFile = null;
             
             // Only the last selected file will be used
-            foreach (var file in e.GetMultipleFiles())
+            foreach (IBrowserFile file in e.GetMultipleFiles())
             {
                 logFile = file;
             }
@@ -509,7 +511,7 @@ namespace EveIntelCheckerPages
         {
             // Secondary Window, play sound only if Window is opened at the moment of the sound trigger
             if((WindowSpecificSuffix.Equals("_2") && ElectronHandler.SecondaryWindowOpened) || WindowSpecificSuffix.Equals("_1"))
-                await SoundPlayer.PlaySound(isDanger, WindowSpecificSuffix, SettingsReader.UserSettingsValues.NotificationVolume);
+                await SoundPlayer.PlaySound(isDanger, WindowSpecificSuffix);
         }
 
         /// <summary>
@@ -672,7 +674,8 @@ namespace EveIntelCheckerPages
         {
             SettingsReader.UserSettingsValues.NotificationVolume = newValue;
             SettingsReader.WriteUserSettings();
-            await SoundPlayer.PlaySound(true, WindowSpecificSuffix, SettingsReader.UserSettingsValues.NotificationVolume);
+            await SoundPlayer.SetPlayersVolume(SettingsReader.UserSettingsValues.NotificationVolume);
+            await SoundPlayer.PlaySound(true, WindowSpecificSuffix);
         }
 
         /// <summary>

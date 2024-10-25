@@ -55,25 +55,29 @@ namespace EveIntelCheckerLib.Data
         }
 
         /// <summary>
+        /// Set the volume for the players
+        /// </summary>
+        /// <param name="volume">The volume to apply</param>
+        /// <returns></returns>
+        public async Task SetPlayersVolume(int volume)
+        {
+            if(volume >= 0 && volume <= 100)
+                foreach (Player player in SoundPlayers)
+                    await player.SetVolume((byte)volume);
+        }
+
+        /// <summary>
         /// Play the sound selected with corresponding player
         /// </summary>
         /// <param name="isDanger">Play Danger notification or normal notification</param>
         /// <param name="sender">_1 or _2 (Primary or Secondary window ?)</param>
-        /// <param name="volume">Volume applied to the notification</param>
-        public async Task PlaySound(bool isDanger, string sender, int volume = -1)
+        public async Task PlaySound(bool isDanger, string sender)
         {
             int index = sender switch
             {
                 "_1" => 0,
                 "_2" => 3
             };
-
-            if (volume != -1)
-            {
-                SoundPlayers[index].SetVolume((byte)volume);
-                SoundPlayers[index+1].SetVolume((byte)volume);
-                SoundPlayers[index+2].SetVolume((byte)volume);
-            }
 
             if (sender == "_1")
             {
