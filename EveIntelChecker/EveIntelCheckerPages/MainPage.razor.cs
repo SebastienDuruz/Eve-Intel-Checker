@@ -11,10 +11,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.AspNetCore.Components;
 using static System.GC;
+using Timer = System.Timers.Timer;
 
 namespace EveIntelCheckerPages
 {
@@ -119,6 +121,7 @@ namespace EveIntelCheckerPages
             {
                 Primary = "#007ea7",
                 Background = "#1c1c1c",
+                BackgroundGray =  "#1c1c1c",
                 AppbarBackground = "#1c1c1c",
                 DrawerBackground = "#1c1c1c",
                 Divider = "#FFFFFF",
@@ -131,7 +134,6 @@ namespace EveIntelCheckerPages
                 OverlayDark = "#1c1c1c",
                 GrayDark = "#1c1c1c",
                 GrayDarker = "#1c1c1c",
-                BackgroundGrey = "#1c1c1c",
                 Surface = "#1c1c1c",
             },
             Typography = new Typography()
@@ -289,7 +291,7 @@ namespace EveIntelCheckerPages
         /// </summary>
         /// <param name="value">System name to search</param>
         /// <returns>DB object with sytem informations</returns>
-        private async Task<IEnumerable<MapSolarSystem?>> SearchSystem(string value)
+        private async Task<IEnumerable<MapSolarSystem?>> SearchSystem(string value, CancellationToken cancellationToken = new CancellationToken())
         {
             if (string.IsNullOrEmpty(value))
                 return new List<MapSolarSystem?>();
