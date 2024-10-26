@@ -91,33 +91,33 @@
                     </div>
                     @foreach (IntelSystem system in IntelSystems)
                     {
-                        string classes = ClearClasses;
-                        @if (system.IsRed)
-                            classes += RedClasses;
-                        else if (system.TriggerCounter > 0)
-                            classes += OrangeClasses;
+                    string classes = ClearClasses;
+                    @if (system.IsRed)
+                    classes += RedClasses;
+                    else if (system.TriggerCounter > 0)
+                    classes += OrangeClasses;
 
-                        string zKillboardUrl = $"https://zkillboard.com/system/{system.SystemId}";
-                        string dotlanUrl = $"https://evemaps.dotlan.net/system/{system.SystemName}";
+                    string zKillboardUrl = $"https://zkillboard.com/system/{system.SystemId}";
+                    string dotlanUrl = $"https://evemaps.dotlan.net/system/{system.SystemName}";
 
-                        <div class="@classes" style="width: 100%;">
-                            <MudText Typo="Typo.body2">@system.Jumps</MudText>
-                            <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
-                                <ActivatorContent>
-                                    <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
-                                </ActivatorContent>
-                                <ChildContent>
-                                    <MudMenuItem OnClick="() => OpenURL(zKillboardUrl)">ZKillboard</MudMenuItem>
-                                    <MudMenuItem OnClick="() => OpenURL(dotlanUrl)">Dotlan</MudMenuItem>
-                                    <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
-                                </ChildContent>
-                            </MudMenu>
-                            <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
-                        </div>
+                    <div class="@classes" style="width: 100%;">
+                        <MudText Typo="Typo.body2">@system.Jumps</MudText>
+                        <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
+                            <ActivatorContent>
+                                <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MudMenuItem OnClick="() => OpenURL(zKillboardUrl)">ZKillboard</MudMenuItem>
+                                <MudMenuItem OnClick="() => OpenURL(dotlanUrl)">Dotlan</MudMenuItem>
+                                <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
+                            </ChildContent>
+                        </MudMenu>
+                        <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
+                    </div>
                     }
                 </MudStack>
             }
         }
-        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 96px; right: 0; bottom: 0; left: 0;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
+        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 100px; right: 0; bottom: 0; left: 0;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
     }
 </div>

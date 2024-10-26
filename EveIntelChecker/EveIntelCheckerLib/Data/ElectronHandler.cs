@@ -99,8 +99,8 @@ namespace EveIntelCheckerLib.Data
             {
                 Electron.Dialog.ShowErrorBox(
                     "Required folder does not exists", 
-                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\n");
-                Electron.App.Exit();
+                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\nhttps://github.com/SebastienDuruz/Eve-Intel-Checker/blob/main/README.md");
+                Electron.App.Quit();
             }
         }
 
@@ -140,7 +140,7 @@ namespace EveIntelCheckerLib.Data
             
             // Close the windows before exiting the app
             MainWindow.Close();
-            Electron.App.Exit();
+            Electron.App.Quit();
         }
 
         /// <summary>
