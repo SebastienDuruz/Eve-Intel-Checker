@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ElectronNET.API;
@@ -58,6 +57,10 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public static string LogFolder { get; private set; }
 
+        /// <summary>
+        /// Setup the settings corresponding to the Platform EveIntelChecker as been launched on
+        /// </summary>
+        /// <returns>result of the task</returns>
         public static async Task<bool> SetupSettings()
         {
             MainSettingsReader = new UserSettingsReader("_1");
@@ -93,7 +96,6 @@ namespace EveIntelCheckerLib.Data
         /// <returns>Results of the task</returns>
         public static async Task CreateElectronWindow()
         {
-            
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
             SecondaryWindowInstanced = false;
