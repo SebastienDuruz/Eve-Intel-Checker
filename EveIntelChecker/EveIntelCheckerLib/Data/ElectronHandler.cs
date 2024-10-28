@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ElectronNET.API;
@@ -53,21 +54,50 @@ namespace EveIntelCheckerLib.Data
         private static bool IsFirstShow { get; set; } = true;
 
         /// <summary>
+        /// The chatlogs folder used by EveIntelChecker
+        /// </summary>
+        public static string LogFolder { get; private set; }
+
+        public static async Task<bool> SetupSettings()
+        {
+            MainSettingsReader = new UserSettingsReader("_1");
+            SecondarySettingsReader = new UserSettingsReader("_2");
+
+            // Setup the corresponding chatlog folder for the required platform
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                LinuxSettingsReader = new LinuxSettingsReader();
+                LogFolder = LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder;
+            }
+
+            // Check the Eve Chatlogs folder, if it does not exists and can't be created, close the application
+            if (!CheckEveFolder())
+                if (!CreateEveFolder())
+                {
+                    Electron.Dialog.ShowErrorBox(
+                    "Required folder does not exists and can't be created by EveIntelChecker.",
+                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\nhttps://github.com/SebastienDuruz/Eve-Intel-Checker/blob/main/README.md");
+                    return false;
+                }
+
+            return true;
+        }
+
+        /// <summary>
         /// Create the Electron Window
         /// </summary>
         /// <returns>Results of the task</returns>
         public static async Task CreateElectronWindow()
         {
-            MainSettingsReader = new UserSettingsReader("_1");
-            SecondarySettingsReader = new UserSettingsReader("_2");
-
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                LinuxSettingsReader = new LinuxSettingsReader();
             
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
             SecondaryWindowInstanced = false;
-            
+
             MainWindow = await Electron.WindowManager.CreateWindowAsync(
                 new BrowserWindowOptions()
                 {
@@ -88,20 +118,11 @@ namespace EveIntelCheckerLib.Data
 
             // Clear cache to prevent old JS file to not update
             await MainWindow.WebContents.Session.ClearCacheAsync();
-            
+
             // Add events to mainWindow
             MainWindow.OnReadyToShow += MainWindowOnOnReadyToShow;
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
-            
-            // Check the Eve Chatlogs folder, if it does not exists, close the application
-            if (!CheckEveFolder())
-            {
-                Electron.Dialog.ShowErrorBox(
-                    "Required folder does not exists", 
-                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\nhttps://github.com/SebastienDuruz/Eve-Intel-Checker/blob/main/README.md");
-                Electron.App.Quit();
-            }
         }
 
         /// <summary>
@@ -187,11 +208,11 @@ namespace EveIntelCheckerLib.Data
                             Focusable = true,
                             AlwaysOnTop = SecondarySettingsReader.UserSettingsValues.WindowIsTopMost,
                             MinHeight = 100,
-                            Height = (int)SecondarySettingsReader.UserSettingsValues.WindowHeight,
+                            Height = SecondarySettingsReader.UserSettingsValues.WindowHeight,
                             MinWidth = 210,
-                            Width = (int)SecondarySettingsReader.UserSettingsValues.WindowWidth,
-                            X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
-                            Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
+                            Width = SecondarySettingsReader.UserSettingsValues.WindowWidth,
+                            X = SecondarySettingsReader.UserSettingsValues.WindowLeft,
+                            Y = SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
                     SecondaryWindow.LoadURL($"http://localhost:{3969}/secondary");
 
@@ -256,18 +277,17 @@ namespace EveIntelCheckerLib.Data
         /// <returns>True if exists, false if not</returns>
         private static bool CheckEveFolder()
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return Directory.Exists(
-                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\");
+            return Directory.Exists(LogFolder);
+        }
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return Directory.Exists(
-                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/");
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return Directory.Exists(LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder);
-
-            return false;
+        /// <summary>
+        /// Autocreate the Eve Logs folder if not already exists
+        /// </summary>
+        /// <returns></returns>
+        private static bool CreateEveFolder()
+        {
+            Directory.CreateDirectory(LogFolder);
+            return CheckEveFolder();
         }
     }
 }

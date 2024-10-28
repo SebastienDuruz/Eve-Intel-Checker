@@ -38,6 +38,9 @@ Environment.SetEnvironmentVariable("MALLOC_TRIM_THRESHOLD_", "100000");
 
 // Support Electron
 if (HybridSupport.IsElectronActive)
-    await ElectronHandler.CreateElectronWindow();
+    if (await ElectronHandler.SetupSettings())
+        await ElectronHandler.CreateElectronWindow();
+    else
+        Electron.App.Exit();
 
 app.Run();
