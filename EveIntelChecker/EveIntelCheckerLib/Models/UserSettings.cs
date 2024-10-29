@@ -8,12 +8,17 @@
         /// <summary>
         /// Last file opened by the application
         /// </summary>
-        public string LastFileName { get; set; } = "";
+        public string LastLogFile { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Folder that contains the log files (set each time user load an Eve logs file
+        /// </summary>
+        public string LogFilesFolder { get; set; } = string.Empty;
 
         /// <summary>
         /// The last system selected by the user (only valid system)
         /// </summary>
-        public string LastSelectedSystem { get; set; } = "";
+        public string LastSelectedSystem { get; set; } = string.Empty;
 
         /// <summary>
         /// The numbers of jumps to take around the main system

@@ -26,7 +26,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// Path of the DB export files
         /// </summary>
-        private static string FolderPath { get; set; }
+        private static string FolderPath { get; set; } = string.Empty;
 
         /// <summary>
         /// List of SolarSystems

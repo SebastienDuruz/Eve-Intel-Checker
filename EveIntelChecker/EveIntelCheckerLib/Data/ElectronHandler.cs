@@ -1,7 +1,9 @@
 ﻿using ElectronNET.API;
 using ElectronNET.API.Entities;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -21,11 +23,6 @@ namespace EveIntelCheckerLib.Data
         /// Reader for the Settings json file for SecondaryWindow
         /// </summary>
         public static UserSettingsReader SecondarySettingsReader { get; set; }
-
-        /// <summary>
-        /// Only for linux users -> contains specific settings for Wine Path
-        /// </summary>
-        public static LinuxSettingsReader LinuxSettingsReader { get; set; }
 
         /// <summary>
         /// Main App Window
@@ -53,41 +50,34 @@ namespace EveIntelCheckerLib.Data
         private static bool IsFirstShow { get; set; } = true;
 
         /// <summary>
-        /// The chatlogs folder used by EveIntelChecker
-        /// </summary>
-        public static string LogFolder { get; private set; }
-
-        /// <summary>
         /// Setup the settings corresponding to the Platform EveIntelChecker as been launched on
         /// </summary>
         /// <returns>result of the task</returns>
         public static async Task<bool> SetupSettings()
         {
-            MainSettingsReader = new UserSettingsReader("_1");
-            SecondarySettingsReader = new UserSettingsReader("_2");
-
-            // Setup the corresponding chatlog folder for the required platform
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            try
             {
-                LinuxSettingsReader = new LinuxSettingsReader();
-                LogFolder = LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder;
+                MainSettingsReader = new UserSettingsReader("_1");
+                SecondarySettingsReader = new UserSettingsReader("_2");
+            }
+            catch (Exception ex)
+            {
+                // TODO : Do something with exception
+                return false;
             }
 
-            // Check the Eve Chatlogs folder, if it does not exists and can't be created, close the application
-            if (!CheckEveFolder())
-                if (!CreateEveFolder())
-                {
-                    Electron.Dialog.ShowErrorBox(
-                    "Required folder does not exists and can't be created by EveIntelChecker.",
-                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\nhttps://github.com/SebastienDuruz/Eve-Intel-Checker/blob/main/README.md");
-                    return false;
-                }
-
             return true;
+
+            // Setup the corresponding chatlog folder for the required platform
+            //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            //    LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+            //else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            //    LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
+            //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            //{
+            //    // No default folder for linux
+            //    // TODO : Detect if Eve is installed somewhere ?
+            //}
         }
 
         /// <summary>
@@ -273,23 +263,19 @@ namespace EveIntelCheckerLib.Data
             return mainWindowPositionIsValid && secondaryWindowPositionIsValid;
         }
 
-        /// <summary>
-        /// Check if Eve folder exists
-        /// </summary>
-        /// <returns>True if exists, false if not</returns>
-        private static bool CheckEveFolder()
+        public static async Task<string> OpenFileDialog()
         {
-            return Directory.Exists(LogFolder);
-        }
+            string[] files = await Electron.Dialog.ShowOpenDialogAsync(MainWindow, new OpenDialogOptions()
+            {
+                DefaultPath = SpecialDirectories.MyDocuments,
+                Properties = [OpenDialogProperty.openFile],
+                Filters = [new FileFilter { Name = "Text Files", Extensions = new[] { "txt" } }]
+            });
 
-        /// <summary>
-        /// Autocreate the Eve Logs folder if not already exists
-        /// </summary>
-        /// <returns></returns>
-        private static bool CreateEveFolder()
-        {
-            Directory.CreateDirectory(LogFolder);
-            return CheckEveFolder();
+            if (files.Length > 0)
+                return files[0];
+
+            return string.Empty;
         }
     }
 }

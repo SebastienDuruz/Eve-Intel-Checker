@@ -1,10 +1,12 @@
-﻿using EveIntelCheckerLib.Data;
+﻿using ElectronNET.API;
+using EveIntelCheckerLib.Data;
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using EveIntelCheckerLib.Models.Map;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using Microsoft.VisualBasic.FileIO;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
@@ -229,7 +231,7 @@ namespace EveIntelCheckerPages
                 // Update the settings file
                 if (SettingsReader != null)
                 {
-                    SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                    SettingsReader.UserSettingsValues.LastLogFile = ChatLogFile.LogFileFullName;
                     SettingsReader.WriteUserSettings();
                 }
 
@@ -254,13 +256,13 @@ namespace EveIntelCheckerPages
                 SettingsReader.ReadUserSettings();
 
                 // If a filename is found
-                if (!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastFileName))
+                if (!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastLogFile))
                 {
                     // Chat-log file exists
                     if (File.Exists(Path.Combine(ChatLogFile.LogFileFolder,
-                            SettingsReader.UserSettingsValues.LastFileName)))
+                            SettingsReader.UserSettingsValues.LastLogFile)))
                     {
-                        ChatLogFile.LogFileFullName = SettingsReader.UserSettingsValues.LastFileName;
+                        ChatLogFile.LogFileFullName = SettingsReader.UserSettingsValues.LastLogFile;
                         ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
                         ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
                         FileIconColor = Color.Success;
@@ -493,7 +495,7 @@ namespace EveIntelCheckerPages
                             ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
 
                             // Set the file to settings
-                            SettingsReader!.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                            SettingsReader!.UserSettingsValues.LastLogFile = ChatLogFile.LogFileFullName;
                             SettingsReader.WriteUserSettings();
                         }
                     }
@@ -576,20 +578,23 @@ namespace EveIntelCheckerPages
         {
             ChatLogFile = new ChatLogFile();
 
-            // Default case --> Windows
-            ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
-            ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
+            ChatLogFile.LogFileFolder = SettingsReader.UserSettingsValues.LogFilesFolder;
+            ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\logs_copies\\";
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
-                ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                ChatLogFile.LogFileFolder = ElectronHandler.LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder;
-                ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
-            }
+            // Default case --> Windows
+            //ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+            //ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
+
+            //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            //{
+            //    ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
+            //    ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
+            //}
+            //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            //{
+            //    ChatLogFile.LogFileFolder = ElectronHandler.LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder;
+            //    ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
+            //}
         }
 
         /// <summary>
@@ -760,7 +765,7 @@ namespace EveIntelCheckerPages
         /// Open an URL into the default browser
         /// </summary>
         /// <param name="url">URL to open</param>
-        private async Task OpenURL(string url)
+        private void OpenURL(string url)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 Process.Start(new ProcessStartInfo
@@ -770,6 +775,41 @@ namespace EveIntelCheckerPages
                 });
             else
                 Process.Start(url);
+        }
+
+        /// <summary>
+        /// Open the log file selected by the user
+        /// </summary>
+        /// <returns></returns>
+        private async Task OpenLogFile()
+        {
+            string logFileFullPath = await ElectronHandler.OpenFileDialog();
+
+            if (logFileFullPath != string.Empty)
+            {
+                // Update chat logs values
+                ChatLogFile.LogFileFullName = logFileFullPath; // Full name with folder path
+                ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(Path.GetFileName(logFileFullPath));
+                ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(Path.GetFileName(logFileFullPath));
+                FileIconColor = Color.Success;
+
+                // Update the settings file
+                if (SettingsReader != null)
+                {
+                    SettingsReader.UserSettingsValues.LastLogFile = logFileFullPath;
+                    SettingsReader.UserSettingsValues.LogFilesFolder = Path.GetDirectoryName(logFileFullPath);
+                    SettingsReader.WriteUserSettings();
+                }
+
+                LogFileLoaded = true;
+            }
+            else
+            {
+
+                FileIconColor = Color.Error;
+                LogFileLoaded = false;
+                SetDefaultChatLogFileFolders();
+            }
         }
     }
 }
