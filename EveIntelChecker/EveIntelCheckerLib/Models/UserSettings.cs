@@ -59,7 +59,7 @@
         /// Window is TopMost ? (default -> true)
         /// </summary>
         public bool WindowIsTopMost { get; set; } = true;
-        
+
         /// <summary>
         /// Compact mode is the default display mode, if set to false display a Node graph
         /// </summary>

@@ -23,9 +23,9 @@
                 <div>
                     <MudIconButton Class="noDragContainer" HtmlTag="label" OnClick="ElectronHandler.HideAndShowSecondaryWindow" Color="@Color.Default" Icon="@Icons.Material.Rounded.OpenInNewOff" Size="Size.Small" Title="Hide the secondary window"></MudIconButton>
                 </div>
-            }    
+            }
         </div>
-    </div> 
+    </div>
     <div Class="d-flex flex-column topBar" style="z-index: 2">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
             <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
@@ -35,7 +35,7 @@
                 <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="Last message read">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
-                @if(!SettingsReader.UserSettingsValues.CompactMode)
+                @if (!SettingsReader!.UserSettingsValues.CompactMode)
                 {
                     <MudIconButton HtmlTag="label" Icon="@Icons.Material.Rounded.AlignVerticalCenter" Size="Size.Small" OnClick="ResizeMap" Title="Resize the map to fit the window"></MudIconButton>
                 }
@@ -85,35 +85,35 @@
             {
                 <MudStack Spacing="0" Class="mx-2 content">
                     <div class="d-flex justify-space-around align-center flex-grow-1 gap-8" style="width: 100%;">
-                        <MudText>J</MudText>
-                        <MudText Class="flex-shrink-1 align-content-center align-center" Align="Align.Start" Style="width: 100%;">System</MudText>
-                        <MudText>T</MudText>
+                        <MudText><b>J</b></MudText>
+                        <MudText Class="flex-shrink-1 align-content-center align-center" Align="Align.Start" Style="width: 100%;"><b>System</b></MudText>
+                        <MudText><b>T</b></MudText>
                     </div>
                     @foreach (IntelSystem system in IntelSystems)
                     {
-                    string classes = ClearClasses;
-                    @if (system.IsRed)
-                    classes += RedClasses;
-                    else if (system.TriggerCounter > 0)
-                    classes += OrangeClasses;
+                        string classes = ClearClasses;
+                        @if (system.IsRed)
+                            classes += RedClasses;
+                        else if (system.TriggerCounter > 0)
+                            classes += OrangeClasses;
 
-                    string zKillboardUrl = $"https://zkillboard.com/system/{system.SystemId}";
-                    string dotlanUrl = $"https://evemaps.dotlan.net/system/{system.SystemName}";
+                        string zKillboardUrl = $"https://zkillboard.com/system/{system.SystemId}";
+                        string dotlanUrl = $"https://evemaps.dotlan.net/system/{system.SystemName}";
 
-                    <div class="@classes" style="width: 100%;">
-                        <MudText Typo="Typo.body2">@system.Jumps</MudText>
-                        <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
-                            <ActivatorContent>
-                                <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
-                            </ActivatorContent>
-                            <ChildContent>
-                                <MudMenuItem OnClick="() => OpenURL(zKillboardUrl)">ZKillboard</MudMenuItem>
-                                <MudMenuItem OnClick="() => OpenURL(dotlanUrl)">Dotlan</MudMenuItem>
-                                <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
-                            </ChildContent>
-                        </MudMenu>
-                        <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
-                    </div>
+                        <div class="@classes" style="width: 100%;">
+                            <MudText Typo="Typo.body2">@system.Jumps</MudText>
+                            <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
+                                <ActivatorContent>
+                                    <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <MudMenuItem OnClick="() => OpenURL(zKillboardUrl)">ZKillboard</MudMenuItem>
+                                    <MudMenuItem OnClick="() => OpenURL(dotlanUrl)">Dotlan</MudMenuItem>
+                                    <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
+                                </ChildContent>
+                            </MudMenu>
+                            <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
+                        </div>
                     }
                 </MudStack>
             }

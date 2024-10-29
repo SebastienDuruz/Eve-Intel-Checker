@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ElectronNET.API;
+using ElectronNET.API.Entities;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using ElectronNET.API;
-using ElectronNET.API.Entities;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -16,32 +16,32 @@ namespace EveIntelCheckerLib.Data
         /// Reader for the Settings json file for MainWindow
         /// </summary>
         public static UserSettingsReader MainSettingsReader { get; set; }
-        
+
         /// <summary>
         /// Reader for the Settings json file for SecondaryWindow
         /// </summary>
         public static UserSettingsReader SecondarySettingsReader { get; set; }
-        
+
         /// <summary>
         /// Only for linux users -> contains specific settings for Wine Path
         /// </summary>
         public static LinuxSettingsReader LinuxSettingsReader { get; set; }
-        
+
         /// <summary>
         /// Main App Window
         /// </summary>
         private static BrowserWindow MainWindow { get; set; }
-        
+
         /// <summary>
         /// Secondary App Window
         /// </summary>
         private static BrowserWindow SecondaryWindow { get; set; }
-        
+
         /// <summary>
         /// State of the Secondary Window
         /// </summary>
         public static bool SecondaryWindowOpened { get; set; }
-        
+
         /// <summary>
         /// State of the instance of Secondary Window
         /// </summary>
@@ -69,7 +69,7 @@ namespace EveIntelCheckerLib.Data
             // Setup the corresponding chatlog folder for the required platform
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
-            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
@@ -158,9 +158,9 @@ namespace EveIntelCheckerLib.Data
             if (SecondaryWindowInstanced)
             {
                 await SaveSecondaryWindowSettings();
-                SecondaryWindow.Close();                
+                SecondaryWindow.Close();
             }
-            
+
             // Close the windows before exiting the app
             MainWindow.Close();
             Electron.App.Quit();
@@ -236,7 +236,7 @@ namespace EveIntelCheckerLib.Data
             bool mainWindowPositionIsValid = false;
             bool secondaryWindowPositionIsValid = false;
             Display[] displays = await Electron.Screen.GetAllDisplaysAsync();
-            
+
             // check Windows positions
             foreach (Display display in displays)
             {
@@ -245,7 +245,7 @@ namespace EveIntelCheckerLib.Data
                     && display.Bounds.Y <= MainSettingsReader.UserSettingsValues.WindowHeight
                     && display.Bounds.Y + display.Bounds.Height >= MainSettingsReader.UserSettingsValues.WindowTop)
                     mainWindowPositionIsValid = true;
-                
+
                 if (display.Bounds.X <= SecondarySettingsReader.UserSettingsValues.WindowLeft
                     && display.Bounds.X + display.Bounds.Width >= SecondarySettingsReader.UserSettingsValues.WindowLeft
                     && display.Bounds.Y <= SecondarySettingsReader.UserSettingsValues.WindowHeight

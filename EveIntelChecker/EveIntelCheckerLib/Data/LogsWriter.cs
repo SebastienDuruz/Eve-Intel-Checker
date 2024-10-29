@@ -11,7 +11,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// File path
         /// </summary>
-        private string LogFile { get;set; }
+        private string LogFile { get; set; }
 
         /// <summary>
         /// The logLevel

@@ -31,7 +31,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// List of SolarSystems
         /// </summary>
-        public List<MapSolarSystem?> SolarSystems { get; set; }
+        public List<MapSolarSystem> SolarSystems { get; set; }
 
         /// <summary>
         /// List of JumpGates
@@ -44,7 +44,7 @@ namespace EveIntelCheckerLib.Data
         private EveStaticDatabase()
         {
             FolderPath = Path.Combine(Directory.GetCurrentDirectory());
-            
+
             // Resolve an issue with Blazor default folder (when Electron is not selected)
             if (!Directory.Exists(FolderPath) || !File.Exists(Path.Combine(FolderPath, "mapRegion.json")))
                 FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""));
@@ -73,16 +73,16 @@ namespace EveIntelCheckerLib.Data
         /// Read the solar systems export file
         /// </summary>
         /// <returns>List of solar systems</returns>
-        public List<MapSolarSystem?> ReadSolarSystems()
+        public List<MapSolarSystem> ReadSolarSystems()
         {
             try
             {
-                return JsonConvert.DeserializeObject<List<MapSolarSystem>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystems.json")));
+                return JsonConvert.DeserializeObject<List<MapSolarSystem>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystems.json")))!;
             }
             catch (Exception ex)
             {
                 StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
-                return new List<MapSolarSystem?>();
+                return new List<MapSolarSystem>();
             }
         }
 
@@ -94,7 +94,7 @@ namespace EveIntelCheckerLib.Data
         {
             try
             {
-                return JsonConvert.DeserializeObject<List<MapSolarSystemJump>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystemJumps.json")));
+                return JsonConvert.DeserializeObject<List<MapSolarSystemJump>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystemJumps.json")))!;
             }
             catch (Exception ex)
             {
@@ -111,8 +111,7 @@ namespace EveIntelCheckerLib.Data
         /// <returns>The list with systems to check</returns>
         public List<IntelSystem> BuildSystemsList(MapSolarSystem? root, int systemDepth)
         {
-            List<IntelSystem> intelSystems = new List<IntelSystem>();
-            intelSystems.Add(ConvertMapSytemToIntelSystem(root));
+            List<IntelSystem> intelSystems = [ConvertMapSytemToIntelSystem(root)];
 
             for (int i = 0; i < systemDepth; ++i)
                 foreach (IntelSystem system in intelSystems.ToList())
@@ -123,7 +122,7 @@ namespace EveIntelCheckerLib.Data
                             current.Jumps = i + 1;
                             intelSystems.Add(current);
                         }
-            
+
             return intelSystems;
         }
 
@@ -135,7 +134,7 @@ namespace EveIntelCheckerLib.Data
         private IntelSystem ConvertMapSytemToIntelSystem(MapSolarSystem? system)
         {
             IntelSystem intelSystem = new IntelSystem();
-            intelSystem.SystemId = system.SolarSystemID;
+            intelSystem.SystemId = system!.SolarSystemID;
             intelSystem.SystemName = system.SolarSystemName;
 
             foreach (MapSolarSystemJump connection in SolarSystemJumps.Where(x => x.FromSolarSystemID == intelSystem.SystemId))

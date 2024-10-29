@@ -26,11 +26,12 @@ namespace EveIntelCheckerLib.Data
         /// <param name="identifier">The prefix to identify the setting file</param>
         public UserSettingsReader(string identifier)
         {
-            if(!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker")))
+            if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker")))
                 Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"));
-            
+
             FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"), $"userSettings{identifier}.json");
-            
+
+            UserSettingsValues = new UserSettings();
             ReadUserSettings();
         }
 
@@ -40,7 +41,7 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public void ReadUserSettings()
         {
-            if(File.Exists(FilePath))
+            if (File.Exists(FilePath))
             {
                 try
                 {

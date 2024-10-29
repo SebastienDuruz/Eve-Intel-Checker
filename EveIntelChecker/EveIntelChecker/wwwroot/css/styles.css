@@ -12,7 +12,7 @@
 }
 
 .topBar {
-    height:71px; 
+    height:75px; 
     margin-top: 25px;
     position: fixed;
     width: 100%;
@@ -20,7 +20,7 @@
 }
 
 .content {
-    padding-top: 106px;
+    padding-top: 100px;
     position: relative;
 }
 

@@ -2,6 +2,7 @@
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using EveIntelCheckerLib.Models.Map;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
@@ -14,7 +15,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using Microsoft.AspNetCore.Components;
 using static System.GC;
 using Timer = System.Timers.Timer;
 
@@ -28,20 +28,20 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Window Suffix parameter
         /// </summary>
-        [Parameter] 
-        public string?  WindowSpecificSuffix { get; set; }
+        [Parameter]
+        public string? WindowSpecificSuffix { get; set; }
 
         /// <summary>
         /// SettingsReader object
         /// </summary>
         [Parameter]
         public UserSettingsReader? SettingsReader { get; set; }
-        
+
         /// <summary>
         /// The selected system (root)
         /// </summary>
         private MapSolarSystem? _selectedSystem;
-        
+
         /// <summary>
         /// Property of the _selectedSytem attribute
         /// </summary>
@@ -115,13 +115,13 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Main theme for MudBlazor
         /// </summary>
-        private MudTheme _mainTheme = new MudTheme()
+        private readonly MudTheme _mainTheme = new MudTheme()
         {
             PaletteDark = new PaletteDark()
             {
                 Primary = "#007ea7",
                 Background = "#1c1c1c",
-                BackgroundGray =  "#1c1c1c",
+                BackgroundGray = "#1c1c1c",
                 AppbarBackground = "#1c1c1c",
                 DrawerBackground = "#1c1c1c",
                 Divider = "#FFFFFF",
@@ -155,7 +155,7 @@ namespace EveIntelCheckerPages
 
             if (SettingsReader == null)
                 SettingsReader = new UserSettingsReader("web");
-            
+
             SetDefaultChatLogFileFolders();
             LoadUserSettingsLastLog();
         }
@@ -183,17 +183,17 @@ namespace EveIntelCheckerPages
                 // Read chat log file each sec
                 ReadFileTimer = new Timer(StaticData.ReadLogInterval);
 
-                ReadFileTimer.Elapsed += ReadLogHandler;
+                ReadFileTimer.Elapsed += ReadLogHandler!;
                 ReadFileTimer.AutoReset = true;
                 ReadFileTimer.Enabled = true;
                 ReadFileTimer.Start();
 
-                await SoundPlayer.SetPlayersVolume(SettingsReader.UserSettingsValues.NotificationVolume);
+                await SoundPlayer.SetPlayersVolume(SettingsReader!.UserSettingsValues.NotificationVolume);
             }
 
             if (SettingsReader is { UserSettingsValues.CompactMode: false })
             {
-                if(firstRender || MapRebuildRequired)
+                if (firstRender || MapRebuildRequired)
                 {
                     await JsRuntime.InvokeVoidAsync("buildMap", [MapSystemsData.Item1, MapSystemsData.Item2]);
 
@@ -211,7 +211,7 @@ namespace EveIntelCheckerPages
         private void SelectFile(InputFileChangeEventArgs e)
         {
             IBrowserFile? logFile = null;
-            
+
             // Only the last selected file will be used
             foreach (IBrowserFile file in e.GetMultipleFiles())
             {
@@ -276,7 +276,7 @@ namespace EveIntelCheckerPages
                 // Select the system if it exists in the DB
                 if (!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastSelectedSystem)
                     && EveStaticDatabase.Instance.SolarSystems.Exists(x =>
-                        x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
+                        x!.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
                 {
                     SolarSystemSelector.Value = EveStaticDatabase.Instance.SolarSystems.Where(x =>
                         x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem).First();
@@ -291,10 +291,10 @@ namespace EveIntelCheckerPages
         /// </summary>
         /// <param name="value">System name to search</param>
         /// <returns>DB object with sytem informations</returns>
-        private async Task<IEnumerable<MapSolarSystem?>> SearchSystem(string value, CancellationToken cancellationToken = new CancellationToken())
+        private async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value, CancellationToken cancellationToken = new CancellationToken())
         {
             if (string.IsNullOrEmpty(value))
-                return new List<MapSolarSystem?>();
+                return new List<MapSolarSystem>();
             return EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName.Contains(value, StringComparison.InvariantCultureIgnoreCase) || x.SolarSystemID.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
 
@@ -305,12 +305,12 @@ namespace EveIntelCheckerPages
         {
             // Check the value before doing anything
             if (SelectedSystem == null) return;
-            
+
             // Build the list of systems
-            IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, SettingsReader.UserSettingsValues.SystemsDepth);
+            IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, SettingsReader!.UserSettingsValues.SystemsDepth);
 
             MapSystemsData = BuildMapNodes();
-            if(!SettingsReader.UserSettingsValues.CompactMode && !SettingsPageOpened)
+            if (!SettingsReader.UserSettingsValues.CompactMode && !SettingsPageOpened)
                 await JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
 
             // Update the userSettings with new selected system
@@ -359,7 +359,7 @@ namespace EveIntelCheckerPages
                 }
 
                 // Check for new chatlog file
-                await CheckNewLogFile();
+                CheckNewLogFile();
             }
         }
 
@@ -369,22 +369,22 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the task</returns>
         private async Task CheckSystemProximity()
         {
-            string newRedSystem = "";
+            string newRedSystem = string.Empty;
 
             // Check if message contains a system set to be checked
             foreach (IntelSystem intelSystem in IntelSystems)
                 if (ChatLogFile.LastLogFileMessage.Contains(intelSystem.SystemName))
                 {
                     intelSystem.IsRed = true;
-                    
+
                     // Play specific sounds if needed by the user settings
-                    if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
+                    if (intelSystem.Jumps < SettingsReader!.UserSettingsValues.IgnoreNotification &&
                         intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
-                        await PlayNotificationSound(true);
+                        PlayNotificationSound(true);
                     else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
                              intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
-                        await PlayNotificationSound(false);
-                    
+                        PlayNotificationSound(false);
+
                     ++intelSystem.TriggerCounter;
                     newRedSystem = intelSystem.SystemName;
                 }
@@ -397,7 +397,7 @@ namespace EveIntelCheckerPages
                         intelSystem.IsRed = false;
 
                 // rebuild the systems data for StarMap
-                if(!SettingsReader.UserSettingsValues.CompactMode)
+                if (!SettingsReader!.UserSettingsValues.CompactMode)
                 {
                     MapSystemsData = BuildMapNodes();
                     await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
@@ -419,7 +419,7 @@ namespace EveIntelCheckerPages
                 }
 
             MapSystemsData = BuildMapNodes();
-            if (!SettingsReader.UserSettingsValues.CompactMode)
+            if (!SettingsReader!.UserSettingsValues.CompactMode)
                 await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
         }
 
@@ -440,7 +440,7 @@ namespace EveIntelCheckerPages
         private void UpdateRootSystem(IntelSystem system)
         {
             SelectedSystem = EveStaticDatabase.Instance.SolarSystems.FirstOrDefault(x => x.SolarSystemName == system.SystemName);
-            SolarSystemSelector.Text = SelectedSystem.SolarSystemName;
+            SolarSystemSelector.Text = SelectedSystem!.SolarSystemName;
         }
 
         /// <summary>
@@ -448,9 +448,9 @@ namespace EveIntelCheckerPages
         /// Change the chatlog file information if needed
         /// </summary>
         /// <returns>True if changed, false if nothing changed</returns>
-        private async Task CheckNewLogFile()
+        private void CheckNewLogFile()
         {
-            if(ChatLogFile.LogFileFolder != "" && ChatLogFile.LogFileShortName != "" && LogFileLoaded)
+            if (ChatLogFile.LogFileFolder != "" && ChatLogFile.LogFileShortName != "" && LogFileLoaded)
             {
                 try
                 {
@@ -466,7 +466,7 @@ namespace EveIntelCheckerPages
                         if ($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}" != chatLogFile)
                         {
                             string[] splitedToCheck = chatLogFile.Split("_");
-                            
+
                             // FileName is not valid
                             if (splitedToCheck.Length < 4)
                                 continue;
@@ -493,12 +493,12 @@ namespace EveIntelCheckerPages
                             ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
 
                             // Set the file to settings
-                            SettingsReader.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
+                            SettingsReader!.UserSettingsValues.LastFileName = ChatLogFile.LogFileFullName;
                             SettingsReader.WriteUserSettings();
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // TODO : Do something with exception
                 }
@@ -509,11 +509,11 @@ namespace EveIntelCheckerPages
         /// Play a sound on new trigger
         /// </summary>
         /// <returns>Result of the Task</returns>
-        private async Task PlayNotificationSound(bool isDanger)
+        private void PlayNotificationSound(bool isDanger)
         {
             // Secondary Window, play sound only if Window is opened at the moment of the sound trigger
-            if((WindowSpecificSuffix.Equals("_2") && ElectronHandler.SecondaryWindowOpened) || WindowSpecificSuffix.Equals("_1"))
-                await SoundPlayer.PlaySound(isDanger, WindowSpecificSuffix);
+            if ((WindowSpecificSuffix!.Equals("_2") && ElectronHandler.SecondaryWindowOpened) || WindowSpecificSuffix.Equals("_1"))
+                SoundPlayer.PlaySound(isDanger, WindowSpecificSuffix); // We don't want to wait for this call, weird but it works !
         }
 
         /// <summary>
@@ -526,7 +526,7 @@ namespace EveIntelCheckerPages
             try
             {
                 // Only if message have correct format
-                if(message.Contains("[") && message.Contains("]"))
+                if (message.Contains("[") && message.Contains("]"))
                 {
                     string time = message.Split("[")[1];
                     time = time.Split("]")[0];
@@ -553,7 +553,7 @@ namespace EveIntelCheckerPages
                 string chatName = fileName.Split("_")[0];
                 return chatName;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return "";
             }
@@ -575,7 +575,7 @@ namespace EveIntelCheckerPages
         private void SetDefaultChatLogFileFolders()
         {
             ChatLogFile = new ChatLogFile();
-            
+
             // Default case --> Windows
             ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
             ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
@@ -595,7 +595,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Open or Close the Settings panel, save the settings if settings panel as been closed
         /// </summary>
-        private async Task OpenCloseSettingsPanel()
+        private void OpenCloseSettingsPanel()
         {
             SettingsPageOpened = !SettingsPageOpened;
             if (!SettingsPageOpened)
@@ -604,7 +604,7 @@ namespace EveIntelCheckerPages
                 MapRebuildRequired = true;
 
                 // Apply changes
-                SettingsReader.WriteUserSettings();
+                SettingsReader!.WriteUserSettings();
                 if (_selectedSystem != null && SettingsChanged)
                 {
                     BuildSystems();
@@ -619,7 +619,7 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void CompactModeChanged(bool newValue)
         {
-            SettingsReader.UserSettingsValues.CompactMode = newValue;
+            SettingsReader!.UserSettingsValues.CompactMode = newValue;
             SettingsReader.WriteUserSettings();
         }
 
@@ -629,17 +629,17 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void TopMostChanged(bool newValue)
         {
-            SettingsReader.UserSettingsValues.WindowIsTopMost = newValue;
+            SettingsReader!.UserSettingsValues.WindowIsTopMost = newValue;
             SettingsReader.WriteUserSettings();
         }
-        
+
         /// <summary>
         /// Update the value of SystemsDepth
         /// </summary>
         /// <param name="newValue">The new value to be applied</param>
         private void SystemsDepthChanged(int newValue)
         {
-            SettingsReader.UserSettingsValues.SystemsDepth = newValue;
+            SettingsReader!.UserSettingsValues.SystemsDepth = newValue;
             SettingsChanged = true;
             SettingsReader.WriteUserSettings();
         }
@@ -650,7 +650,7 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void DangerNotificationChanged(int newValue)
         {
-            SettingsReader.UserSettingsValues.DangerNotification = newValue;
+            SettingsReader!.UserSettingsValues.DangerNotification = newValue;
             if (SettingsReader.UserSettingsValues.IgnoreNotification < newValue)
                 SettingsReader.UserSettingsValues.IgnoreNotification = newValue;
             SettingsReader.WriteUserSettings();
@@ -662,7 +662,7 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private void IgnoreNotificationChanged(int newValue)
         {
-            SettingsReader.UserSettingsValues.IgnoreNotification = newValue;
+            SettingsReader!.UserSettingsValues.IgnoreNotification = newValue;
             if (SettingsReader.UserSettingsValues.DangerNotification > newValue)
                 SettingsReader.UserSettingsValues.DangerNotification = newValue;
             SettingsReader.WriteUserSettings();
@@ -674,10 +674,10 @@ namespace EveIntelCheckerPages
         /// <param name="newValue">The new value to be applied</param>
         private async void NotificationVolumeChanged(int newValue)
         {
-            SettingsReader.UserSettingsValues.NotificationVolume = newValue;
+            SettingsReader!.UserSettingsValues.NotificationVolume = newValue;
             SettingsReader.WriteUserSettings();
             await SoundPlayer.SetPlayersVolume(SettingsReader.UserSettingsValues.NotificationVolume);
-            await SoundPlayer.PlaySound(true, WindowSpecificSuffix);
+            SoundPlayer.PlaySound(true, WindowSpecificSuffix!); // We don't want to wait for this call, weird but it works !
         }
 
         /// <summary>
@@ -714,7 +714,7 @@ namespace EveIntelCheckerPages
                 mapNodes[i].Font.Multi = true;
                 mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n<code>J:{IntelSystems[i].Jumps} T:{IntelSystems[i].TriggerCounter}</code>";
                 mapNodes[i].Id = i + 1;
-                mapNodes[i].System = IntelSystems[i].SystemName;
+                mapNodes[i].System = IntelSystems[i].SystemName!;
             }
 
             foreach (IntelSystem system in IntelSystems)
@@ -725,13 +725,13 @@ namespace EveIntelCheckerPages
 
                     try
                     {
-                        systemLink.From = mapNodes.FirstOrDefault(x => x.Label.Contains(system.SystemName)).Id;
-                        IntelSystem systemToConnect = IntelSystems.FirstOrDefault(x => x.SystemId == link);
+                        systemLink.From = mapNodes.FirstOrDefault(x => x.Label.Contains(system.SystemName))!.Id;
+                        IntelSystem systemToConnect = IntelSystems.FirstOrDefault(x => x.SystemId == link)!;
 
                         // Only if system is still on the generation
                         if (systemToConnect != null)
                         {
-                            systemLink.To = mapNodes.FirstOrDefault(x => x.Label.Contains(systemToConnect.SystemName)).Id;
+                            systemLink.To = mapNodes.FirstOrDefault(x => x.Label.Contains(systemToConnect.SystemName))!.Id;
                             if (!mapLinks.Exists(x => x.From == systemLink.From && x.To == systemLink.To) &&
                                 !mapLinks.Exists(x => x.From == systemLink.To && x.To == systemLink.From))
                                 mapLinks.Add(systemLink);
@@ -745,13 +745,13 @@ namespace EveIntelCheckerPages
 
             return (mapNodes, mapLinks.ToArray());
         }
-        
+
         /// <summary>
         /// Task for closing the application
         /// </summary>
-        private static async Task CloseApplication()
+        private static void CloseApplication()
         {
-            ReadFileTimer.Stop();
+            ReadFileTimer!.Stop();
             ReadFileTimer.Close();
             ElectronHandler.CloseMainWindow();
         }

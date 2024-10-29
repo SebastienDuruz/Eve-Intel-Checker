@@ -1,7 +1,7 @@
-using System;
-using System.IO;
 using EveIntelCheckerLib.Models;
 using Newtonsoft.Json;
+using System;
+using System.IO;
 
 namespace EveIntelCheckerLib.Data;
 
@@ -25,11 +25,12 @@ public class LinuxSettingsReader
     /// </summary>
     public LinuxSettingsReader()
     {
-        if(!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker")))
+        if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker")))
             Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"));
-        
+
         FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"), $"linuxSettings.json");
-        
+
+        LinuxSettingsValues = new LinuxSettings();
         ReadLinuxSettings();
     }
 
@@ -39,16 +40,16 @@ public class LinuxSettingsReader
     /// </summary>
     public void ReadLinuxSettings()
     {
-        if(File.Exists(FilePath))
+        if (File.Exists(FilePath))
         {
             try
             {
-                LinuxSettingsValues = JsonConvert.DeserializeObject<LinuxSettings>(File.ReadAllText(FilePath));
+                LinuxSettingsValues = JsonConvert.DeserializeObject<LinuxSettings>(File.ReadAllText(FilePath))!;
             }
             catch (Exception ex)
             {
                 StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
-                
+
                 // Reset the settings by recreating a file
                 WriteLinuxSettings();
                 LinuxSettingsValues = new LinuxSettings();

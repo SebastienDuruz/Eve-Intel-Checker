@@ -25,7 +25,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="NetCoreAudio" />
-    <None Include="wwwroot\img\EveIntelChecker_logo.png" />
-    <None Include="wwwroot\img\EveIntelChecker_logo_small.png" />
+    <None Include="wwwroot\img\EveIntelChecker_logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\img\EveIntelChecker_logo_small.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
