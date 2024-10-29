@@ -207,45 +207,6 @@ namespace EveIntelCheckerPages
         }
 
         /// <summary>
-        /// Select the chat log file
-        /// </summary>
-        /// <param name="e">args of the event caller</param>
-        private void SelectFile(InputFileChangeEventArgs e)
-        {
-            IBrowserFile? logFile = null;
-
-            // Only the last selected file will be used
-            foreach (IBrowserFile file in e.GetMultipleFiles())
-            {
-                logFile = file;
-            }
-
-            if (logFile is { ContentType: "text/plain" })
-            {
-                // Update chat logs values
-                ChatLogFile.LogFileFullName = logFile.Name;
-                ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
-                ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
-                FileIconColor = Color.Success;
-
-                // Update the settings file
-                if (SettingsReader != null)
-                {
-                    SettingsReader.UserSettingsValues.LastLogFile = ChatLogFile.LogFileFullName;
-                    SettingsReader.WriteUserSettings();
-                }
-
-                LogFileLoaded = true;
-            }
-            else
-            {
-                FileIconColor = Color.Error;
-                LogFileLoaded = false;
-                SetDefaultChatLogFileFolders();
-            }
-        }
-
-        /// <summary>
         /// Load the userSettings last logfile at the initial start
         /// </summary>
         private void LoadUserSettingsLastLog()
