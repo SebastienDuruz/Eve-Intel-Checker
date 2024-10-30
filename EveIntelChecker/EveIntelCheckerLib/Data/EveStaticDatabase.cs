@@ -46,8 +46,8 @@ namespace EveIntelCheckerLib.Data
             FolderPath = Path.Combine(Directory.GetCurrentDirectory());
 
             // Resolve an issue with Blazor default folder (when Electron is not selected)
-            if (!Directory.Exists(FolderPath) || !File.Exists(Path.Combine(FolderPath, "mapRegion.json")))
-                FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""));
+            //if (!Directory.Exists(FolderPath) || !File.Exists(Path.Combine(FolderPath, "mapRegion.json")))
+            //    FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""));
 
             SolarSystems = ReadSolarSystems();
             SolarSystemJumps = ReadSolarSystemJumps();

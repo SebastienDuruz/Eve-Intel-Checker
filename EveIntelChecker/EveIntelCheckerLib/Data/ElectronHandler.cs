@@ -263,13 +263,17 @@ namespace EveIntelCheckerLib.Data
             return mainWindowPositionIsValid && secondaryWindowPositionIsValid;
         }
 
+        /// <summary>
+        /// Open dialog to select a log file
+        /// </summary>
+        /// <returns></returns>
         public static async Task<string> OpenFileDialog()
         {
             string[] files = await Electron.Dialog.ShowOpenDialogAsync(MainWindow, new OpenDialogOptions()
             {
                 DefaultPath = SpecialDirectories.MyDocuments,
                 Properties = [OpenDialogProperty.openFile],
-                Filters = [new FileFilter { Name = "Text Files", Extensions = new[] { "txt" } }]
+                Filters = [new FileFilter { Name = "Text Files", Extensions = new[] { "txt" }}],
             });
 
             if (files.Length > 0)

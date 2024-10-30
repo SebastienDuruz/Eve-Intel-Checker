@@ -18,7 +18,7 @@
         /// <summary>
         /// The full name of the log file
         /// </summary>
-        public string LogFileFullName { get; set; } = string.Empty;
+        public string LogFileFullPath { get; set; } = string.Empty;
 
         /// <summary>
         /// The short name of the log file (name of the chat channel)
@@ -28,7 +28,7 @@
         /// <summary>
         /// The full name of the copy logFile
         /// </summary>
-        public string CopyLogFileFullName { get; set; } = string.Empty;
+        public string CopyLogFileFullPath { get; set; } = string.Empty;
 
         /// <summary>
         /// The last message sent writed on the logFile

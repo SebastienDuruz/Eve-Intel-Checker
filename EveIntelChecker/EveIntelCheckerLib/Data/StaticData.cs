@@ -18,6 +18,18 @@ public static class StaticData
     public static int ReadLogInterval { get; set; } = 1000;
 
     /// <summary>
+    /// Name of the application
+    /// </summary>
+    public static string ApplicationName { get; set; } = "EveIntelChecker";
+
+    public static string ApplicationLogsName { get; set; } = "logs.txt";
+
+    /// <summary>
+    /// Name of the folder that contains the copied Eve logs files
+    /// </summary>
+    public static string EvelogsCopyFolderName { get; set; } = "evelogs_copies";
+
+    /// <summary>
     /// LogLevel Enum
     /// </summary>
     public enum LogLevel

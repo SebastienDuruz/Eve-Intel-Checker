@@ -220,12 +220,11 @@ namespace EveIntelCheckerPages
                 if (!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastLogFile))
                 {
                     // Chat-log file exists
-                    if (File.Exists(Path.Combine(ChatLogFile.LogFileFolder,
-                            SettingsReader.UserSettingsValues.LastLogFile)))
+                    if (File.Exists(SettingsReader.UserSettingsValues.LastLogFile))
                     {
-                        ChatLogFile.LogFileFullName = SettingsReader.UserSettingsValues.LastLogFile;
-                        ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
-                        ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+                        ChatLogFile.LogFileFullPath = SettingsReader.UserSettingsValues.LastLogFile;
+                        ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullPath);
+                        ChatLogFile.CopyLogFileFullPath = BuildCopyFromFullName(ChatLogFile.LogFileFullPath);
                         FileIconColor = Color.Success;
                         LogFileLoaded = true;
                     }
@@ -274,7 +273,7 @@ namespace EveIntelCheckerPages
 
             MapSystemsData = BuildMapNodes();
             if (!SettingsReader.UserSettingsValues.CompactMode && !SettingsPageOpened)
-                await JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+                await JsRuntime.InvokeVoidAsync("buildMap", [MapSystemsData.Item1, MapSystemsData.Item2]);
 
             // Update the userSettings with new selected system
             SettingsReader.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
@@ -291,22 +290,21 @@ namespace EveIntelCheckerPages
             if (LogFileLoaded && IntelSystems.Count > 0)
             {
                 // File exists (Read the file)
-                if (File.Exists($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}"))
+                if (File.Exists(ChatLogFile.LogFileFullPath))
                 {
                     try
                     {
-                        File.Copy($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}",
-                            $"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}", true);
+                        File.Copy(ChatLogFile.LogFileFullPath, ChatLogFile.CopyLogFileFullPath, true);
                     }
                     catch (Exception ex)
                     {
-                        StaticData.Log(StaticData.LogLevel.Error, $"[[{WindowSpecificSuffix}]] {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
+                        LogsWriter.Instance.Log(StaticData.LogLevel.Error, $"{WindowSpecificSuffix} {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
                     }
 
                     try
                     {
                         // Execute the main process by reading last line of the logfile
-                        IEnumerable<string> lines = File.ReadLines($"{ChatLogFile.CopyLogFileFolder}{ChatLogFile.CopyLogFileFullName}");
+                        IEnumerable<string> lines = File.ReadLines(ChatLogFile.CopyLogFileFullPath);
                         if (lines.Any())
                             if (lines.Last() != ChatLogFile.LastLogFileMessage)
                             {
@@ -317,7 +315,7 @@ namespace EveIntelCheckerPages
                     }
                     catch (Exception ex)
                     {
-                        StaticData.Log(StaticData.LogLevel.Error, $"[[{WindowSpecificSuffix}]] <- {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
+                        LogsWriter.Instance.Log(StaticData.LogLevel.Error, $"{WindowSpecificSuffix} {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
                     }
                 }
 
@@ -420,13 +418,13 @@ namespace EveIntelCheckerPages
                     // Get the logfiles corresponding to the selected chat file
                     List<string> chatLogFiles = Directory
                         .GetFiles(ChatLogFile.LogFileFolder, $"{ChatLogFile.LogFileShortName}*.txt").ToList();
-                    string[] splitedCurrent = ChatLogFile.LogFileFullName.Split("_");
+                    string[] splitedCurrent = ChatLogFile.LogFileFullPath.Split("_");
 
                     // Replace the logfile by the most recent if it's not the current that is used
                     foreach (string chatLogFile in chatLogFiles)
                     {
                         // Only check different files
-                        if ($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullName}" != chatLogFile)
+                        if ($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullPath}" != chatLogFile)
                         {
                             string[] splitedToCheck = chatLogFile.Split("_");
 
@@ -451,12 +449,12 @@ namespace EveIntelCheckerPages
                             string separator = "/";
                             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                                 separator = "\\";
-                            ChatLogFile.LogFileFullName = chatLogFile.Split(separator).Last();
-                            ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullName);
-                            ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(ChatLogFile.LogFileFullName);
+                            ChatLogFile.LogFileFullPath = chatLogFile.Split(separator).Last();
+                            ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullPath);
+                            ChatLogFile.CopyLogFileFullPath = BuildCopyFromFullName(ChatLogFile.LogFileFullPath);
 
                             // Set the file to settings
-                            SettingsReader!.UserSettingsValues.LastLogFile = ChatLogFile.LogFileFullName;
+                            SettingsReader!.UserSettingsValues.LastLogFile = ChatLogFile.LogFileFullPath;
                             SettingsReader.WriteUserSettings();
                         }
                     }
@@ -539,8 +537,8 @@ namespace EveIntelCheckerPages
         {
             ChatLogFile = new ChatLogFile();
 
-            ChatLogFile.LogFileFolder = SettingsReader.UserSettingsValues.LogFilesFolder;
-            ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\logs_copies\\";
+            ChatLogFile.LogFileFolder = SettingsReader!.UserSettingsValues.LogFilesFolder;
+            ChatLogFile.CopyLogFileFolder = SettingsReader.CopyLogFolderPath;
 
             // Default case --> Windows
             //ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
@@ -557,7 +555,7 @@ namespace EveIntelCheckerPages
             //    ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
             //}
         }
-
+        #region Settings
         /// <summary>
         /// Open or Close the Settings panel, save the settings if settings panel as been closed
         /// </summary>
@@ -645,6 +643,8 @@ namespace EveIntelCheckerPages
             await SoundPlayer.SetPlayersVolume(SettingsReader.UserSettingsValues.NotificationVolume);
             SoundPlayer.PlaySound(true, WindowSpecificSuffix!); // We don't want to wait for this call, weird but it works !
         }
+
+        #endregion Settings
 
         /// <summary>
         /// Build the data required by the Javascript map
@@ -749,8 +749,8 @@ namespace EveIntelCheckerPages
             if (logFileFullPath != string.Empty)
             {
                 // Update chat logs values
-                ChatLogFile.LogFileFullName = logFileFullPath; // Full name with folder path
-                ChatLogFile.CopyLogFileFullName = BuildCopyFromFullName(Path.GetFileName(logFileFullPath));
+                ChatLogFile.LogFileFullPath = logFileFullPath; // Full name with folder path
+                ChatLogFile.CopyLogFileFullPath = BuildCopyFromFullName(Path.GetFileName(logFileFullPath));
                 ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(Path.GetFileName(logFileFullPath));
                 FileIconColor = Color.Success;
 
