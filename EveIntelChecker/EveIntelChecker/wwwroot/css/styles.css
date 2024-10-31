@@ -27,3 +27,7 @@
 .noDragContainer {
     -webkit-app-region: no-drag;
 }
+
+.settingsBox {
+    padding-top: 105px;
+}

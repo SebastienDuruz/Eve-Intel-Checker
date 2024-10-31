@@ -157,7 +157,7 @@ namespace EveIntelCheckerLib.Data
             MainWindow.Close();
             Electron.App.Quit();
 
-            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Application started");
+            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Application closed");
         }
 
         /// <summary>
