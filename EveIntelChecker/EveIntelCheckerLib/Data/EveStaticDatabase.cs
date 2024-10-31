@@ -81,7 +81,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
                 return new List<MapSolarSystem>();
             }
         }
@@ -98,7 +98,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
                 return new List<MapSolarSystemJump>();
             }
         }

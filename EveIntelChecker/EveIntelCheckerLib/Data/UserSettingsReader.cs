@@ -58,7 +58,7 @@ namespace EveIntelCheckerLib.Data
                 }
                 catch (Exception ex)
                 {
-                    StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                    LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
 
                     // Reset the settings by recreating a file
                     WriteUserSettings();
@@ -83,7 +83,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
             }
         }
     }

@@ -21,14 +21,14 @@
         public string LogFileFullPath { get; set; } = string.Empty;
 
         /// <summary>
-        /// The short name of the log file (name of the chat channel)
-        /// </summary>
-        public string LogFileShortName { get; set; } = string.Empty;
-
-        /// <summary>
         /// The full name of the copy logFile
         /// </summary>
         public string CopyLogFileFullPath { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The short name of the log file (name of the chat channel)
+        /// </summary>
+        public string LogFileShortName { get; set; } = string.Empty;
 
         /// <summary>
         /// The last message sent writed on the logFile

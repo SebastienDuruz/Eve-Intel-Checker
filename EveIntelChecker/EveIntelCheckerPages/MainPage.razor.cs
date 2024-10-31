@@ -1,12 +1,9 @@
-﻿using ElectronNET.API;
-using EveIntelCheckerLib.Data;
+﻿using EveIntelCheckerLib.Data;
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
 using EveIntelCheckerLib.Models.Map;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using Microsoft.VisualBasic.FileIO;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
@@ -223,8 +220,8 @@ namespace EveIntelCheckerPages
                     if (File.Exists(SettingsReader.UserSettingsValues.LastLogFile))
                     {
                         ChatLogFile.LogFileFullPath = SettingsReader.UserSettingsValues.LastLogFile;
-                        ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullPath);
-                        ChatLogFile.CopyLogFileFullPath = BuildCopyFromFullName(ChatLogFile.LogFileFullPath);
+                        ChatLogFile.LogFileShortName = ExtractShortNameFromFullPath(ChatLogFile.LogFileFullPath);
+                        ChatLogFile.CopyLogFileFullPath = BuildCopyPathFromFullPath(ChatLogFile.LogFileFullPath);
                         FileIconColor = Color.Success;
                         LogFileLoaded = true;
                     }
@@ -424,7 +421,7 @@ namespace EveIntelCheckerPages
                     foreach (string chatLogFile in chatLogFiles)
                     {
                         // Only check different files
-                        if ($"{ChatLogFile.LogFileFolder}{ChatLogFile.LogFileFullPath}" != chatLogFile)
+                        if (ChatLogFile.LogFileFullPath != chatLogFile)
                         {
                             string[] splitedToCheck = chatLogFile.Split("_");
 
@@ -446,12 +443,9 @@ namespace EveIntelCheckerPages
                                 continue;
 
                             // NEW FILE DETECTED do the necessary changes
-                            string separator = "/";
-                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                                separator = "\\";
-                            ChatLogFile.LogFileFullPath = chatLogFile.Split(separator).Last();
-                            ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(ChatLogFile.LogFileFullPath);
-                            ChatLogFile.CopyLogFileFullPath = BuildCopyFromFullName(ChatLogFile.LogFileFullPath);
+                            ChatLogFile.LogFileFullPath = chatLogFile;
+                            ChatLogFile.LogFileShortName = ExtractShortNameFromFullPath(ChatLogFile.LogFileFullPath);
+                            ChatLogFile.CopyLogFileFullPath = BuildCopyPathFromFullPath(ChatLogFile.LogFileFullPath);
 
                             // Set the file to settings
                             SettingsReader!.UserSettingsValues.LastLogFile = ChatLogFile.LogFileFullPath;
@@ -505,13 +499,13 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Extract the chat name from a filename
         /// </summary>
-        /// <param name="fileName">The full filename</param>
+        /// <param name="fileName">The full file path</param>
         /// <returns>Extracted chat name or empty if not in correct format</returns>
-        private string ExtractShortNameFromFullName(string fileName)
+        private string ExtractShortNameFromFullPath(string fileName)
         {
             try
             {
-                string chatName = fileName.Split("_")[0];
+                string chatName = Path.GetFileName(fileName).Split("_")[0];
                 return chatName;
             }
             catch (Exception)
@@ -521,13 +515,14 @@ namespace EveIntelCheckerPages
         }
 
         /// <summary>
-        /// Build the copy filename from full filename
+        /// Build the copy filePath from full filepath
         /// </summary>
-        /// <param name="fileName">The filename to use</param>
+        /// <param name="filePath">The filepath to use</param>
         /// <returns>Copy filename</returns>
-        private string BuildCopyFromFullName(string fileName)
+        private string BuildCopyPathFromFullPath(string filePath)
         {
-            return $"Copy{WindowSpecificSuffix}{fileName}";
+            string filename = Path.GetFileName(filePath);
+            return Path.Combine(SettingsReader!.CopyLogFolderPath, $"Copy{WindowSpecificSuffix}{filename}");
         }
 
         /// <summary>
@@ -745,13 +740,21 @@ namespace EveIntelCheckerPages
         private async Task OpenLogFile()
         {
             string logFileFullPath = await ElectronHandler.OpenFileDialog();
+            this.SetLogFile(logFileFullPath);
+        }
 
+        /// <summary>
+        /// From the path of the log file, build the necessary informations to use a logfile
+        /// </summary>
+        /// <param name="logFileFullPath"></param>
+        private void SetLogFile(string logFileFullPath)
+        {
             if (logFileFullPath != string.Empty)
             {
                 // Update chat logs values
                 ChatLogFile.LogFileFullPath = logFileFullPath; // Full name with folder path
-                ChatLogFile.CopyLogFileFullPath = BuildCopyFromFullName(Path.GetFileName(logFileFullPath));
-                ChatLogFile.LogFileShortName = ExtractShortNameFromFullName(Path.GetFileName(logFileFullPath));
+                ChatLogFile.CopyLogFileFullPath = BuildCopyPathFromFullPath(Path.GetFileName(logFileFullPath));
+                ChatLogFile.LogFileShortName = ExtractShortNameFromFullPath(Path.GetFileName(logFileFullPath));
                 FileIconColor = Color.Success;
 
                 // Update the settings file
