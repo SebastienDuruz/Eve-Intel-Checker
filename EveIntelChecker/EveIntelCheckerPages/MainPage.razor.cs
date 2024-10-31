@@ -360,6 +360,10 @@ namespace EveIntelCheckerPages
                     MapSystemsData = BuildMapNodes();
                     await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
                 }
+                else
+                {
+                    await InvokeAsync(StateHasChanged);
+                }
             }
         }
 
@@ -534,21 +538,6 @@ namespace EveIntelCheckerPages
 
             ChatLogFile.LogFileFolder = SettingsReader!.UserSettingsValues.LogFilesFolder;
             ChatLogFile.CopyLogFileFolder = SettingsReader.CopyLogFolderPath;
-
-            // Default case --> Windows
-            //ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
-            //ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EveIntelChecker\\";
-
-            //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            //{
-            //    ChatLogFile.LogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
-            //    ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
-            //}
-            //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            //{
-            //    ChatLogFile.LogFileFolder = ElectronHandler.LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder;
-            //    ChatLogFile.CopyLogFileFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/EveIntelChecker/";
-            //}
         }
         #region Settings
         /// <summary>
