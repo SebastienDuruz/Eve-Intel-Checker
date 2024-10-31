@@ -350,6 +350,8 @@ namespace EveIntelCheckerPages
             // If needed a reset to the last system set to RED
             if (newRedSystem != "")
             {
+                LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"New trigger in : {newRedSystem}");
+
                 foreach (IntelSystem intelSystem in IntelSystems)
                     if (intelSystem.SystemName != newRedSystem)
                         intelSystem.IsRed = false;

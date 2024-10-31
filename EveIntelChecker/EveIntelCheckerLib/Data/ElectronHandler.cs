@@ -115,6 +115,8 @@ namespace EveIntelCheckerLib.Data
             MainWindow.OnReadyToShow += MainWindowOnOnReadyToShow;
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
+
+            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Application started");
         }
 
         /// <summary>
@@ -154,6 +156,8 @@ namespace EveIntelCheckerLib.Data
             // Close the windows before exiting the app
             MainWindow.Close();
             Electron.App.Quit();
+
+            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Application started");
         }
 
         /// <summary>
@@ -276,9 +280,14 @@ namespace EveIntelCheckerLib.Data
                 Filters = [new FileFilter { Name = "Text Files", Extensions = new[] { "txt" }}],
             });
 
-            if (files.Length > 0)
-                return files[0];
 
+            if (files.Length > 0)
+            {
+                LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"Logfile path to load : {files[0]}");
+                return files[0];
+            }
+
+            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Logfile path is empty");
             return string.Empty;
         }
     }
