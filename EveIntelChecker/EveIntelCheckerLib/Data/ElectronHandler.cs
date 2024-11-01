@@ -3,8 +3,6 @@ using ElectronNET.API.Entities;
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace EveIntelCheckerLib.Data
@@ -53,7 +51,7 @@ namespace EveIntelCheckerLib.Data
         /// Setup the settings corresponding to the Platform EveIntelChecker as been launched on
         /// </summary>
         /// <returns>result of the task</returns>
-        public static async Task<bool> SetupSettings()
+        public static bool SetupSettings()
         {
             try
             {
@@ -62,7 +60,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                // TODO : Do something with exception
+                LogsWriter.Instance.Log(StaticData.LogLevel.Error, $"Failed to create instances for windows settings : {ex.Message}");
                 return false;
             }
 
@@ -273,9 +271,14 @@ namespace EveIntelCheckerLib.Data
         /// <returns></returns>
         public static async Task<string> OpenFileDialog()
         {
+            // Set the default path, if not already set or exists -> default is documents
+            string defaultPath = MainSettingsReader.UserSettingsValues.LogFilesFolder == "" ? SpecialDirectories.MyDocuments : MainSettingsReader.UserSettingsValues.LogFilesFolder;
+            if(!Directory.Exists(defaultPath))
+                defaultPath = SpecialDirectories.MyDocuments;
+
             string[] files = await Electron.Dialog.ShowOpenDialogAsync(MainWindow, new OpenDialogOptions()
             {
-                DefaultPath = SpecialDirectories.MyDocuments,
+                DefaultPath = defaultPath,
                 Properties = [OpenDialogProperty.openFile],
                 Filters = [new FileFilter { Name = "Text Files", Extensions = new[] { "txt" }}],
             });

@@ -32,9 +32,12 @@ Environment.SetEnvironmentVariable("MALLOC_TRIM_THRESHOLD_", "100000");
 
 // Support Electron
 if (HybridSupport.IsElectronActive)
-    if (await ElectronHandler.SetupSettings())
+    if (ElectronHandler.SetupSettings())
         await ElectronHandler.CreateElectronWindow();
     else
+    {
+        LogsWriter.Instance.Log(StaticData.LogLevel.Error, "Failed to setup the settings. The application has been closed");
         Electron.App.Exit();
+    }
 
 app.Run();
