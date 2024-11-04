@@ -24,11 +24,6 @@ namespace EveIntelCheckerLib.Data
         private static EveStaticDatabase _instance = null;
 
         /// <summary>
-        /// Path of the DB export files
-        /// </summary>
-        private static string FolderPath { get; set; } = string.Empty;
-
-        /// <summary>
         /// List of SolarSystems
         /// </summary>
         public List<MapSolarSystem> SolarSystems { get; set; }
@@ -43,11 +38,7 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         private EveStaticDatabase()
         {
-            FolderPath = Path.Combine(Directory.GetCurrentDirectory());
-
-            // Resolve an issue with Blazor default folder (when Electron is not selected)
-            //if (!Directory.Exists(FolderPath) || !File.Exists(Path.Combine(FolderPath, "mapRegion.json")))
-            //    FolderPath = Path.Combine(this.GetType().Assembly.Location.Replace("EveIntelCheckerLib.dll", ""));
+            //FolderPath = Path.Combine(Directory.GetCurrentDirectory());
 
             SolarSystems = ReadSolarSystems();
             SolarSystemJumps = ReadSolarSystemJumps();
@@ -77,7 +68,8 @@ namespace EveIntelCheckerLib.Data
         {
             try
             {
-                return JsonConvert.DeserializeObject<List<MapSolarSystem>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystems.json")))!;
+                LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"Try to load mapSolarSystems.json");
+                return JsonConvert.DeserializeObject<List<MapSolarSystem>>(File.ReadAllText("mapSolarSystems.json"))!;
             }
             catch (Exception ex)
             {
@@ -94,7 +86,8 @@ namespace EveIntelCheckerLib.Data
         {
             try
             {
-                return JsonConvert.DeserializeObject<List<MapSolarSystemJump>>(File.ReadAllText(Path.Combine(FolderPath, "mapSolarSystemJumps.json")))!;
+                LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"Try to load mapSolarSystemJumps.json");
+                return JsonConvert.DeserializeObject<List<MapSolarSystemJump>>(File.ReadAllText("mapSolarSystemJumps.json"))!;
             }
             catch (Exception ex)
             {
