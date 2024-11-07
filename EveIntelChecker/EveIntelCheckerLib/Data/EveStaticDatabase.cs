@@ -64,7 +64,7 @@ namespace EveIntelCheckerLib.Data
         /// Read the solar systems export file
         /// </summary>
         /// <returns>List of solar systems</returns>
-        public List<MapSolarSystem> ReadSolarSystems()
+        private List<MapSolarSystem> ReadSolarSystems()
         {
             try
             {
@@ -73,16 +73,16 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
+                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, $"{ex.GetType()} {ex.Message}");
                 return new List<MapSolarSystem>();
-            }
+            };
         }
 
         /// <summary>
         /// Read the solar systems jumps export file
         /// </summary>
         /// <returns>List of solar systems</returns>
-        public List<MapSolarSystemJump> ReadSolarSystemJumps()
+        private List<MapSolarSystemJump> ReadSolarSystemJumps()
         {
             try
             {
@@ -91,7 +91,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
+                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, $"{ex.GetType()} {ex.Message}");
                 return new List<MapSolarSystemJump>();
             }
         }

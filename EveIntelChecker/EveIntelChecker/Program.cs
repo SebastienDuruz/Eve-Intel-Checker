@@ -36,7 +36,7 @@ if (HybridSupport.IsElectronActive)
         await ElectronHandler.CreateElectronWindow();
     else
     {
-        LogsWriter.Instance.Log(StaticData.LogLevel.Error, "Failed to setup the settings. The application has been closed");
+        LogsWriter.Instance.Log(StaticData.LogLevel.Error, "Failed to setup the settings. The application will be closed.");
         Electron.App.Exit();
     }
 

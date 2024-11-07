@@ -9,12 +9,12 @@
     },
     "EveIntelCheckerElectron": {
       "commandName": "Project",
-      "commandLineArgs": "electronize-h5 start",
+      "commandLineArgs": "electronize start",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:7295;http://localhost:5295"
+      "applicationUrl": "http://localhost:3969"
     },
     "IIS Express": {
       "commandName": "IISExpress",
