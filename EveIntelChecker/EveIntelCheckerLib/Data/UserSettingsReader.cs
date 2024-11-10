@@ -13,7 +13,12 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// File path of the userSettings file
         /// </summary>
-        private string FilePath { get; }
+        public string FilePath { get; }
+
+        /// <summary>
+        /// Folder that contains the copy of the Evelogs files
+        /// </summary>
+        public string CopyLogFolderPath { get; }
 
         /// <summary>
         /// Objects that contains the settings values
@@ -26,11 +31,16 @@ namespace EveIntelCheckerLib.Data
         /// <param name="identifier">The prefix to identify the setting file</param>
         public UserSettingsReader(string identifier)
         {
-            if(!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker")))
-                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"));
-            
-            FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EveIntelChecker"), $"userSettings{identifier}.json");
-            
+            if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName)))
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName));
+
+            if (!Directory.Exists(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), StaticData.EvelogsCopyFolderName)))
+                Directory.CreateDirectory(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), StaticData.EvelogsCopyFolderName));
+
+            FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), $"userSettings{identifier}.json");
+            CopyLogFolderPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), StaticData.EvelogsCopyFolderName);
+
+            UserSettingsValues = new UserSettings();
             ReadUserSettings();
         }
 
@@ -40,7 +50,7 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         public void ReadUserSettings()
         {
-            if(File.Exists(FilePath))
+            if (File.Exists(FilePath))
             {
                 try
                 {
@@ -48,7 +58,7 @@ namespace EveIntelCheckerLib.Data
                 }
                 catch (Exception ex)
                 {
-                    StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                    LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
 
                     // Reset the settings by recreating a file
                     WriteUserSettings();
@@ -73,7 +83,7 @@ namespace EveIntelCheckerLib.Data
             }
             catch (Exception ex)
             {
-                StaticData.Log(StaticData.LogLevel.Warning, ex.Message);
+                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
             }
         }
     }

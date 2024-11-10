@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using ElectronNET.API;
+﻿using ElectronNET.API;
 using ElectronNET.API.Entities;
+using Microsoft.VisualBasic.FileIO;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace EveIntelCheckerLib.Data
 {
@@ -16,32 +16,27 @@ namespace EveIntelCheckerLib.Data
         /// Reader for the Settings json file for MainWindow
         /// </summary>
         public static UserSettingsReader MainSettingsReader { get; set; }
-        
+
         /// <summary>
         /// Reader for the Settings json file for SecondaryWindow
         /// </summary>
         public static UserSettingsReader SecondarySettingsReader { get; set; }
-        
-        /// <summary>
-        /// Only for linux users -> contains specific settings for Wine Path
-        /// </summary>
-        public static LinuxSettingsReader LinuxSettingsReader { get; set; }
-        
+
         /// <summary>
         /// Main App Window
         /// </summary>
         private static BrowserWindow MainWindow { get; set; }
-        
+
         /// <summary>
         /// Secondary App Window
         /// </summary>
         private static BrowserWindow SecondaryWindow { get; set; }
-        
+
         /// <summary>
         /// State of the Secondary Window
         /// </summary>
         public static bool SecondaryWindowOpened { get; set; }
-        
+
         /// <summary>
         /// State of the instance of Secondary Window
         /// </summary>
@@ -53,21 +48,46 @@ namespace EveIntelCheckerLib.Data
         private static bool IsFirstShow { get; set; } = true;
 
         /// <summary>
+        /// Setup the settings corresponding to the Platform EveIntelChecker as been launched on
+        /// </summary>
+        /// <returns>result of the task</returns>
+        public static bool SetupSettings()
+        {
+            try
+            {
+                MainSettingsReader = new UserSettingsReader("_1");
+                SecondarySettingsReader = new UserSettingsReader("_2");
+            }
+            catch (Exception ex)
+            {
+                LogsWriter.Instance.Log(StaticData.LogLevel.Error, $"Failed to create instances for windows settings : {ex.Message}");
+                return false;
+            }
+
+            return true;
+
+            // Setup the corresponding chatlog folder for the required platform
+            //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            //    LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\";
+            //else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            //    LogFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/";
+            //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            //{
+            //    // No default folder for linux
+            //    // TODO : Detect if Eve is installed somewhere ?
+            //}
+        }
+
+        /// <summary>
         /// Create the Electron Window
         /// </summary>
         /// <returns>Results of the task</returns>
         public static async Task CreateElectronWindow()
         {
-            MainSettingsReader = new UserSettingsReader("_1");
-            SecondarySettingsReader = new UserSettingsReader("_2");
-
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                LinuxSettingsReader = new LinuxSettingsReader();
-            
             await ValidateApplicationPosition();
             SecondaryWindowOpened = false;
             SecondaryWindowInstanced = false;
-            
+
             MainWindow = await Electron.WindowManager.CreateWindowAsync(
                 new BrowserWindowOptions()
                 {
@@ -88,20 +108,13 @@ namespace EveIntelCheckerLib.Data
 
             // Clear cache to prevent old JS file to not update
             await MainWindow.WebContents.Session.ClearCacheAsync();
-            
+
             // Add events to mainWindow
             MainWindow.OnReadyToShow += MainWindowOnOnReadyToShow;
             MainWindow.OnBlur += () => MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
             MainWindow.SetAlwaysOnTop(MainSettingsReader.UserSettingsValues.WindowIsTopMost);
-            
-            // Check the Eve Chatlogs folder, if it does not exists, close the application
-            if (!CheckEveFolder())
-            {
-                Electron.Dialog.ShowErrorBox(
-                    "Required folder does not exists", 
-                    "The Eve chat logs folder does not exist.\n\nFor more informations check the Github documentation.\n");
-                Electron.App.Exit();
-            }
+
+            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Application started");
         }
 
         /// <summary>
@@ -135,12 +148,14 @@ namespace EveIntelCheckerLib.Data
             if (SecondaryWindowInstanced)
             {
                 await SaveSecondaryWindowSettings();
-                SecondaryWindow.Close();                
+                SecondaryWindow.Close();
             }
-            
+
             // Close the windows before exiting the app
             MainWindow.Close();
-            Electron.App.Exit();
+            Electron.App.Quit();
+
+            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Application closed");
         }
 
         /// <summary>
@@ -187,11 +202,11 @@ namespace EveIntelCheckerLib.Data
                             Focusable = true,
                             AlwaysOnTop = SecondarySettingsReader.UserSettingsValues.WindowIsTopMost,
                             MinHeight = 100,
-                            Height = (int)SecondarySettingsReader.UserSettingsValues.WindowHeight,
+                            Height = SecondarySettingsReader.UserSettingsValues.WindowHeight,
                             MinWidth = 210,
-                            Width = (int)SecondarySettingsReader.UserSettingsValues.WindowWidth,
-                            X = (int)SecondarySettingsReader.UserSettingsValues.WindowLeft,
-                            Y = (int)SecondarySettingsReader.UserSettingsValues.WindowTop,
+                            Width = SecondarySettingsReader.UserSettingsValues.WindowWidth,
+                            X = SecondarySettingsReader.UserSettingsValues.WindowLeft,
+                            Y = SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
                     SecondaryWindow.LoadURL($"http://localhost:{3969}/secondary");
 
@@ -213,7 +228,7 @@ namespace EveIntelCheckerLib.Data
             bool mainWindowPositionIsValid = false;
             bool secondaryWindowPositionIsValid = false;
             Display[] displays = await Electron.Screen.GetAllDisplaysAsync();
-            
+
             // check Windows positions
             foreach (Display display in displays)
             {
@@ -222,7 +237,7 @@ namespace EveIntelCheckerLib.Data
                     && display.Bounds.Y <= MainSettingsReader.UserSettingsValues.WindowHeight
                     && display.Bounds.Y + display.Bounds.Height >= MainSettingsReader.UserSettingsValues.WindowTop)
                     mainWindowPositionIsValid = true;
-                
+
                 if (display.Bounds.X <= SecondarySettingsReader.UserSettingsValues.WindowLeft
                     && display.Bounds.X + display.Bounds.Width >= SecondarySettingsReader.UserSettingsValues.WindowLeft
                     && display.Bounds.Y <= SecondarySettingsReader.UserSettingsValues.WindowHeight
@@ -251,23 +266,32 @@ namespace EveIntelCheckerLib.Data
         }
 
         /// <summary>
-        /// Check if Eve folder exists
+        /// Open dialog to select a log file
         /// </summary>
-        /// <returns>True if exists, false if not</returns>
-        private static bool CheckEveFolder()
+        /// <returns></returns>
+        public static async Task<string> OpenFileDialog()
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return Directory.Exists(
-                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EVE\\logs\\Chatlogs\\");
+            // Set the default path, if not already set or exists -> default is documents
+            string defaultPath = MainSettingsReader.UserSettingsValues.LogFilesFolder == "" ? SpecialDirectories.MyDocuments : MainSettingsReader.UserSettingsValues.LogFilesFolder;
+            if(!Directory.Exists(defaultPath))
+                defaultPath = SpecialDirectories.MyDocuments;
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return Directory.Exists(
-                    $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/Documents/EVE/logs/Chatlogs/");
+            string[] files = await Electron.Dialog.ShowOpenDialogAsync(MainWindow, new OpenDialogOptions()
+            {
+                DefaultPath = defaultPath,
+                Properties = [OpenDialogProperty.openFile],
+                Filters = [new FileFilter { Name = "Text Files", Extensions = new[] { "txt" }}],
+            });
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return Directory.Exists(LinuxSettingsReader.LinuxSettingsValues.LinuxEveLogFolder);
 
-            return false;
+            if (files.Length > 0)
+            {
+                LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"Logfile path to load : {files[0]}");
+                return files[0];
+            }
+
+            LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Logfile path is empty");
+            return string.Empty;
         }
     }
 }

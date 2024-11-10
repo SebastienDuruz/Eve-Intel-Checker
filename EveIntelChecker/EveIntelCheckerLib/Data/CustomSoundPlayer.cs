@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using NetCoreAudio;
+﻿using NetCoreAudio;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace EveIntelCheckerLib.Data
@@ -13,7 +13,7 @@ namespace EveIntelCheckerLib.Data
         /// SoundPlayer using NAudio
         /// </summary>
         private List<Player> SoundPlayers { get; set; }
-        
+
         /// <summary>
         /// FilePath of the danger audio file
         /// </summary>
@@ -23,7 +23,7 @@ namespace EveIntelCheckerLib.Data
         /// FilePath of the normal audio file
         /// </summary>
         private string NormalAudioFilePath { get; set; }
-        
+
         /// <summary>
         /// FilePath of the danger audio file
         /// </summary>
@@ -33,12 +33,12 @@ namespace EveIntelCheckerLib.Data
         /// FilePath of the normal audio file
         /// </summary>
         private string NormalAudioFilePath2 { get; set; }
-        
+
         /// <summary>
         /// Last Window that played sound
         /// </summary>
         private string LastPlayed { get; set; }
-        
+
         /// <summary>
         /// Custom Constructor
         /// </summary>
@@ -49,9 +49,21 @@ namespace EveIntelCheckerLib.Data
             NormalAudioFilePath = normalSoundPath;
             DangerAudioFilePath2 = dangerSoundPath2;
             NormalAudioFilePath2 = normalSoundPath2;
-            
+
             SoundPlayers = new List<Player>() { new Player(), new Player(), new Player(), new Player(), new Player(), new Player() };
             LastPlayed = "NONE";
+        }
+
+        /// <summary>
+        /// Set the volume for the players
+        /// </summary>
+        /// <param name="volume">The volume to apply</param>
+        /// <returns></returns>
+        public async Task SetPlayersVolume(int volume)
+        {
+            if (volume >= 0 && volume <= 100)
+                foreach (Player player in SoundPlayers)
+                    await player.SetVolume((byte)volume);
         }
 
         /// <summary>
@@ -59,8 +71,7 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         /// <param name="isDanger">Play Danger notification or normal notification</param>
         /// <param name="sender">_1 or _2 (Primary or Secondary window ?)</param>
-        /// <param name="volume">Volume applied to the notification</param>
-        public async Task PlaySound(bool isDanger, string sender, int volume = -1)
+        public async Task PlaySound(bool isDanger, string sender)
         {
             int index = sender switch
             {
@@ -68,34 +79,27 @@ namespace EveIntelCheckerLib.Data
                 "_2" => 3
             };
 
-            if (volume != -1)
-            {
-                SoundPlayers[index].SetVolume((byte)volume);
-                SoundPlayers[index+1].SetVolume((byte)volume);
-                SoundPlayers[index+2].SetVolume((byte)volume);
-            }
-
             if (sender == "_1")
             {
                 if (!SoundPlayers[index].Playing)
-                    SoundPlayers[index].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
+                    await SoundPlayers[index].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
                 else if (!SoundPlayers[index + 1].Playing)
-                    SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
+                    await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
                 else if (!SoundPlayers[index + 2].Playing)
-                    SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
-                else 
-                    SoundPlayers[index].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
+                    await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
+                else
+                    await SoundPlayers[index].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
             }
             else
             {
                 if (!SoundPlayers[index].Playing)
-                    SoundPlayers[index].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
+                    await SoundPlayers[index].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
                 else if (!SoundPlayers[index + 1].Playing)
-                    SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
+                    await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
                 else if (!SoundPlayers[index + 2].Playing)
-                    SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
-                else 
-                    SoundPlayers[index].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
+                    await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
+                else
+                    await SoundPlayers[index].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
             }
         }
     }

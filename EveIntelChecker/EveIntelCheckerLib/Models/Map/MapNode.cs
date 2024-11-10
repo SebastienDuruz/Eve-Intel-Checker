@@ -8,9 +8,9 @@ namespace EveIntelCheckerLib.Models.Map
     public class MapNode
     {
         public long Id { get; set; }
-        public string Label { get; set; }
-        public string System { get; set; }
-        public string Region { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public string System { get; set; } = string.Empty;
+        public string Region { get; set; } = string.Empty;
         public string Shape { get; set; } = "box";
         public int BorderWidth { get; set; } = 1;
         public Colors Color { get; set; } = new Colors();
@@ -23,7 +23,7 @@ namespace EveIntelCheckerLib.Models.Map
         public string Border { get; set; } = "#E0E0E0";
     }
 
-    public class Font 
+    public class Font
     {
         public bool Multi { get; set; } = false;
     }

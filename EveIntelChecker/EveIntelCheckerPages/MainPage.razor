@@ -1,7 +1,8 @@
 ﻿@inject IJSRuntime JsRuntime
 @inject CustomSoundPlayer SoundPlayer
 
-<MudThemeProvider IsDarkMode="SettingsReader.UserSettingsValues.DarkMode" Theme="_mainTheme" />
+<MudThemeProvider IsDarkMode="true" Theme="_mainTheme" />
+<MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -22,19 +23,18 @@
                 <div>
                     <MudIconButton Class="noDragContainer" HtmlTag="label" OnClick="ElectronHandler.HideAndShowSecondaryWindow" Color="@Color.Default" Icon="@Icons.Material.Rounded.OpenInNewOff" Size="Size.Small" Title="Hide the secondary window"></MudIconButton>
                 </div>
-            }    
+            }
         </div>
-    </div> 
+    </div>
     <div Class="d-flex flex-column topBar" style="z-index: 2">
         <div class="d-flex justify-space-between align-center" MaxWidth="MaxWidth.ExtraExtraLarge">
-            <InputFile id="fileInput" OnChange="SelectFile" hidden accept=".txt" />
-            <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Material.Rounded.FileOpen" Size="Size.Small" for="fileInput" id="fileIcon" Title="Select the chat log file to use"></MudIconButton>
+            <MudIconButton HtmlTag="label" Color="@FileIconColor" Icon="@Icons.Material.Rounded.FileOpen" Size="Size.Small" OnClick="OpenLogFile" Title="Select the chat log file to use"></MudIconButton>
             @if (ChatLogFile.LastLogFileMessage != "")
             {
                 <MudText Typo="Typo.body2" Style="font-weight: bold; text-overflow:ellipsis;" Color="Color.Success" title="Last message read">@ChatLogFile.LastLogFileRead</MudText>
             }
             <div>
-                @if(!SettingsReader.UserSettingsValues.CompactMode)
+                @if (!SettingsReader!.UserSettingsValues.CompactMode)
                 {
                     <MudIconButton HtmlTag="label" Icon="@Icons.Material.Rounded.AlignVerticalCenter" Size="Size.Small" OnClick="ResizeMap" Title="Resize the map to fit the window"></MudIconButton>
                 }
@@ -49,7 +49,7 @@
 
     @if (SettingsPageOpened)
     {
-        <div class="d-flex flex-column mx-2 content" style="z-index: 1">
+        <div class="d-flex flex-column mx-2 content settingsBox" style="z-index: 1">
             <MudText Typo="Typo.body2">Jumps from root : @(SettingsReader.UserSettingsValues.SystemsDepth)</MudText>
             <div class="mx-3">
                 <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.SystemsDepth" ValueChanged="(int x) => SystemsDepthChanged(x)" Immediate="true" Min="1" Max="10" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
@@ -67,11 +67,11 @@
                 <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
             </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch Checked="SettingsReader.UserSettingsValues.CompactMode" CheckedChanged="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
+                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.CompactMode" OnClick="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Compact mode</MudText>
             </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch Checked="SettingsReader.UserSettingsValues.WindowIsTopMost" CheckedChanged="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
+                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.WindowIsTopMost" OnClick="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Always on top (restart required)</MudText>
             </div>
         </div>
@@ -84,9 +84,9 @@
             {
                 <MudStack Spacing="0" Class="mx-2 content">
                     <div class="d-flex justify-space-around align-center flex-grow-1 gap-8" style="width: 100%;">
-                        <MudText>J</MudText>
-                        <MudText Class="flex-shrink-1 align-content-center align-center" Align="Align.Start" Style="width: 100%;">System</MudText>
-                        <MudText>T</MudText>
+                        <MudText><b>J</b></MudText>
+                        <MudText Class="flex-shrink-1 align-content-center align-center" Align="Align.Start" Style="width: 100%;"><b>System</b></MudText>
+                        <MudText><b>T</b></MudText>
                     </div>
                     @foreach (IntelSystem system in IntelSystems)
                     {
@@ -101,7 +101,7 @@
 
                         <div class="@classes" style="width: 100%;">
                             <MudText Typo="Typo.body2">@system.Jumps</MudText>
-                            <MudMenu Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
+                            <MudMenu PositionAtCursor="true" Dense="true" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Style="width: 100%;">
                                 <ActivatorContent>
                                     <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
                                 </ActivatorContent>
@@ -117,6 +117,6 @@
                 </MudStack>
             }
         }
-        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 96px; right: 0; bottom: 0; left: 0;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
+        <div id="canvasMap" style="overflow:hidden; position: absolute; top: 100px; right: 0; bottom: 0; left: 0;" hidden="@SettingsReader.UserSettingsValues.CompactMode"></div>
     }
 </div>

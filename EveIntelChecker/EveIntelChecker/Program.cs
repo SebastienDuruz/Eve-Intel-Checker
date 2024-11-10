@@ -1,11 +1,5 @@
-using System;
-using System.Runtime.InteropServices;
 using ElectronNET.API;
 using EveIntelCheckerLib.Data;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +15,7 @@ builder.WebHost.UseUrls($"http://localhost:{StaticData.ApplicationPort}");
 
 var app = builder.Build();
 
- // Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -38,6 +32,12 @@ Environment.SetEnvironmentVariable("MALLOC_TRIM_THRESHOLD_", "100000");
 
 // Support Electron
 if (HybridSupport.IsElectronActive)
-    await ElectronHandler.CreateElectronWindow();
+    if (ElectronHandler.SetupSettings())
+        await ElectronHandler.CreateElectronWindow();
+    else
+    {
+        LogsWriter.Instance.Log(StaticData.LogLevel.Error, "Failed to setup the settings. The application will be closed.");
+        Electron.App.Exit();
+    }
 
 app.Run();

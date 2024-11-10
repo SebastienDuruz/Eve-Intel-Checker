@@ -6,7 +6,7 @@
     <RootNamespace>EveIntelCheckerElectron</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MudBlazor" Version="6.19.1" />
+    <PackageReference Include="MudBlazor" Version="7.15.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EveIntelCheckerLib\EveIntelCheckerLib.csproj" />
@@ -25,7 +25,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="NetCoreAudio" />
-    <None Include="wwwroot\img\EveIntelChecker_logo.png" />
-    <None Include="wwwroot\img\EveIntelChecker_logo_small.png" />
+    <None Include="wwwroot\img\EveIntelChecker_logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\img\EveIntelChecker_logo_small.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

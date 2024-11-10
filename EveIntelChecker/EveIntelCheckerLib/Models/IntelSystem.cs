@@ -30,7 +30,7 @@ namespace EveIntelCheckerLib.Models
         /// <summary>
         /// Name of the system
         /// </summary>
-        public string? SystemName { get; set; }
+        public string SystemName { get; set; } = string.Empty;
 
         /// <summary>
         /// List of system ID directly connected with this system

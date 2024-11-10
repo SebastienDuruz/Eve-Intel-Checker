@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace EveIntelCheckerLib.Data;
+﻿namespace EveIntelCheckerLib.Data;
 
 /// <summary>
 /// Class StaticData
@@ -18,6 +16,21 @@ public static class StaticData
     public static int ReadLogInterval { get; set; } = 1000;
 
     /// <summary>
+    /// Name of the application
+    /// </summary>
+    public static string ApplicationName { get; set; } = "EveIntelChecker";
+
+    /// <summary>
+    /// Name of the default log file with extension
+    /// </summary>
+    public static string ApplicationLogsName { get; set; } = "logs.txt";
+
+    /// <summary>
+    /// Name of the folder that contains the copied Eve logs files
+    /// </summary>
+    public static string EvelogsCopyFolderName { get; set; } = "evelogs_copies";
+
+    /// <summary>
     /// LogLevel Enum
     /// </summary>
     public enum LogLevel
@@ -26,15 +39,5 @@ public static class StaticData
         Error,
         Warning,
         Info
-    }
-
-    /// <summary>
-    /// Log a message from the whole application
-    /// </summary>
-    /// <param name="logLevel">Loglevel to apply to the message</param>
-    /// <param name="message">The message to log</param>
-    public static void Log(LogLevel logLevel, string message)
-    {
-        Console.WriteLine($"[{DateTime.Now}] [{logLevel.ToString()}] {message}");
     }
 }
