@@ -79,24 +79,6 @@ Ensure that **the Log Chat to File** option is activated. If it is not, activate
   <img align="middle" height="250" src=".\Screenshots\ChatLogOption.png">
 </p>
 
-### Linux specific settings
-
-After first launch an error message will be shown.
-
-You have to **manually** set the folder that contains the **Eve Online chat logs**.
-
-For doing so edit the **linuxSettings.json** file presents in the **EveIntelChecker Data** folder :
-```
-/home/YOUR_USERNAME/.local/share/EveIntelChecker/
-```
-
-I use the steam Eve Online client so in my case, the file content is :
-```
-{
-  "LinuxEveLogFolder": "/home/YOUR_USERNAME/.steam/steam/steamapps/compatdata/8500/pfx/drive_c/users/steamuser/Documents/EVE/logs/Chatlogs/"
-}
-```
-
 ### Select your current system
 
 Use the autocomplete form to select the system you're currently in. Press Enter to validate your selection.
