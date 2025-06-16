@@ -137,7 +137,7 @@ namespace EveIntelCheckerPages
             },
             Typography = new Typography()
             {
-                Default = new Default()
+                Default = new DefaultTypography()
                 {
                     FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }
                 }
@@ -580,6 +580,12 @@ namespace EveIntelCheckerPages
         private void TopMostChanged(bool newValue)
         {
             SettingsReader!.UserSettingsValues.WindowIsTopMost = newValue;
+            SettingsReader.WriteUserSettings();
+        }
+        
+        private void ClearResetCounterChanged(bool newValue)
+        {
+            SettingsReader!.UserSettingsValues.ClearResetCounter = newValue;
             SettingsReader.WriteUserSettings();
         }
 

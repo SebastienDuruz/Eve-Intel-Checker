@@ -1,4 +1,6 @@
-﻿namespace EveIntelCheckerLib.Models
+﻿using System.Collections.Generic;
+
+namespace EveIntelCheckerLib.Models
 {
     /// <summary>
     /// Class UserSettings
@@ -69,6 +71,16 @@
         /// Compact mode is the default display mode, if set to false display a Node graph
         /// </summary>
         public bool CompactMode { get; set; } = true;
+
+        /// <summary>
+        /// Auto clear the counter of a system if message contains the system and a filter
+        /// </summary>
+        public bool ClearResetCounter { get; set; } = true;
+
+        /// <summary>
+        /// Default filters active when ClearResetCounter is set
+        /// </summary>
+        public List<string> ExcludeFilters { get; set; } = new List<string>() { "Clr", "Clear" };
 
         /// <summary>
         /// Using an alternate color scheme for accessibility usage
