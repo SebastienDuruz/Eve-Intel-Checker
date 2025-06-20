@@ -80,7 +80,7 @@ namespace EveIntelCheckerLib.Models
         /// <summary>
         /// Default filters active when ClearResetCounter is set
         /// </summary>
-        public List<string> ExcludeFilters { get; set; } = new List<string>() { "Clr", "Clear" };
+        public List<string> ExcludeFilters { get; set; } = new List<string>() { "clr", "clear" };
 
         /// <summary>
         /// Using an alternate color scheme for accessibility usage

@@ -40,7 +40,6 @@ namespace EveIntelCheckerLib.Data
             FilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), $"userSettings{identifier}.json");
             CopyLogFolderPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), StaticData.EvelogsCopyFolderName);
 
-            UserSettingsValues = new UserSettings();
             ReadUserSettings();
         }
 
@@ -61,8 +60,8 @@ namespace EveIntelCheckerLib.Data
                     LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
 
                     // Reset the settings by recreating a file
-                    WriteUserSettings();
                     UserSettingsValues = new UserSettings();
+                    WriteUserSettings();
                 }
             }
             else
