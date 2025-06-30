@@ -333,17 +333,29 @@ namespace EveIntelCheckerPages
             foreach (IntelSystem intelSystem in IntelSystems)
                 if (ChatLogFile.LastLogFileMessage.Contains(intelSystem.SystemName))
                 {
-                    intelSystem.IsRed = true;
+                    // Check for exclude filters
+                    if (SettingsReader.UserSettingsValues.ClearResetCounter 
+                        && SettingsReader.UserSettingsValues.ExcludeFilters.Any(
+                            filter => ChatLogFile.LastLogFileMessage.Contains(filter))
+                        )
+                    {
+                        intelSystem.IsRed = false;
+                        intelSystem.TriggerCounter = 0;
+                    }
+                    else
+                    {
+                        intelSystem.IsRed = true;
 
-                    // Play specific sounds if needed by the user settings
-                    if (intelSystem.Jumps < SettingsReader!.UserSettingsValues.IgnoreNotification &&
-                        intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
-                        PlayNotificationSound(true);
-                    else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
-                             intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
-                        PlayNotificationSound(false);
+                        // Play specific sounds if needed by the user settings
+                        if (intelSystem.Jumps < SettingsReader!.UserSettingsValues.IgnoreNotification &&
+                            intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
+                            PlayNotificationSound(true);
+                        else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
+                                 intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
+                            PlayNotificationSound(false);
 
-                    ++intelSystem.TriggerCounter;
+                        ++intelSystem.TriggerCounter;
+                    }
                     newRedSystem = intelSystem.SystemName;
                 }
 

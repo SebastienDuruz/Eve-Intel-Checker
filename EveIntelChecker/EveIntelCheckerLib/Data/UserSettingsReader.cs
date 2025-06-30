@@ -31,9 +31,6 @@ namespace EveIntelCheckerLib.Data
         /// <param name="identifier">The prefix to identify the setting file</param>
         public UserSettingsReader(string identifier)
         {
-            if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName)))
-                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName));
-
             if (!Directory.Exists(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), StaticData.EvelogsCopyFolderName)))
                 Directory.CreateDirectory(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), StaticData.ApplicationName), StaticData.EvelogsCopyFolderName));
 
