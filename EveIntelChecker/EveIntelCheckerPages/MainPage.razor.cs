@@ -250,11 +250,23 @@ namespace EveIntelCheckerPages
         /// </summary>
         /// <param name="value">System name to search</param>
         /// <returns>DB object with sytem informations</returns>
-        private async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value, CancellationToken cancellationToken = new CancellationToken())
+        private static async Task<IEnumerable<MapSolarSystem>>? SearchSystem(string value, CancellationToken cancellationToken = new ())
         {
-            if (string.IsNullOrEmpty(value))
-                return new List<MapSolarSystem>();
-            return EveStaticDatabase.Instance.SolarSystems.Where(x => x.SolarSystemName.Contains(value, StringComparison.InvariantCultureIgnoreCase) || x.SolarSystemID.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            if (string.IsNullOrWhiteSpace(value))
+                return [];
+            
+            return await Task.Run(() =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                List<MapSolarSystem> systems = EveStaticDatabase.Instance.SolarSystems
+                    .Where(x =>
+                        x.SolarSystemName.Contains(value, StringComparison.InvariantCultureIgnoreCase) ||
+                        x.SolarSystemID.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                    .ToList();
+
+                return systems.AsEnumerable();
+            }, cancellationToken);
         }
 
         /// <summary>
@@ -302,13 +314,13 @@ namespace EveIntelCheckerPages
                     {
                         // Execute the main process by reading last line of the logfile
                         IEnumerable<string> lines = File.ReadLines(ChatLogFile.CopyLogFileFullPath);
-                        if (lines.Any())
-                            if (lines.Last() != ChatLogFile.LastLogFileMessage)
-                            {
-                                ChatLogFile.LastLogFileMessage = lines.Last();
-                                await CheckSystemProximity();
-                                await ExtractTimeFromMessage(ChatLogFile.LastLogFileMessage);
-                            }
+                        string last = lines.Last();
+                        if (last != ChatLogFile.LastLogFileMessage)
+                        {
+                            ChatLogFile.LastLogFileMessage = last;
+                            await CheckSystemProximity();
+                            await ExtractTimeFromMessage(ChatLogFile.LastLogFileMessage);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -645,7 +657,7 @@ namespace EveIntelCheckerPages
             SettingsReader!.UserSettingsValues.NotificationVolume = newValue;
             SettingsReader.WriteUserSettings();
             await SoundPlayer.SetPlayersVolume(SettingsReader.UserSettingsValues.NotificationVolume);
-            SoundPlayer.PlaySound(true, WindowSpecificSuffix!); // We don't want to wait for this call, weird but it works !
+            await SoundPlayer.PlaySound(true, WindowSpecificSuffix!); // We don't want to wait for this call, weird but it works !
         }
 
         #endregion Settings
@@ -699,16 +711,14 @@ namespace EveIntelCheckerPages
                         IntelSystem systemToConnect = IntelSystems.FirstOrDefault(x => x.SystemId == link)!;
 
                         // Only if system is still on the generation
-                        if (systemToConnect != null)
-                        {
-                            systemLink.To = mapNodes.FirstOrDefault(x => x.Label.Contains(systemToConnect.SystemName))!.Id;
-                            if (!mapLinks.Exists(x => x.From == systemLink.From && x.To == systemLink.To) &&
-                                !mapLinks.Exists(x => x.From == systemLink.To && x.To == systemLink.From))
-                                mapLinks.Add(systemLink);
-                        }
+                        systemLink.To = mapNodes.FirstOrDefault(x => x.Label.Contains(systemToConnect.SystemName))!.Id;
+                        if (!mapLinks.Exists(x => x.From == systemLink.From && x.To == systemLink.To) &&
+                            !mapLinks.Exists(x => x.From == systemLink.To && x.To == systemLink.From))
+                            mapLinks.Add(systemLink);
                     }
-                    catch
+                    catch(Exception ex)
                     {
+                        LogsWriter.Instance.Log(StaticData.LogLevel.Error, ex.Message);
                     }
                 }
             }

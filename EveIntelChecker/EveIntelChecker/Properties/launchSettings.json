@@ -1,10 +1,17 @@
 {
   "profiles": {
-    "Electron.NET App": {
+    "Electron.NET App Windows": {
       "commandName": "Executable",
       "executablePath": "electronize",
       "commandLineArgs": "start",
       "workingDirectory": "C:\\Users\\sebdu\\Documents\\GitHub\\Eve-Intel-Checker\\EveIntelChecker\\EveIntelChecker",
+      "nativeDebugging": false
+    },
+    "Electron.NET App Linux": {
+      "commandName": "Executable",
+      "executablePath": "/home/smour/.dotnet/tools/electronize",
+      "commandLineArgs": "start",
+      "workingDirectory": "/home/smour/Documents/GitHub/Eve-Intel-Checker/EveIntelChecker/EveIntelChecker",
       "nativeDebugging": false
     },
     "EveIntelCheckerElectron": {

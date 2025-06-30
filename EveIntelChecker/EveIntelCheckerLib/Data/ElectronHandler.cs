@@ -15,22 +15,22 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// Reader for the Settings json file for MainWindow
         /// </summary>
-        public static UserSettingsReader MainSettingsReader { get; set; }
+        public static UserSettingsReader? MainSettingsReader { get; set; }
 
         /// <summary>
         /// Reader for the Settings json file for SecondaryWindow
         /// </summary>
-        public static UserSettingsReader SecondarySettingsReader { get; set; }
+        public static UserSettingsReader? SecondarySettingsReader { get; set; }
 
         /// <summary>
         /// Main App Window
         /// </summary>
-        private static BrowserWindow MainWindow { get; set; }
+        private static BrowserWindow? MainWindow { get; set; }
 
         /// <summary>
         /// Secondary App Window
         /// </summary>
-        private static BrowserWindow SecondaryWindow { get; set; }
+        private static BrowserWindow? SecondaryWindow { get; set; }
 
         /// <summary>
         /// State of the Secondary Window
@@ -96,7 +96,7 @@ namespace EveIntelCheckerLib.Data
                     Frame = false,
                     UseContentSize = true,
                     Focusable = true,
-                    AlwaysOnTop = MainSettingsReader.UserSettingsValues.WindowIsTopMost,
+                    AlwaysOnTop = MainSettingsReader!.UserSettingsValues.WindowIsTopMost,
                     MinHeight = 100,
                     Height = MainSettingsReader.UserSettingsValues.WindowHeight,
                     MinWidth = 210,
@@ -122,7 +122,7 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         private static void MainWindowOnOnReadyToShow()
         {
-            MainWindow.Show();
+            MainWindow!.Show();
             if (IsFirstShow)
             {
                 MainWindow.Reload();
@@ -136,9 +136,9 @@ namespace EveIntelCheckerLib.Data
         public static async void CloseMainWindow()
         {
             // Save the current state of the mainWindow
-            int[] mainWindowSize = await MainWindow.GetSizeAsync();
+            int[] mainWindowSize = await MainWindow!.GetSizeAsync();
             int[] mainWindowPosition = await MainWindow.GetPositionAsync();
-            MainSettingsReader.UserSettingsValues.WindowWidth = mainWindowSize[0] - 14;
+            MainSettingsReader!.UserSettingsValues.WindowWidth = mainWindowSize[0] - 14;
             MainSettingsReader.UserSettingsValues.WindowHeight = mainWindowSize[1] - 8;
             MainSettingsReader.UserSettingsValues.WindowLeft = mainWindowPosition[0] + 7;
             MainSettingsReader.UserSettingsValues.WindowTop = mainWindowPosition[1];
@@ -148,7 +148,7 @@ namespace EveIntelCheckerLib.Data
             if (SecondaryWindowInstanced)
             {
                 await SaveSecondaryWindowSettings();
-                SecondaryWindow.Close();
+                SecondaryWindow!.Close();
             }
 
             // Close the windows before exiting the app
@@ -164,9 +164,9 @@ namespace EveIntelCheckerLib.Data
         private static async Task SaveSecondaryWindowSettings()
         {
             // Save the current state of the secondaryWindow
-            int[] secondaryContentSize = await SecondaryWindow.GetSizeAsync();
+            int[] secondaryContentSize = await SecondaryWindow!.GetSizeAsync();
             int[] secondaryWindowPosition = await SecondaryWindow.GetPositionAsync();
-            SecondarySettingsReader.UserSettingsValues.WindowWidth = secondaryContentSize[0] - 14;
+            SecondarySettingsReader!.UserSettingsValues.WindowWidth = secondaryContentSize[0] - 14;
             SecondarySettingsReader.UserSettingsValues.WindowHeight = secondaryContentSize[1] - 8;
             SecondarySettingsReader.UserSettingsValues.WindowLeft = secondaryWindowPosition[0] + 7;
             SecondarySettingsReader.UserSettingsValues.WindowTop = secondaryWindowPosition[1];
@@ -181,14 +181,14 @@ namespace EveIntelCheckerLib.Data
             if (SecondaryWindowOpened)
             {
                 await SaveSecondaryWindowSettings();
-                SecondaryWindow.Hide();
+                SecondaryWindow!.Hide();
                 SecondaryWindowOpened = false;
             }
             else
             {
                 if (SecondaryWindowInstanced)
                 {
-                    SecondaryWindow.Show();
+                    SecondaryWindow!.Show();
                     SecondaryWindowOpened = true;
                 }
                 else
@@ -200,7 +200,7 @@ namespace EveIntelCheckerLib.Data
                             Frame = false,
                             UseContentSize = true,
                             Focusable = true,
-                            AlwaysOnTop = SecondarySettingsReader.UserSettingsValues.WindowIsTopMost,
+                            AlwaysOnTop = SecondarySettingsReader!.UserSettingsValues.WindowIsTopMost,
                             MinHeight = 100,
                             Height = SecondarySettingsReader.UserSettingsValues.WindowHeight,
                             MinWidth = 210,
@@ -232,13 +232,13 @@ namespace EveIntelCheckerLib.Data
             // check Windows positions
             foreach (Display display in displays)
             {
-                if (display.Bounds.X <= MainSettingsReader.UserSettingsValues.WindowLeft
+                if (display.Bounds.X <= MainSettingsReader!.UserSettingsValues.WindowLeft
                     && display.Bounds.X + display.Bounds.Width >= MainSettingsReader.UserSettingsValues.WindowLeft
                     && display.Bounds.Y <= MainSettingsReader.UserSettingsValues.WindowHeight
                     && display.Bounds.Y + display.Bounds.Height >= MainSettingsReader.UserSettingsValues.WindowTop)
                     mainWindowPositionIsValid = true;
 
-                if (display.Bounds.X <= SecondarySettingsReader.UserSettingsValues.WindowLeft
+                if (display.Bounds.X <= SecondarySettingsReader!.UserSettingsValues.WindowLeft
                     && display.Bounds.X + display.Bounds.Width >= SecondarySettingsReader.UserSettingsValues.WindowLeft
                     && display.Bounds.Y <= SecondarySettingsReader.UserSettingsValues.WindowHeight
                     && display.Bounds.Y + display.Bounds.Height >= SecondarySettingsReader.UserSettingsValues.WindowTop)
@@ -248,7 +248,7 @@ namespace EveIntelCheckerLib.Data
             // Reset the position values for MainWindow
             if (!mainWindowPositionIsValid)
             {
-                MainSettingsReader.UserSettingsValues.WindowLeft = 100;
+                MainSettingsReader!.UserSettingsValues.WindowLeft = 100;
                 MainSettingsReader.UserSettingsValues.WindowTop = 100;
                 MainSettingsReader.WriteUserSettings();
             }
@@ -256,7 +256,7 @@ namespace EveIntelCheckerLib.Data
             // Reset the position values for SecondaryWindow
             if (!secondaryWindowPositionIsValid)
             {
-                SecondarySettingsReader.UserSettingsValues.WindowLeft = 100;
+                SecondarySettingsReader!.UserSettingsValues.WindowLeft = 100;
                 SecondarySettingsReader.UserSettingsValues.WindowTop = 100;
                 SecondarySettingsReader.WriteUserSettings();
             }
@@ -272,7 +272,7 @@ namespace EveIntelCheckerLib.Data
         public static async Task<string> OpenFileDialog()
         {
             // Set the default path, if not already set or exists -> default is documents
-            string defaultPath = MainSettingsReader.UserSettingsValues.LogFilesFolder == "" ? SpecialDirectories.MyDocuments : MainSettingsReader.UserSettingsValues.LogFilesFolder;
+            string defaultPath = MainSettingsReader!.UserSettingsValues.LogFilesFolder == "" ? SpecialDirectories.MyDocuments : MainSettingsReader.UserSettingsValues.LogFilesFolder;
             if(!Directory.Exists(defaultPath))
                 defaultPath = SpecialDirectories.MyDocuments;
 

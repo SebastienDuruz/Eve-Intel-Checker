@@ -110,9 +110,9 @@
                                     <MudText Class="flex-shrink-1 align-content-center align-center" Typo="Typo.body2" Align="Align.Justify">@system.SystemName</MudText>
                                 </ActivatorContent>
                                 <ChildContent>
-                                    <MudMenuItem OnClick="() => OpenURL(zKillboardUrl)">ZKillboard</MudMenuItem>
-                                    <MudMenuItem OnClick="() => OpenURL(dotlanUrl)">Dotlan</MudMenuItem>
-                                    <MudMenuItem OnClick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
+                                    <MudMenuItem @onclick="() => OpenURL(zKillboardUrl)">ZKillboard</MudMenuItem>
+                                    <MudMenuItem @onclick="() => OpenURL(dotlanUrl)">Dotlan</MudMenuItem>
+                                    <MudMenuItem @onclick="() => UpdateRootSystem(system)">Set as Root</MudMenuItem>
                                 </ChildContent>
                             </MudMenu>
                             <MudText Typo="Typo.body2">@system.TriggerCounter</MudText>
