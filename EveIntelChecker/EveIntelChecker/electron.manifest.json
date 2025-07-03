@@ -12,8 +12,8 @@
   "build": {
     "appId": "com.EveIntelChecker.app",
     "productName": "EveIntelChecker",
-    "copyright": "Copyright © 2024",
-    "buildVersion": "1.0.12",
+    "copyright": "Copyright © 2025",
+    "buildVersion": "1.0.13",
     "compression": "normal",
     "win": {
       "icon": "../../../bin/Desktop/win-unpacked/resources/bin/EveIntelChecker_logo.ico"
