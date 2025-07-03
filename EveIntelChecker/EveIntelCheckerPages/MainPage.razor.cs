@@ -94,12 +94,12 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Set to true if Settings panel is open
         /// </summary>
-        private bool SettingsPageOpened { get; set; } = false;
+        private bool SettingsPageOpened { get; set; }
 
         /// <summary>
         /// Define if a settings as been changed by user (recreate or not the Systems list)
         /// </summary>
-        private bool SettingsChanged { get; set; } = false;
+        private bool SettingsChanged { get; set; }
 
         /// <summary>
         /// Object that contains the build data ready to be used by JS (building the map)
@@ -109,12 +109,12 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Set to true if settings panel just closed
         /// </summary>
-        private bool MapRebuildRequired { get; set; } = false;
+        private bool MapRebuildRequired { get; set; }
 
         /// <summary>
         /// Main theme for MudBlazor
         /// </summary>
-        private readonly MudTheme _mainTheme = new MudTheme()
+        private readonly MudTheme _mainTheme = new ()
         {
             PaletteDark = new PaletteDark()
             {
@@ -235,7 +235,7 @@ namespace EveIntelCheckerPages
                 // Select the system if it exists in the DB
                 if (!string.IsNullOrWhiteSpace(SettingsReader.UserSettingsValues.LastSelectedSystem)
                     && EveStaticDatabase.Instance.SolarSystems.Exists(x =>
-                        x!.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
+                        x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem))
                 {
                     SolarSystemSelector.Value = EveStaticDatabase.Instance.SolarSystems.Where(x =>
                         x.SolarSystemName == SettingsReader.UserSettingsValues.LastSelectedSystem).First();
@@ -249,8 +249,9 @@ namespace EveIntelCheckerPages
         /// SearchSystem event
         /// </summary>
         /// <param name="value">System name to search</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>DB object with sytem informations</returns>
-        private static async Task<IEnumerable<MapSolarSystem>>? SearchSystem(string value, CancellationToken cancellationToken = new ())
+        private static async Task<IEnumerable<MapSolarSystem>> SearchSystem(string value, CancellationToken cancellationToken = new ())
         {
             if (string.IsNullOrWhiteSpace(value))
                 return [];
@@ -346,7 +347,7 @@ namespace EveIntelCheckerPages
                 if (ChatLogFile.LastLogFileMessage.Contains(intelSystem.SystemName))
                 {
                     // Check for exclude filters
-                    if (SettingsReader.UserSettingsValues.ClearResetCounter 
+                    if (SettingsReader!.UserSettingsValues.ClearResetCounter 
                         && SettingsReader.UserSettingsValues.ExcludeFilters.Any(
                             filter => ChatLogFile.LastLogFileMessage.Contains(filter))
                         )
@@ -376,9 +377,8 @@ namespace EveIntelCheckerPages
             {
                 LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"New trigger in : {newRedSystem}");
 
-                foreach (IntelSystem intelSystem in IntelSystems)
-                    if (intelSystem.SystemName != newRedSystem)
-                        intelSystem.IsRed = false;
+                foreach (IntelSystem intelSystem in IntelSystems.Where(intelSystem => intelSystem.SystemName != newRedSystem))
+                    intelSystem.IsRed = false;
 
                 // rebuild the systems data for StarMap
                 if (!SettingsReader!.UserSettingsValues.CompactMode)
@@ -399,12 +399,11 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task ResetTriggers()
         {
-            if (IntelSystems != null)
-                foreach (IntelSystem system in IntelSystems)
-                {
-                    system.TriggerCounter = 0;
-                    system.IsRed = false;
-                }
+            foreach (IntelSystem system in IntelSystems)
+            {
+                system.TriggerCounter = 0;
+                system.IsRed = false;
+            }
 
             MapSystemsData = BuildMapNodes();
             if (!SettingsReader!.UserSettingsValues.CompactMode)
@@ -696,7 +695,7 @@ namespace EveIntelCheckerPages
                 mapNodes[i].Font.Multi = true;
                 mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n<code>J:{IntelSystems[i].Jumps} T:{IntelSystems[i].TriggerCounter}</code>";
                 mapNodes[i].Id = i + 1;
-                mapNodes[i].System = IntelSystems[i].SystemName!;
+                mapNodes[i].System = IntelSystems[i].SystemName;
             }
 
             foreach (IntelSystem system in IntelSystems)
@@ -763,7 +762,7 @@ namespace EveIntelCheckerPages
         }
 
         /// <summary>
-        /// From the path of the log file, build the necessary informations to use a logfile
+        /// From the path of the log file, build the necessary information to use a logfile
         /// </summary>
         /// <param name="logFileFullPath"></param>
         private void SetLogFile(string logFileFullPath)
@@ -780,7 +779,7 @@ namespace EveIntelCheckerPages
                 if (SettingsReader != null)
                 {
                     SettingsReader.UserSettingsValues.LastLogFile = logFileFullPath;
-                    SettingsReader.UserSettingsValues.LogFilesFolder = Path.GetDirectoryName(logFileFullPath);
+                    SettingsReader.UserSettingsValues.LogFilesFolder = Path.GetDirectoryName(logFileFullPath)!;
                     SettingsReader.WriteUserSettings();
                 }
 
