@@ -208,7 +208,7 @@ namespace EveIntelCheckerLib.Data
                             X = SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = SecondarySettingsReader.UserSettingsValues.WindowTop,
                         });
-                    SecondaryWindow.LoadURL($"http://localhost:{3969}/secondary");
+                    SecondaryWindow.LoadURL($"http://localhost:{StaticData.ApplicationPort}/secondary");
 
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);

@@ -8,7 +8,7 @@ public static class StaticData
     /// <summary>
     /// The port used by the application
     /// </summary>
-    public static int ApplicationPort { get; set; } = 3969;
+    public static int ApplicationPort { get; set; } = 6968;
 
     /// <summary>
     /// The interval between each log file read

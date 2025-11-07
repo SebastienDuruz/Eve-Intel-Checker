@@ -5,14 +5,14 @@
       "executablePath": "electronize",
       "commandLineArgs": "start",
       "workingDirectory": "C:\\Users\\sebdu\\Documents\\GitHub\\Eve-Intel-Checker\\EveIntelChecker\\EveIntelChecker",
-      "nativeDebugging": false
+      "nativeDebugging": true
     },
     "Electron.NET App Linux": {
       "commandName": "Executable",
       "executablePath": "/home/smour/.dotnet/tools/electronize",
       "commandLineArgs": "start",
       "workingDirectory": "/home/smour/Documents/GitHub/Eve-Intel-Checker/EveIntelChecker/EveIntelChecker",
-      "nativeDebugging": false
+      "nativeDebugging": true
     },
     "EveIntelCheckerElectron": {
       "commandName": "Project",
@@ -21,7 +21,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:3969"
+      "applicationUrl": "http://localhost:6968"
     },
     "IIS Express": {
       "commandName": "IISExpress",
