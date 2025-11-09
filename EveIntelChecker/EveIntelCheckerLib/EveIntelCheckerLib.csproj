@@ -31,7 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ElectronNET.API" Version="23.6.2" />
+    <PackageReference Include="ElectronNET.Core" Version="0.1.0-pre.163" />
+    <PackageReference Include="ElectronNET.Core.API" Version="0.1.0-pre.163" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.0" />
     <PackageReference Include="NetCoreAudio" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

@@ -3,10 +3,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>EveIntelCheckerElectron</RootNamespace>
     <LangVersion>latestmajor</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="ElectronNET.Core" Version="0.1.0-pre.163" />
+    <PackageReference Include="ElectronNET.Core.API" Version="0.1.0-pre.163" />
+    <PackageReference Include="ElectronNET.Core.AspNet" Version="0.0.18" />
     <PackageReference Include="MudBlazor" Version="8.7.0" />
   </ItemGroup>
   <ItemGroup>

@@ -5,12 +5,11 @@ using MudBlazor.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.UseElectron(args, ElectronAppReady);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 builder.Services.AddSingleton(new CustomSoundPlayer("notif_1.wav", "danger_1.wav", "notif_2.wav", "danger_2.wav"));
-
-builder.WebHost.UseElectron(args);
 builder.WebHost.UseUrls($"http://localhost:{StaticData.ApplicationPort}");
 
 var app = builder.Build();
@@ -41,3 +40,12 @@ if (HybridSupport.IsElectronActive)
     }
 
 app.Run();
+
+static async Task ElectronAppReady()
+{
+    await ElectronHandler.CreateElectronWindow();
+    // var browserWindow = await Electron.WindowManager.CreateWindowAsync(
+    //     new BrowserWindowOptions { Show = false });
+    //
+    // browserWindow.OnReadyToShow += () => browserWindow.Show();
+}

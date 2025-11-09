@@ -1,0 +1,15 @@
+{
+  "linux": {
+    "target": [
+      "tar.xz"
+    ]
+  },
+  "win": {
+    "target": [
+      {
+        "target": "portable",
+        "arch": "x64"
+      }
+    ]
+  }
+}
