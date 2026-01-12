@@ -1,4 +1,5 @@
-﻿using ElectronNET.API;
+﻿using ElectronNET;
+using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.VisualBasic.FileIO;
 using System;
@@ -104,6 +105,7 @@ namespace EveIntelCheckerLib.Data
                     X = MainSettingsReader.UserSettingsValues.WindowLeft,
                     Y = MainSettingsReader.UserSettingsValues.WindowTop,
                     Title = "Eve Intel Checker",
+                    IsRunningBlazor = true,
                 });
 
             // Clear cache to prevent old JS file to not update
@@ -207,8 +209,9 @@ namespace EveIntelCheckerLib.Data
                             Width = SecondarySettingsReader.UserSettingsValues.WindowWidth,
                             X = SecondarySettingsReader.UserSettingsValues.WindowLeft,
                             Y = SecondarySettingsReader.UserSettingsValues.WindowTop,
+                            IsRunningBlazor = true,
                         });
-                    SecondaryWindow.LoadURL($"http://localhost:{StaticData.ApplicationPort}/secondary");
+                    SecondaryWindow.LoadURL($"{GetAppUrl()}/secondary");
 
                     SecondaryWindow.OnReadyToShow += () => SecondaryWindow.Show();
                     SecondaryWindow.OnBlur += () => SecondaryWindow.SetAlwaysOnTop(SecondarySettingsReader.UserSettingsValues.WindowIsTopMost);
@@ -292,6 +295,12 @@ namespace EveIntelCheckerLib.Data
 
             LogsWriter.Instance.Log(StaticData.LogLevel.Info, "Logfile path is empty");
             return string.Empty;
+        }
+
+        private static string GetAppUrl()
+        {
+            int port = ElectronNetRuntime.AspNetWebPort ?? StaticData.ApplicationPort;
+            return $"http://localhost:{port}";
         }
     }
 }

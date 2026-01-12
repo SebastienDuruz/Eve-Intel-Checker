@@ -5,12 +5,12 @@ using MudBlazor.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.UseElectron(args, ElectronAppReady);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+builder.Services.AddElectron();
 builder.Services.AddSingleton(new CustomSoundPlayer("notif_1.wav", "danger_1.wav", "notif_2.wav", "danger_2.wav"));
-builder.WebHost.UseUrls($"http://localhost:{StaticData.ApplicationPort}");
+builder.UseElectron(args, ElectronAppReady);
 
 var app = builder.Build();
 
@@ -29,20 +29,17 @@ app.MapFallbackToPage("/_Host");
 // Set a limit to MALLOC_TRIM (reduce RAM usage on Linux)
 Environment.SetEnvironmentVariable("MALLOC_TRIM_THRESHOLD_", "100000");
 
-// Support Electron
-if (HybridSupport.IsElectronActive)
-    if (ElectronHandler.SetupSettings())
-        await ElectronHandler.CreateElectronWindow();
-    else
-    {
-        LogsWriter.Instance.Log(StaticData.LogLevel.Error, "Failed to setup the settings. The application will be closed.");
-        Electron.App.Exit();
-    }
-
 app.Run();
 
 static async Task ElectronAppReady()
 {
+    if (!ElectronHandler.SetupSettings())
+    {
+        LogsWriter.Instance.Log(StaticData.LogLevel.Error, "Failed to setup the settings. The application will be closed.");
+        Electron.App.Exit();
+        return;
+    }
+
     await ElectronHandler.CreateElectronWindow();
     // var browserWindow = await Electron.WindowManager.CreateWindowAsync(
     //     new BrowserWindowOptions { Show = false });

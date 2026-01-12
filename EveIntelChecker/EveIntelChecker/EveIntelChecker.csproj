@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latestmajor</LangVersion>
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ElectronNET.Core" Version="0.4.0" />
@@ -15,9 +16,6 @@
     <ProjectReference Include="..\EveIntelCheckerPages\EveIntelCheckerPages.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="electron.manifest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Update="wwwroot\js\buildGraph.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
