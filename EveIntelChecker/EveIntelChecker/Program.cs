@@ -2,7 +2,12 @@ using ElectronNET.API;
 using EveIntelCheckerLib.Data;
 using MudBlazor.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+{
+    Args = args,
+    ContentRootPath = AppContext.BaseDirectory
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();

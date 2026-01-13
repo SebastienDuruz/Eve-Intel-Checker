@@ -93,7 +93,6 @@ namespace EveIntelCheckerLib.Data
                 new BrowserWindowOptions()
                 {
                     Icon = "appIcon.ico",
-                    AutoHideMenuBar = true,
                     Frame = false,
                     UseContentSize = true,
                     Focusable = true,
