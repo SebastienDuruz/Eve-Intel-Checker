@@ -1,7 +1,7 @@
+using ElectronNET;
 using ElectronNET.API;
 using EveIntelCheckerLib.Data;
 using MudBlazor.Services;
-
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
 {

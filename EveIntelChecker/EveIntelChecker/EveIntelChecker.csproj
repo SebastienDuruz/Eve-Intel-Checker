@@ -4,7 +4,17 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latestmajor</LangVersion>
-    <RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <PropertyGroup Label="ElectronNetCommon">
+    <ElectronVersion>30.4.0</ElectronVersion>
+    <ElectronBuilderVersion>26.0</ElectronBuilderVersion>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <ElectronSingleInstance>true</ElectronSingleInstance>
+    <ElectronIcon>wwwroot/img/EveIntelChecker_logo.png</ElectronIcon>
+    <ElectronPackageId>$(MSBuildProjectName.Replace(".", "-").ToLower())</ElectronPackageId>
+    <ElectronBuilderJson>electron-builder.json</ElectronBuilderJson>
+    <Title>$(MSBuildProjectName)</Title>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ElectronNET.Core" Version="0.4.0" />

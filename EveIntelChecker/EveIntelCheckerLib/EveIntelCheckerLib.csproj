@@ -35,6 +35,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.9" />
     <PackageReference Include="NetCoreAudio" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.Windows.Extensions" Version="10.0.1" />
+    <PackageReference Include="System.Windows.Extensions" Version="10.0.2" />
   </ItemGroup>
 </Project>
