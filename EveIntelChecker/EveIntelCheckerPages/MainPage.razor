@@ -67,15 +67,15 @@
                 <MudSlider Size="Size.Small" Value="SettingsReader.UserSettingsValues.NotificationVolume" ValueChanged="(int x) => NotificationVolumeChanged(x)" Immediate="false" Min="0" Max="100" Variant="Variant.Outlined" Step="1" Color="Color.Primary" ValueLabel="true" />
             </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.CompactMode" OnClick="(bool x) => CompactModeChanged(x)" Color="Color.Primary" />
+                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.CompactMode" OnClick="@((bool x) => CompactModeChanged(x))" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Compact mode</MudText>
             </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.WindowIsTopMost" OnClick="(bool x) => TopMostChanged(x)" Color="Color.Primary" />
+                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.WindowIsTopMost" OnClick="@((bool x) => TopMostChanged(x))" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Always on top</MudText>
             </div>
             <div class="d-flex justify-space-between align-center align-content-center">
-                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.ClearResetCounter" OnClick="(bool x) => ClearResetCounterChanged(x)" Color="Color.Primary" />
+                <MudSwitch @bind-Value="SettingsReader!.UserSettingsValues.ClearResetCounter" OnClick="@((bool x) => ClearResetCounterChanged(x))" Color="Color.Primary" />
                 <MudText Align="Align.Center" Typo="Typo.body2">Reset the counter on filters</MudText>
             </div>
         </div>

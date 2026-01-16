@@ -63,7 +63,6 @@ namespace EveIntelCheckerLib.Data
         /// <returns></returns>
         public async Task SetPlayersVolume(int volume)
         {
-            Console.WriteLine(Directory.GetCurrentDirectory());
             if (volume >= 0 && volume <= 100)
                 foreach (Player player in SoundPlayers)
                     await player.SetVolume((byte)volume);
