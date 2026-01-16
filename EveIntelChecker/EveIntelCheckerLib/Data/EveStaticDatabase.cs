@@ -104,16 +104,23 @@ namespace EveIntelCheckerLib.Data
         /// <returns>The list with systems to check</returns>
         public List<IntelSystem> BuildSystemsList(MapSolarSystem? root, int systemDepth)
         {
-            List<IntelSystem> intelSystems = [ConvertMapSytemToIntelSystem(root)];
+            if (root == null)
+                return new List<IntelSystem>();
+
+            List<IntelSystem> intelSystems = [ConvertMapSystemToIntelSystem(root)];
 
             for (int i = 0; i < systemDepth; ++i)
                 foreach (IntelSystem system in intelSystems.ToList())
                     foreach (long id in system.ConnectedSytemsId)
                         if (!intelSystems.Exists(x => x.SystemId == id))
                         {
-                            IntelSystem current = ConvertMapSytemToIntelSystem(SolarSystems.Where(x => x.SolarSystemID == id).First());
-                            current.Jumps = i + 1;
-                            intelSystems.Add(current);
+                            MapSolarSystem? mapSystem = SolarSystems.FirstOrDefault(x => x.SolarSystemID == id);
+                            if (mapSystem != null)
+                            {
+                                IntelSystem current = ConvertMapSystemToIntelSystem(mapSystem);
+                                current.Jumps = i + 1;
+                                intelSystems.Add(current);
+                            }
                         }
 
             return intelSystems;
@@ -124,10 +131,10 @@ namespace EveIntelCheckerLib.Data
         /// </summary>
         /// <param name="system">The DB object</param>
         /// <returns>The converted frontend object</returns>
-        private IntelSystem ConvertMapSytemToIntelSystem(MapSolarSystem? system)
+        private IntelSystem ConvertMapSystemToIntelSystem(MapSolarSystem system)
         {
             IntelSystem intelSystem = new IntelSystem();
-            intelSystem.SystemId = system!.SolarSystemID;
+            intelSystem.SystemId = system.SolarSystemID;
             intelSystem.SystemName = system.SolarSystemName;
 
             foreach (MapSolarSystemJump connection in SolarSystemJumps.Where(x => x.FromSolarSystemID == intelSystem.SystemId))

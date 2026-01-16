@@ -75,20 +75,17 @@ namespace EveIntelCheckerLib.Data
         /// <param name="sender">_1 or _2 (Primary or Secondary window ?)</param>
         public async Task PlaySound(bool isDanger, string sender)
         {
-            int index = sender switch
-            {
-                "_1" => 0,
-                "_2" => 3
-            };
+            bool isPrimary = sender != "_2";
+            int index = isPrimary ? 0 : 3;
 
-            if (sender == "_1")
+            if (isPrimary)
             {
                 if (!SoundPlayers[index].Playing)
                     await SoundPlayers[index].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
                 else if (!SoundPlayers[index + 1].Playing)
                     await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
                 else if (!SoundPlayers[index + 2].Playing)
-                    await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
+                    await SoundPlayers[index + 2].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
                 else
                     await SoundPlayers[index].Play(isDanger ? DangerAudioFilePath : NormalAudioFilePath);
             }
@@ -99,7 +96,7 @@ namespace EveIntelCheckerLib.Data
                 else if (!SoundPlayers[index + 1].Playing)
                     await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
                 else if (!SoundPlayers[index + 2].Playing)
-                    await SoundPlayers[index + 1].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
+                    await SoundPlayers[index + 2].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
                 else
                     await SoundPlayers[index].Play(isDanger ? DangerAudioFilePath2 : NormalAudioFilePath2);
             }

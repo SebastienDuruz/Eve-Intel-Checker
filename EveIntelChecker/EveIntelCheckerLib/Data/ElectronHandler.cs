@@ -134,7 +134,7 @@ namespace EveIntelCheckerLib.Data
         /// <summary>
         /// Save the application dimensions before closing the app
         /// </summary>
-        public static async void CloseMainWindow()
+        public static async Task CloseMainWindow()
         {
             // Save the current state of the mainWindow
             int[] mainWindowSize = await MainWindow!.GetSizeAsync();
@@ -236,13 +236,13 @@ namespace EveIntelCheckerLib.Data
             {
                 if (display.Bounds.X <= MainSettingsReader!.UserSettingsValues.WindowLeft
                     && display.Bounds.X + display.Bounds.Width >= MainSettingsReader.UserSettingsValues.WindowLeft
-                    && display.Bounds.Y <= MainSettingsReader.UserSettingsValues.WindowHeight
+                    && display.Bounds.Y <= MainSettingsReader.UserSettingsValues.WindowTop
                     && display.Bounds.Y + display.Bounds.Height >= MainSettingsReader.UserSettingsValues.WindowTop)
                     mainWindowPositionIsValid = true;
 
                 if (display.Bounds.X <= SecondarySettingsReader!.UserSettingsValues.WindowLeft
                     && display.Bounds.X + display.Bounds.Width >= SecondarySettingsReader.UserSettingsValues.WindowLeft
-                    && display.Bounds.Y <= SecondarySettingsReader.UserSettingsValues.WindowHeight
+                    && display.Bounds.Y <= SecondarySettingsReader.UserSettingsValues.WindowTop
                     && display.Bounds.Y + display.Bounds.Height >= SecondarySettingsReader.UserSettingsValues.WindowTop)
                     secondaryWindowPositionIsValid = true;
             }
