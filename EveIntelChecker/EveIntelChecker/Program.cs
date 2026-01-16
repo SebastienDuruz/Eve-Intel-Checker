@@ -1,6 +1,7 @@
 using ElectronNET;
 using ElectronNET.API;
 using EveIntelCheckerLib.Data;
+using EveIntelCheckerLib.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions());
@@ -11,6 +12,9 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 builder.Services.AddElectron();
 builder.Services.AddSingleton(new CustomSoundPlayer("notif_1.wav", "danger_1.wav", "notif_2.wav", "danger_2.wav"));
+builder.Services.AddScoped<ILogFileReader, LogFileReader>();
+builder.Services.AddSingleton<IIntelMessageProcessor, IntelMessageProcessor>();
+builder.Services.AddSingleton<IMapDataBuilder, MapDataBuilder>();
 builder.UseElectron(args, ElectronAppReady);
 
 var app = builder.Build();

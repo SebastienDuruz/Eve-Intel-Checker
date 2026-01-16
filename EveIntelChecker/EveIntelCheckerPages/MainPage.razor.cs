@@ -1,7 +1,7 @@
 ﻿using EveIntelCheckerLib.Data;
 using EveIntelCheckerLib.Models;
 using EveIntelCheckerLib.Models.Database;
-using EveIntelCheckerLib.Models.Map;
+using EveIntelCheckerLib.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
@@ -11,7 +11,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +32,24 @@ namespace EveIntelCheckerPages
         /// </summary>
         [Parameter]
         public UserSettingsReader? SettingsReader { get; set; }
+
+        /// <summary>
+        /// Log tailer service
+        /// </summary>
+        [Inject]
+        public ILogFileReader LogFileReader { get; set; } = default!;
+
+        /// <summary>
+        /// Intel message processor
+        /// </summary>
+        [Inject]
+        public IIntelMessageProcessor IntelMessageProcessor { get; set; } = default!;
+
+        /// <summary>
+        /// Map data builder
+        /// </summary>
+        [Inject]
+        public IMapDataBuilder MapDataBuilder { get; set; } = default!;
 
         /// <summary>
         /// The selected system (root)
@@ -61,31 +78,6 @@ namespace EveIntelCheckerPages
         /// Does a LogFile is currently loaded
         /// </summary>
         private bool LogFileLoaded { get; set; }
-
-        /// <summary>
-        /// Timer loop for reading the chat log file
-        /// </summary>
-        private PeriodicTimer? _readFileTimer;
-
-        /// <summary>
-        /// Cancellation for the log read loop
-        /// </summary>
-        private CancellationTokenSource? _readFileCts;
-
-        /// <summary>
-        /// Background task for the log read loop
-        /// </summary>
-        private Task? _readFileTask;
-
-        /// <summary>
-        /// Tracking for incremental logfile reads
-        /// </summary>
-        private long _logFilePosition;
-
-        /// <summary>
-        /// Encoding detected for the logfile
-        /// </summary>
-        private Encoding? _logFileEncoding;
 
         /// <summary>
         /// The informations about current chat LogFile
@@ -130,7 +122,7 @@ namespace EveIntelCheckerPages
         /// <summary>
         /// Object that contains the build data ready to be used by JS (building the map)
         /// </summary>
-        private (MapNode[], MapLink[]) MapSystemsData { get; set; } = (Array.Empty<MapNode>(), Array.Empty<MapLink>());
+        private MapData MapDataState { get; set; } = MapData.Empty;
 
         /// <summary>
         /// Set to true if settings panel just closed
@@ -181,15 +173,12 @@ namespace EveIntelCheckerPages
             if (SettingsReader == null)
                 SettingsReader = new UserSettingsReader("web");
 
+            LogFileReader.LineRead += OnLogLineRead;
+            LogFileReader.Tick += OnLogTick;
+
             SetDefaultChatLogFileFolders();
             LoadUserSettingsLastLog();
         }
-
-        /// <summary>
-        /// Handler for logfile reading process
-        /// </summary>
-        /// <param name="source">Source object</param>
-        /// <param name="e">Event Args</param>
         /// <summary>
         /// Execute JS routines after render is done
         /// </summary>
@@ -199,7 +188,8 @@ namespace EveIntelCheckerPages
         {
             if (firstRender)
             {
-                StartLogReaderLoop();
+                await LogFileReader.StartAsync(StaticData.ReadLogInterval);
+                UpdateLogReaderState();
 
                 await SoundPlayer.SetPlayersVolume(SettingsReader!.UserSettingsValues.NotificationVolume);
             }
@@ -208,7 +198,7 @@ namespace EveIntelCheckerPages
             {
                 if (firstRender || MapRebuildRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("buildMap", [MapSystemsData.Item1, MapSystemsData.Item2]);
+                    await JsRuntime.InvokeVoidAsync("buildMap", [MapDataState.Nodes, MapDataState.Links]);
 
                     // Reset the value, avoiding rebuild at every rendering
                     MapRebuildRequired = false;
@@ -218,113 +208,68 @@ namespace EveIntelCheckerPages
         }
 
         /// <summary>
-        /// Start the periodic log reader loop
+        /// Log tailer new line handler
         /// </summary>
-        private void StartLogReaderLoop()
+        private void OnLogLineRead(object? sender, string line)
         {
-            if (_readFileTimer != null)
-                return;
-
-            _readFileCts = new CancellationTokenSource();
-            _readFileTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(StaticData.ReadLogInterval));
-            _readFileTask = Task.Run(() => ReadLogLoopAsync(_readFileCts.Token));
+            FireAndForget(InvokeAsync(() => HandleLogLineAsync(line)), "HandleLogLine");
         }
 
         /// <summary>
-        /// Stop the periodic log reader loop
+        /// Log tailer tick handler
         /// </summary>
-        private async Task StopLogReaderLoopAsync()
+        private void OnLogTick(object? sender, EventArgs e)
         {
-            if (_readFileCts == null || _readFileTimer == null || _readFileTask == null)
-                return;
-
-            _readFileCts.Cancel();
-            _readFileTimer.Dispose();
-
-            try
-            {
-                await _readFileTask;
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected on cancellation
-            }
-            catch (Exception ex)
-            {
-                LogsWriter.Instance.Log(StaticData.LogLevel.Warning, ex.Message);
-            }
-
-            _readFileCts.Dispose();
-            _readFileCts = null;
-            _readFileTimer = null;
-            _readFileTask = null;
+            FireAndForget(InvokeAsync(CheckNewLogFile), "CheckNewLogFile");
         }
 
         /// <summary>
-        /// Background loop that periodically reads new log lines
+        /// Handle a new log line
         /// </summary>
-        private async Task ReadLogLoopAsync(CancellationToken token)
+        private async Task HandleLogLineAsync(string line)
         {
-            try
+            if (!LogFileLoaded || IntelSystems.Count == 0 || SettingsReader == null)
+                return;
+
+            if (line == ChatLogFile.LastLogFileMessage)
+                return;
+
+            ChatLogFile.LastLogFileMessage = line;
+
+            IntelMessageResult result = IntelMessageProcessor.Process(line, IntelSystems, SettingsReader.UserSettingsValues);
+            foreach (IntelNotification notification in result.Notifications)
+                PlayNotificationSound(notification.IsDanger);
+
+            if (!string.IsNullOrWhiteSpace(result.NewRedSystemName))
             {
-                while (await _readFileTimer!.WaitForNextTickAsync(token))
+                LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"New trigger in : {result.NewRedSystemName}");
+
+                if (!SettingsReader.UserSettingsValues.CompactMode)
                 {
-                    try
-                    {
-                        await ReadLogFileAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        LogsWriter.Instance.Log(StaticData.LogLevel.Error, $"{WindowSpecificSuffix} {ex.Message}");
-                    }
+                    MapDataState = MapDataBuilder.Build(IntelSystems);
+                    await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapDataState.Nodes });
+                }
+                else
+                {
+                    StateHasChanged();
                 }
             }
-            catch (OperationCanceledException)
-            {
-                // Expected on cancellation
-            }
-            catch (ObjectDisposedException)
-            {
-                // Timer disposed while waiting
-            }
+
+            await ExtractTimeFromMessageAsync(ChatLogFile.LastLogFileMessage);
         }
 
         /// <summary>
-        /// Reset incremental logfile tracking
+        /// Update log reader enable state
         /// </summary>
-        private void ResetLogFileTracking()
+        private void UpdateLogReaderState()
         {
-            _logFilePosition = 0;
-            _logFileEncoding = null;
-        }
+            string? desiredPath = LogFileLoaded && !string.IsNullOrWhiteSpace(ChatLogFile.LogFileFullPath)
+                ? ChatLogFile.LogFileFullPath
+                : null;
+            if (!string.Equals(LogFileReader.FilePath, desiredPath, StringComparison.Ordinal))
+                LogFileReader.SetFilePath(desiredPath);
 
-        /// <summary>
-        /// Try to read the newest line since the last read position
-        /// </summary>
-        private bool TryReadNewLogLine(out string? lastLine)
-        {
-            lastLine = null;
-            if (string.IsNullOrWhiteSpace(ChatLogFile.LogFileFullPath))
-                return false;
-
-            using FileStream stream = new FileStream(ChatLogFile.LogFileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            if (_logFilePosition > stream.Length)
-                _logFilePosition = 0;
-
-            stream.Seek(_logFilePosition, SeekOrigin.Begin);
-            using StreamReader reader = _logFileEncoding == null
-                ? new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true)
-                : new StreamReader(stream, _logFileEncoding, detectEncodingFromByteOrderMarks: false, leaveOpen: true);
-
-            string? line;
-            while ((line = reader.ReadLine()) != null)
-                lastLine = line;
-
-            if (_logFileEncoding == null)
-                _logFileEncoding = reader.CurrentEncoding;
-
-            _logFilePosition = stream.Position;
-            return lastLine != null;
+            LogFileReader.SetEnabled(LogFileLoaded && IntelSystems.Count > 0);
         }
 
         /// <summary>
@@ -360,14 +305,15 @@ namespace EveIntelCheckerPages
                         ChatLogFile.CopyLogFileFullPath = BuildCopyPathFromFullPath(ChatLogFile.LogFileFullPath);
                         ChatLogFile.LogFileFolder = Path.GetDirectoryName(ChatLogFile.LogFileFullPath) ?? string.Empty;
                         ChatLogFile.CopyLogFileFolder = SettingsReader.CopyLogFolderPath;
-                        ResetLogFileTracking();
                         FileIconColor = Color.Success;
                         LogFileLoaded = true;
+                        UpdateLogReaderState();
                     }
                     else
                     {
                         LogFileLoaded = false;
                         FileIconColor = Color.Error;
+                        UpdateLogReaderState();
                     }
                 }
 
@@ -421,110 +367,14 @@ namespace EveIntelCheckerPages
             // Build the list of systems
             IntelSystems = EveStaticDatabase.Instance.BuildSystemsList(SelectedSystem, SettingsReader!.UserSettingsValues.SystemsDepth);
 
-            MapSystemsData = BuildMapNodes();
+            MapDataState = MapDataBuilder.Build(IntelSystems);
             if (!SettingsReader.UserSettingsValues.CompactMode && !SettingsPageOpened)
-                await JsRuntime.InvokeVoidAsync("buildMap", [MapSystemsData.Item1, MapSystemsData.Item2]);
+                await JsRuntime.InvokeVoidAsync("buildMap", [MapDataState.Nodes, MapDataState.Links]);
 
             // Update the userSettings with new selected system
             SettingsReader.UserSettingsValues.LastSelectedSystem = SelectedSystem.SolarSystemName;
             SettingsReader.WriteUserSettings();
-        }
-
-        /// <summary>
-        /// Read the chat log file
-        /// </summary>
-        /// <returns>Result of the Task</returns>
-        private async Task ReadLogFileAsync()
-        {
-            // User has selected the required
-            if (LogFileLoaded && IntelSystems.Count > 0)
-            {
-                // File exists (Read the file)
-                if (File.Exists(ChatLogFile.LogFileFullPath))
-                {
-                    try
-                    {
-                        if (TryReadNewLogLine(out string? last) && !string.IsNullOrEmpty(last))
-                        {
-                            if (last != ChatLogFile.LastLogFileMessage)
-                            {
-                                await InvokeAsync(async () =>
-                                {
-                                    ChatLogFile.LastLogFileMessage = last;
-                                    await CheckSystemProximityAsync();
-                                    await ExtractTimeFromMessageAsync(ChatLogFile.LastLogFileMessage);
-                                });
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogsWriter.Instance.Log(StaticData.LogLevel.Error, $"{WindowSpecificSuffix} {ex.Message} ->\n{ex.Source}\n{ex.Data}\n{ex.InnerException}");
-                    }
-                }
-
-                // Check for new chatlog file
-                await InvokeAsync(CheckNewLogFile);
-            }
-        }
-
-        /// <summary>
-        /// Check if the last chat log file contains a system to check
-        /// </summary>
-        /// <returns>Result of the task</returns>
-        private async Task CheckSystemProximityAsync()
-        {
-            string newRedSystem = string.Empty;
-
-            // Check if message contains a system set to be checked
-            foreach (IntelSystem intelSystem in IntelSystems)
-                if (ChatLogFile.LastLogFileMessage.Contains(intelSystem.SystemName))
-                {
-                    // Check for exclude filters
-                    if (SettingsReader!.UserSettingsValues.ClearResetCounter 
-                        && SettingsReader.UserSettingsValues.ExcludeFilters.Any(
-                            filter => ChatLogFile.LastLogFileMessage.Contains(filter))
-                        )
-                    {
-                        intelSystem.IsRed = false;
-                        intelSystem.TriggerCounter = 0;
-                    }
-                    else
-                    {
-                        intelSystem.IsRed = true;
-
-                        // Play specific sounds if needed by the user settings
-                        if (intelSystem.Jumps < SettingsReader!.UserSettingsValues.IgnoreNotification &&
-                            intelSystem.Jumps <= SettingsReader.UserSettingsValues.DangerNotification)
-                            PlayNotificationSound(true);
-                        else if (intelSystem.Jumps < SettingsReader.UserSettingsValues.IgnoreNotification &&
-                                 intelSystem.Jumps > SettingsReader.UserSettingsValues.DangerNotification)
-                            PlayNotificationSound(false);
-
-                        ++intelSystem.TriggerCounter;
-                    }
-                    newRedSystem = intelSystem.SystemName;
-                }
-
-            // If needed a reset to the last system set to RED
-            if (newRedSystem != "")
-            {
-                LogsWriter.Instance.Log(StaticData.LogLevel.Info, $"New trigger in : {newRedSystem}");
-
-                foreach (IntelSystem intelSystem in IntelSystems.Where(intelSystem => intelSystem.SystemName != newRedSystem))
-                    intelSystem.IsRed = false;
-
-                // rebuild the systems data for StarMap
-                if (!SettingsReader!.UserSettingsValues.CompactMode)
-                {
-                    MapSystemsData = BuildMapNodes();
-                    await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
-                }
-                else
-                {
-                    StateHasChanged();
-                }
-            }
+            UpdateLogReaderState();
         }
 
         /// <summary>
@@ -539,9 +389,9 @@ namespace EveIntelCheckerPages
                 system.IsRed = false;
             }
 
-            MapSystemsData = BuildMapNodes();
+            MapDataState = MapDataBuilder.Build(IntelSystems);
             if (!SettingsReader!.UserSettingsValues.CompactMode)
-                await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapSystemsData.Item1 });
+                await JsRuntime.InvokeVoidAsync("setData", new Object[] { MapDataState.Nodes });
         }
 
         /// <summary>
@@ -550,7 +400,7 @@ namespace EveIntelCheckerPages
         /// <returns>Result of the Task</returns>
         private async Task ResizeMap()
         {
-            await JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapSystemsData.Item1, MapSystemsData.Item2 });
+            await JsRuntime.InvokeVoidAsync("buildMap", new Object[] { MapDataState.Nodes, MapDataState.Links });
         }
 
         /// <summary>
@@ -611,7 +461,7 @@ namespace EveIntelCheckerPages
                             ChatLogFile.CopyLogFileFullPath = BuildCopyPathFromFullPath(ChatLogFile.LogFileFullPath);
                             ChatLogFile.LogFileFolder = Path.GetDirectoryName(chatLogFile) ?? ChatLogFile.LogFileFolder;
                             ChatLogFile.CopyLogFileFolder = SettingsReader?.CopyLogFolderPath ?? ChatLogFile.CopyLogFileFolder;
-                            ResetLogFileTracking();
+                            UpdateLogReaderState();
 
                             // Set the file to settings
                             SettingsReader!.UserSettingsValues.LastLogFile = ChatLogFile.LogFileFullPath;
@@ -704,7 +554,7 @@ namespace EveIntelCheckerPages
 
             ChatLogFile.LogFileFolder = SettingsReader!.UserSettingsValues.LogFilesFolder;
             ChatLogFile.CopyLogFileFolder = SettingsReader.CopyLogFolderPath;
-            ResetLogFileTracking();
+            UpdateLogReaderState();
         }
         #region Settings
         /// <summary>
@@ -805,80 +655,11 @@ namespace EveIntelCheckerPages
         #endregion Settings
 
         /// <summary>
-        /// Build the data required by the Javascript map
-        /// </summary>
-        /// <returns></returns>
-        private (MapNode[], MapLink[]) BuildMapNodes()
-        {
-            MapNode[] mapNodes = new MapNode[IntelSystems.Count];
-            List<MapLink> mapLinks = new List<MapLink>();
-            Dictionary<long, int> nodeIdsBySystemId = new Dictionary<long, int>(IntelSystems.Count);
-
-            // Build nodes with Id starting by 1
-            for (int i = 0; i < IntelSystems.Count; ++i)
-            {
-                mapNodes[i] = new MapNode
-                {
-                    Color =
-                    {
-                        Background = "#1c1c1cff"
-                    }
-                };
-
-                if (IntelSystems[i].IsRed)
-                    mapNodes[i].Color.Background = "#ff3f5fff";
-                else if (IntelSystems[i].TriggerCounter > 0)
-                    mapNodes[i].Color.Background = "#ff9800ff";
-
-                if (IntelSystems[i].Jumps == 0)
-                {
-                    mapNodes[i].Shape = "ellipse";
-                    mapNodes[i].BorderWidth = 2;
-                }
-
-                mapNodes[i].Font.Multi = true;
-                mapNodes[i].Label = $"{IntelSystems[i].SystemName}\n<code>J:{IntelSystems[i].Jumps} T:{IntelSystems[i].TriggerCounter}</code>";
-                mapNodes[i].Id = i + 1;
-                mapNodes[i].System = IntelSystems[i].SystemName;
-                nodeIdsBySystemId[IntelSystems[i].SystemId] = (int)mapNodes[i].Id;
-            }
-
-            foreach (IntelSystem system in IntelSystems)
-            {
-                foreach (long link in system.ConnectedSytemsId)
-                {
-                    MapLink systemLink = new MapLink();
-
-                    try
-                    {
-                        if (!nodeIdsBySystemId.TryGetValue(system.SystemId, out int fromId))
-                            continue;
-                        if (!nodeIdsBySystemId.TryGetValue(link, out int toId))
-                            continue;
-
-                        // Only if system is still on the generation
-                        systemLink.From = fromId;
-                        systemLink.To = toId;
-                        if (!mapLinks.Exists(x => x.From == systemLink.From && x.To == systemLink.To) &&
-                            !mapLinks.Exists(x => x.From == systemLink.To && x.To == systemLink.From))
-                            mapLinks.Add(systemLink);
-                    }
-                    catch(Exception ex)
-                    {
-                        LogsWriter.Instance.Log(StaticData.LogLevel.Error, ex.Message);
-                    }
-                }
-            }
-
-            return (mapNodes, mapLinks.ToArray());
-        }
-
-        /// <summary>
         /// Task for closing the application
         /// </summary>
         private async Task CloseApplication()
         {
-            await StopLogReaderLoopAsync();
+            await LogFileReader.StopAsync();
             await ElectronHandler.CloseMainWindow();
         }
 
@@ -922,7 +703,6 @@ namespace EveIntelCheckerPages
                 ChatLogFile.LogFileShortName = ExtractShortNameFromFullPath(Path.GetFileName(logFileFullPath));
                 ChatLogFile.LogFileFolder = Path.GetDirectoryName(logFileFullPath) ?? string.Empty;
                 ChatLogFile.CopyLogFileFolder = SettingsReader?.CopyLogFolderPath ?? string.Empty;
-                ResetLogFileTracking();
                 FileIconColor = Color.Success;
 
                 // Update the settings file
@@ -934,6 +714,7 @@ namespace EveIntelCheckerPages
                 }
 
                 LogFileLoaded = true;
+                UpdateLogReaderState();
             }
             else
             {
@@ -941,6 +722,7 @@ namespace EveIntelCheckerPages
                 FileIconColor = Color.Error;
                 LogFileLoaded = false;
                 SetDefaultChatLogFileFolders();
+                UpdateLogReaderState();
             }
         }
 
@@ -949,7 +731,9 @@ namespace EveIntelCheckerPages
         /// </summary>
         public async ValueTask DisposeAsync()
         {
-            await StopLogReaderLoopAsync();
+            LogFileReader.LineRead -= OnLogLineRead;
+            LogFileReader.Tick -= OnLogTick;
+            await LogFileReader.StopAsync();
         }
     }
 }
