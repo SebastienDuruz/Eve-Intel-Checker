@@ -3,11 +3,7 @@ using ElectronNET.API;
 using EveIntelCheckerLib.Data;
 using MudBlazor.Services;
 
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
-{
-    Args = args,
-    ContentRootPath = AppContext.BaseDirectory
-});
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions());
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -46,8 +42,4 @@ static async Task ElectronAppReady()
     }
 
     await ElectronHandler.CreateElectronWindow();
-    // var browserWindow = await Electron.WindowManager.CreateWindowAsync(
-    //     new BrowserWindowOptions { Show = false });
-    //
-    // browserWindow.OnReadyToShow += () => browserWindow.Show();
 }
